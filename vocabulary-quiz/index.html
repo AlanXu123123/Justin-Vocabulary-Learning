@@ -231,6 +231,7 @@
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
+    const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbxlsCmkVzCqB7pX3BeIq75IVT6zU9C_e0i0xwfOoa0b4-Pj2NtvY8hYjuA7g0Mii_hoSg/exec';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
       { word: 'aggressor', definition: 'a person or country that starts a fight or attack' },
@@ -448,7 +449,11 @@
     let state = { wordBank: DEFAULT_WORDS.slice(), currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
 
     function getVocabUrl() {
-      try { return localStorage.getItem(STORAGE_VOCAB_URL) || ''; } catch (_) { return ''; }
+      try {
+        var saved = localStorage.getItem(STORAGE_VOCAB_URL);
+        if (saved && saved.trim()) return saved.trim();
+      } catch (_) {}
+      return DEFAULT_VOCAB_URL || '';
     }
     function setVocabUrl(url) {
       try { localStorage.setItem(STORAGE_VOCAB_URL, url || ''); } catch (_) {}
@@ -673,9 +678,8 @@
     });
 
     (function init() {
-      var savedUrl = getVocabUrl();
       var input = document.getElementById('vocabSourceUrl');
-      if (input && savedUrl) input.value = savedUrl;
+      if (input) input.value = getVocabUrl();
       var sizeEl = document.getElementById('quizSize');
       if (sizeEl) {
         var saved = getQuizSize();
@@ -683,7 +687,7 @@
         sizeEl.addEventListener('change', function () { setQuizSize(parseInt(sizeEl.value, 10)); });
       }
       updateWordCount();
-      if (savedUrl) tryLoadFromGoogleDoc();
+      if (getVocabUrl()) tryLoadFromGoogleDoc();
     })();
   </script>
 </body>
