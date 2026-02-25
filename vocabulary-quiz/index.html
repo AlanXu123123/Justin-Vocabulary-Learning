@@ -154,12 +154,23 @@
 <body>
   <div class="container">
     <h1>背单词测验</h1>
-    <p class="subtitle">每次 20 题 · 下次测验 15 新词 + 5 错题</p>
+    <p class="subtitle">自选题数 · 下次测验含部分错题</p>
 
     <!-- 首页：直接开始 或 粘贴列表 -->
     <div id="screen-home" class="screen active">
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">内置</span></span></p>
+        <div style="margin-top: 0.75rem;">
+          <label class="hint">每次测验题数</label>
+          <select id="quizSize" style="margin-top:0.35rem;padding:0.5rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
+            <option value="5">5 题</option>
+            <option value="10">10 题</option>
+            <option value="15">15 题</option>
+            <option value="20" selected>20 题</option>
+            <option value="25">25 题</option>
+            <option value="30">30 题</option>
+          </select>
+        </div>
         <div class="google-doc-area" style="margin-top: 0.75rem;">
           <label class="hint">从 Google Doc 同步词库（在 Doc 里更新后，点「刷新词库」即可）</label>
           <input type="url" id="vocabSourceUrl" placeholder="粘贴部署后的链接，例如 https://script.google.com/macros/s/xxx/exec" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
@@ -188,7 +199,7 @@
     <div id="screen-quiz" class="screen">
       <div class="card">
         <div class="quiz-header">
-          <span class="progress" id="progressText">第 1 / 20 题</span>
+          <span class="progress" id="progressText">第 1 / 1 题</span>
         </div>
         <div class="question-card">
           <div class="definition" id="questionDefinition"></div>
@@ -219,6 +230,7 @@
   <script>
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
+    const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
       { word: 'aggressor', definition: 'a person or country that starts a fight or attack' },
@@ -379,26 +391,37 @@
       try { localStorage.setItem(STORAGE_WRONG, JSON.stringify(items)); } catch (_) {}
     }
 
-    function pickTwenty(allWords, wrongList) {
-      const need = 20;
+    function getQuizSize() {
+      try {
+        var n = parseInt(localStorage.getItem(STORAGE_QUIZ_SIZE), 10);
+        if (n >= 5 && n <= 30) return n;
+      } catch (_) {}
+      return 20;
+    }
+    function setQuizSize(n) {
+      try { localStorage.setItem(STORAGE_QUIZ_SIZE, String(n)); } catch (_) {}
+    }
+
+    function pickN(allWords, wrongList, need) {
       if (allWords.length <= need) return [...allWords].sort(() => Math.random() - 0.5);
-      const wrong = wrongList.filter(w => w.word);
+      var wrongCount = Math.min(5, Math.max(1, Math.round(need * 0.25)));
+      const wrong = wrongList.filter(function (w) { return w.word; });
       const wrongPool = wrong.slice(-30);
-      const byWord = new Map(allWords.map(w => [w.word, w]));
-      const fiveWrong = [];
+      const byWord = new Map(allWords.map(function (w) { return [w.word, w]; }));
+      var chosenWrong = [];
       const used = new Set();
-      for (let i = wrongPool.length - 1; i >= 0 && fiveWrong.length < 5; i--) {
-        const w = wrongPool[i].word;
+      for (var i = wrongPool.length - 1; i >= 0 && chosenWrong.length < wrongCount; i--) {
+        var w = wrongPool[i].word;
         if (!used.has(w) && byWord.has(w)) {
-          fiveWrong.push(byWord.get(w));
+          chosenWrong.push(byWord.get(w));
           used.add(w);
         }
       }
-      const newPool = allWords.filter(w => !used.has(w.word));
-      const shuffled = [...newPool].sort(() => Math.random() - 0.5);
-      const rest = need - fiveWrong.length;
-      const twenty = [...shuffled.slice(0, rest), ...fiveWrong];
-      return twenty.sort(() => Math.random() - 0.5);
+      const newPool = allWords.filter(function (w) { return !used.has(w.word); });
+      const shuffled = [...newPool].sort(function () { return Math.random() - 0.5; });
+      var rest = need - chosenWrong.length;
+      var result = shuffled.slice(0, rest).concat(chosenWrong);
+      return result.sort(function () { return Math.random() - 0.5; });
     }
 
     const Audio = (function () {
@@ -492,11 +515,15 @@
     }
 
     function startQuiz(wordBank) {
+      var sizeEl = document.getElementById('quizSize');
+      var size = sizeEl ? parseInt(sizeEl.value, 10) : getQuizSize();
+      if (size < 5 || size > 30) size = 20;
+      setQuizSize(size);
       state.wordBank = wordBank;
       state.wrongAnswers = getWrongFromStorage();
-      state.currentQuiz = pickTwenty(wordBank, state.wrongAnswers);
+      state.currentQuiz = pickN(wordBank, state.wrongAnswers, size);
       if (state.currentQuiz.length === 0) {
-        alert('词库为空或过少，请先导入至少 1 个单词（建议 20 个以上）。');
+        alert('词库为空或过少，请先导入至少 1 个单词。');
         return;
       }
       state.index = 0;
@@ -649,6 +676,12 @@
       var savedUrl = getVocabUrl();
       var input = document.getElementById('vocabSourceUrl');
       if (input && savedUrl) input.value = savedUrl;
+      var sizeEl = document.getElementById('quizSize');
+      if (sizeEl) {
+        var saved = getQuizSize();
+        sizeEl.value = String(saved);
+        sizeEl.addEventListener('change', function () { setQuizSize(parseInt(sizeEl.value, 10)); });
+      }
       updateWordCount();
       if (savedUrl) tryLoadFromGoogleDoc();
     })();
