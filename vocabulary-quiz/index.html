@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>背单词测验</title>
+  <!-- 版本 2025-02-25：Google Doc 词库 + 词库列表 + 错题列表 -->
   <style>
     :root {
       --bg: #0f0f12;
@@ -465,6 +467,7 @@
             setSourceLabel('Google Doc');
             return true;
           }
+          // 若返回空数组，不覆盖词库，保留内置或当前词库
           return false;
         });
     }
