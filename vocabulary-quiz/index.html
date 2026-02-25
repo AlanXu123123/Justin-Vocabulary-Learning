@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>背单词测验</title>
+  <style>
+    :root {
+      --bg: #0f0f12;
+      --card: #1a1a20;
+      --text: #e8e6e3;
+      --muted: #8b8685;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+      --accent: #6366f1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .container { max-width: 560px; margin: 0 auto; }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .import-area label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--muted); }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      background: #25252b;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    textarea::placeholder { color: var(--muted); }
+    .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; }
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      margin-top: 0.75rem;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #333; }
+    /* Quiz screen */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .progress { font-size: 0.9rem; color: var(--muted); }
+    .question-card {
+      margin-bottom: 1rem;
+      padding: 1.25rem;
+      border-radius: 12px;
+      background: #25252b;
+      border: 1px solid #333;
+    }
+    .definition {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .input-row input {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.65rem 0.9rem;
+      font-size: 1rem;
+      background: var(--bg);
+      border: 2px solid #333;
+      border-radius: 8px;
+      color: var(--text);
+    }
+    .input-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .input-row input.correct { border-color: var(--correct); background: rgba(34,197,94,0.1); }
+    .input-row input.wrong { border-color: var(--wrong); background: rgba(239,68,68,0.1); }
+    .feedback {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .feedback.correct { color: var(--correct); }
+    .feedback.wrong { color: var(--wrong); }
+    .icon { font-size: 1.25rem; }
+    /* Result screen */
+    .result-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+    .result-title { font-size: 1.25rem; margin-bottom: 1rem; }
+    .rate {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+    }
+    .rate.high { color: var(--correct); }
+    .rate.mid { color: #eab308; }
+    .rate.low { color: var(--wrong); }
+    .detail { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .wrong-section { text-align: left; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #333; }
+    .wrong-section h3 { font-size: 1rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .wrong-item { margin-bottom: 0.85rem; padding: 0.6rem 0.75rem; background: rgba(239,68,68,0.08); border-radius: 8px; border-left: 3px solid var(--wrong); }
+    .wrong-item .word { font-weight: 600; color: var(--text); }
+    .wrong-item .def { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>背单词测验</h1>
+    <p class="subtitle">每次 20 题 · 下次测验 15 新词 + 5 错题</p>
+
+    <!-- 首页：直接开始 或 粘贴列表 -->
+    <div id="screen-home" class="screen active">
+      <div class="card">
+        <p style="margin-bottom: 1rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。</p>
+        <button type="button" class="btn" id="btnStart">开始测验</button>
+      </div>
+      <div class="card import-area">
+        <label>或粘贴自己的列表（格式：序号. 单词，下一行写英文解释）</label>
+        <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
+        <button type="button" class="btn btn-secondary" id="btnParse">解析并替换词库</button>
+      </div>
+    </div>
+
+    <!-- 测验进行中 -->
+    <div id="screen-quiz" class="screen">
+      <div class="card">
+        <div class="quiz-header">
+          <span class="progress" id="progressText">第 1 / 20 题</span>
+        </div>
+        <div class="question-card">
+          <div class="definition" id="questionDefinition"></div>
+          <div class="input-row">
+            <input type="text" id="answerInput" placeholder="输入单词" autocomplete="off" spellcheck="false" />
+            <span class="feedback" id="feedback" style="display: none;"></span>
+          </div>
+        </div>
+        <button type="button" class="btn" id="btnNext" style="display: none;">下一题</button>
+      </div>
+    </div>
+
+    <!-- 结果 -->
+    <div id="screen-result" class="screen">
+      <div class="card result-card">
+        <div class="result-title">测验结束</div>
+        <div class="rate" id="rateDisplay">0%</div>
+        <div class="detail" id="rateDetail">正确 0 / 20</div>
+        <div class="wrong-section" id="wrongSection" style="display: none;">
+          <h3>本次答错的单词</h3>
+          <div id="wrongList"></div>
+        </div>
+        <button type="button" class="btn" id="btnAgain">再测一次</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_WRONG = 'vocab_quiz_wrong';
+    const DEFAULT_WORDS = [
+      { word: 'guarantee', definition: 'a promise that something will be done or work' },
+      { word: 'aggressor', definition: 'a person or country that starts a fight or attack' },
+      { word: 'covenant', definition: 'formal agreements or promises' },
+      { word: 'insist', definition: 'to say firmly that something must be true or done' },
+      { word: 'regard', definition: 'thought of or considered in a particular way' },
+      { word: 'arbitration', definition: 'the hearing and determining of a dispute or the settling of differences between parties by a person or persons chosen or agreed to by them.' },
+      { word: 'dispute', definition: 'an argument or disagreement' },
+      { word: 'quarrel', definition: 'to argue or fight with someone' },
+      { word: 'obligate', definition: 'required by law or duty to do something' },
+      { word: 'conquest', definition: 'the act of taking control of a place or people by force' },
+      { word: 'adequate', definition: 'enough for what is needed' },
+      { word: 'sanction', definition: 'authoritative permission or approval, as for an action' },
+      { word: 'impose', definition: 'to lay on or set as something to be borne, endured, obeyed, fulfilled, paid, etc.' },
+      { word: 'illusion', definition: 'false ideas or beliefs about something' },
+      { word: 'discontent', definition: 'a feeling of being unhappy or not satisfied' },
+      { word: 'inadequate', definition: 'not enough or not good enough' },
+      { word: 'pension', definition: 'money paid regularly to people after they retire from work' },
+      { word: 'compensate', definition: 'given something (usually money) to make up for loss or suffering' },
+      { word: 'conscription', definition: 'when the government forces people to join the army' },
+      { word: 'resentment', definition: 'feelings of anger or bitterness about something unfair' },
+      { word: 'tear(v)', definition: 'to pull apart or in pieces by force' },
+      { word: 'exhibition', definition: 'a public show of art, objects, or skills' },
+      { word: 'miraculous', definition: 'like a miracle; very amazing and unexpected' },
+      { word: 'suburb', definition: 'areas on the edge of a city where people live' },
+      { word: 'unprecedent', definition: 'never done or known before' },
+      { word: 'construction', definition: 'the process of building something' },
+      { word: 'gear', definition: 'adjusted or prepared for a particular purpose' },
+      { word: 'estimate', definition: 'guessed or calculated a number or amount roughly' },
+      { word: 'restrictive', definition: 'limiting or controlling something tightly' },
+      { word: 'obtain', definition: 'got or acquired something' },
+      { word: 'halibut', definition: 'a large type of flat fish' },
+      { word: 'counterpart', definition: 'a person or thing that has the same job or function as another' },
+      { word: 'ambassador', definition: 'a person who represents their country in another country' },
+      { word: 'negotiate', definition: 'to discuss something to reach an agreement' },
+      { word: 'sovereign', definition: 'having complete power to govern a country' },
+      { word: 'allegiance', definition: 'loyalty to a ruler, country, or group' },
+      { word: 'possession', definition: 'something that you own or have' },
+      { word: 'drastically', definition: 'in a very big or important way' },
+      { word: 'compel', definition: 'force someone to do something' },
+      { word: 'bargain', definition: 'discuss the price of something to get a better deal' },
+      { word: 'restriction', definition: 'rules that limit what you can do' },
+      { word: 'interfere', definition: 'to get involved in a situation where you are not wanted' },
+      { word: 'appliance', definition: 'machines used in the home, like a fridge or washing machine' },
+      { word: 'revenue', definition: 'money that a government or business receives' },
+      { word: 'expenditures', definition: 'money that a government or business spends' },
+      { word: 'budget', definition: 'a spending plan for how much money you will spend and earn' },
+      { word: 'deficit', definition: 'when you spend more money than you earn' },
+      { word: 'possess', definition: 'to own or have something' },
+      { word: 'debt', definition: 'money that you owe to someone else' },
+      { word: 'investor', definition: 'people who put money into a business to make a profit' },
+      { word: 'imply', definition: 'to suggest something without saying it directly' },
+      { word: 'prosperity', definition: 'a time when people are successful and have a lot of money' },
+      { word: 'occasionally', definition: 'sometimes, but not often' },
+      { word: 'prolong', definition: 'lasting for a long time' },
+      { word: 'abruptly', definition: 'suddenly and unexpectedly' },
+      { word: 'bankruptcy', definition: 'situations where a business or person cannot pay their debts' },
+      { word: 'staple', definition: 'basic goods that people need, like food or fuel' },
+      { word: 'crops', definition: 'plants grown by farmers for food' },
+      { word: 'timber', definition: 'wood used for building or making things' },
+      { word: 'mineral', definition: 'natural substances found in the earth, like gold or iron' },
+      { word: 'quantity', definition: 'amount or number of something' },
+      { word: 'prairie', definition: 'a tract of grassland; meadow' },
+      { word: 'drought', definition: 'long periods of time with no rain' },
+      { word: 'merely', definition: 'only; just' },
+      { word: 'indicator', definition: 'a sign that shows something is true or is going to happen' },
+      { word: 'speculation', definition: 'buying something (like stocks) in the hope it will become more valuable' },
+      { word: 'margin', definition: 'the space around the printed or written matter on a page' },
+      { word: 'indication', definition: 'signs that something is true or is going to happen' },
+      { word: 'wheat', definition: 'a type of grain used to make bread' },
+      { word: 'speculator', definition: 'people who buy things in the hope of making a quick profit' },
+      { word: 'downward', definition: 'moving or going down' },
+      { word: 'tariffs', definition: 'taxes on goods brought into a country from another country' },
+      { word: 'protectionist', definition: 'wanting to protect jobs and businesses in your own country by taxing or limiting foreign goods' },
+      { word: 'attempt', definition: 'to try or effort to do something' },
+      { word: 'magnitude', definition: 'the great size or importance of something' },
+      { word: 'intervention', definition: 'when a government or group gets involved to change a situation' },
+      { word: 'implement', definition: 'put a plan or system into action' },
+      { word: 'inward', definition: 'toward the inside, interior, or center, as of a place, space, or body' },
+      { word: 'spiral', definition: 'a situation that gets worse and worse quickly' },
+      { word: 'scheme', definition: 'a plan or system for doing something' },
+      { word: 'infrastructure', definition: 'the basic, underlying framework or features of a system or organization.' },
+      { word: 'panhandle', definition: 'to ask people on the street for money or food' },
+      { word: 'charity', definition: 'organizations that help people who are poor or in need' },
+      { word: 'voucher', definition: 'a piece of paper that can be used to get something for free or at a lower price' },
+      { word: 'freight', definition: 'goods, cargo, or lading transported for pay, whether by water, land, or air.' },
+      { word: 'qualify', definition: 'having the skills or conditions needed to do or get something' },
+      { word: 'deliberately', definition: 'on purpose; done intentionally' },
+      { word: 'municipality', definition: 'local governments, like a city or town council' },
+      { word: 'acute', definition: 'sharpen, very serious or severe' },
+      { word: 'laboured', definition: 'worked hard, often at a physical job' },
+      { word: 'taxation', definition: 'the system of collecting money from people and businesses to run the government' },
+      { word: 'provision', definition: 'supplies of food and other necessary things; also, rules in a law or agreement' },
+      { word: 'barnyard', definition: 'a small farm, often used to mean a dirty or run-down place' },
+      { word: 'frustration', definition: 'the feeling of being upset because you can\'t do what you want' },
+      { word: 'avail', definition: 'use or help; "to no avail" means it didn\'t work' },
+      { word: 'temporarily', definition: 'for a short time only; not forever' },
+      { word: 'quintuplets', definition: 'five children born at the same time to the same mother' },
+      { word: 'eligible', definition: 'legally qualified to be elected or appointed to office' },
+      { word: 'bankrupt', definition: 'unable to pay the money you owe' },
+      { word: 'depositor', definition: 'a person who puts money in a bank' },
+      { word: 'validity', definition: 'the state or quality of being true, correct, or legal' },
+      { word: 'dictatorship', definition: 'a country, government, or the form of government in which absolute power is exercised by one person' },
+      { word: 'ravage', definition: 'to work havoc upon; damage or mar by ruinous or destructive action' },
+      { word: 'pave', definition: 'to cover or lay (a road, walk, etc.) with concrete, stones, bricks, tiles' },
+      { word: 'insurance', definition: 'the act, system, or business of insuring property, life, one\'s person' },
+      { word: 'welfare', definition: 'the good fortune, health, happiness, prosperity' },
+      { word: 'delegate', definition: 'a person designated to act for or represent another or others; deputy; representative, as in a political convention' },
+      { word: 'troop', definition: 'an assemblage of persons or things; company; band' },
+      { word: 'crowd', definition: 'a large number of persons gathered closely together' },
+      { word: 'parade', definition: 'a large public procession, usually including a marching band and often of a festive nature, held in honor of an anniversary, person, event, etc.' },
+      { word: 'protest', definition: 'an expression or declaration of objection, disapproval, or dissent, often in opposition to something a person is powerless to prevent or avoid' },
+      { word: 'conservative', definition: 'disposed to preserve existing conditions, institutions, etc., or to restore traditional ones, and to limit change' },
+      { word: 'cabinet', definition: 'a piece of furniture with shelves, drawers, etc., for holding or displaying items' },
+      { word: 'progressive', definition: 'favoring or advocating progress, change, improvement, or reform, as opposed to wishing to maintain things as they are, especially in political matters' },
+      { word: 'parliament', definition: 'the legislature of certain British colonies and possessions' },
+      { word: 'election', definition: 'the selection of a person or persons for office by vote' },
+      { word: 'institution', definition: 'an organization, establishment, foundation, society, or the like, devoted to the promotion of a particular cause or program, especially one of a public, educational, or charitable character.' }
+    ];
+
+    function parseNumberedWordList(text) {
+      const lines = text.split(/\r?\n/).map(s => s.trim());
+      const list = [];
+      const numWordRe = /^\s*\d+\.\s+(.+)$/;
+      for (let i = 0; i < lines.length; i++) {
+        const m = lines[i].match(numWordRe);
+        if (m) {
+          const word = m[1].trim().toLowerCase();
+          const defLines = [];
+          for (i++; i < lines.length; i++) {
+            if (lines[i].match(numWordRe)) { i--; break; }
+            if (lines[i]) defLines.push(lines[i]);
+          }
+          if (word) list.push({ word, definition: defLines.join(' ').trim() || '(无释义)' });
+        }
+      }
+      return list;
+    }
+
+    function normalizeWord(w) {
+      return w.toLowerCase().replace(/\s*\([nv]\)\s*$/i, '').trim();
+    }
+
+    function wordsMatch(answer, correctWord) {
+      const a = normalizeWord(answer);
+      const c = normalizeWord(correctWord);
+      return a === c;
+    }
+
+    function getWrongFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_WRONG);
+        return raw ? JSON.parse(raw) : [];
+      } catch (_) { return []; }
+    }
+
+    function saveWrongToStorage(items) {
+      try { localStorage.setItem(STORAGE_WRONG, JSON.stringify(items)); } catch (_) {}
+    }
+
+    function pickTwenty(allWords, wrongList) {
+      const need = 20;
+      if (allWords.length <= need) return [...allWords].sort(() => Math.random() - 0.5);
+      const wrong = wrongList.filter(w => w.word);
+      const wrongPool = wrong.slice(-30);
+      const byWord = new Map(allWords.map(w => [w.word, w]));
+      const fiveWrong = [];
+      const used = new Set();
+      for (let i = wrongPool.length - 1; i >= 0 && fiveWrong.length < 5; i--) {
+        const w = wrongPool[i].word;
+        if (!used.has(w) && byWord.has(w)) {
+          fiveWrong.push(byWord.get(w));
+          used.add(w);
+        }
+      }
+      const newPool = allWords.filter(w => !used.has(w.word));
+      const shuffled = [...newPool].sort(() => Math.random() - 0.5);
+      const rest = need - fiveWrong.length;
+      const twenty = [...shuffled.slice(0, rest), ...fiveWrong];
+      return twenty.sort(() => Math.random() - 0.5);
+    }
+
+    const Audio = (function () {
+      const ctx = typeof window !== 'undefined' && window.AudioContext ? new (window.AudioContext || window.webkitAudioContext)() : null;
+      function beep(vol, freq, duration) {
+        if (!ctx) return;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.frequency.value = freq;
+        o.type = 'sine';
+        g.gain.setValueAtTime(vol, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+        o.start(ctx.currentTime);
+        o.stop(ctx.currentTime + duration);
+      }
+      return {
+        correct() { beep(0.15, 523, 0.15); setTimeout(() => beep(0.12, 659, 0.15), 80); setTimeout(() => beep(0.1, 784, 0.2), 160); },
+        wrong() { beep(0.2, 150, 0.25); setTimeout(() => beep(0.15, 100, 0.3), 120); }
+      };
+    })();
+
+    let state = { wordBank: DEFAULT_WORDS.slice(), currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
+
+    function updateWordCount() {
+      const el = document.getElementById('wordCount');
+      if (el) el.textContent = state.wordBank.length;
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function startQuiz(wordBank) {
+      state.wordBank = wordBank;
+      state.wrongAnswers = getWrongFromStorage();
+      state.currentQuiz = pickTwenty(wordBank, state.wrongAnswers);
+      if (state.currentQuiz.length === 0) {
+        alert('词库为空或过少，请先导入至少 1 个单词（建议 20 个以上）。');
+        return;
+      }
+      state.index = 0;
+      state.correct = 0;
+      state.currentWrong = [];
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const total = state.currentQuiz.length;
+      const idx = state.index;
+      document.getElementById('progressText').textContent = `第 ${idx + 1} / ${total} 题`;
+      const item = state.currentQuiz[idx];
+      document.getElementById('questionDefinition').textContent = item.definition;
+      const input = document.getElementById('answerInput');
+      input.value = '';
+      input.className = '';
+      input.disabled = false;
+      input.focus();
+      document.getElementById('feedback').style.display = 'none';
+      document.getElementById('btnNext').style.display = 'none';
+    }
+
+    function submitAnswer() {
+      const input = document.getElementById('answerInput');
+      const user = input.value.trim();
+      const item = state.currentQuiz[state.index];
+      const correct = wordsMatch(user, item.word);
+      const feedbackEl = document.getElementById('feedback');
+
+      input.disabled = true;
+      feedbackEl.style.display = 'inline-flex';
+
+      if (correct) {
+        state.correct++;
+        input.classList.add('correct');
+        feedbackEl.className = 'feedback correct';
+        feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
+        Audio.correct();
+      } else {
+        state.wrongAnswers.push({ word: item.word, definition: item.definition });
+        state.currentWrong.push({ word: item.word, definition: item.definition });
+        saveWrongToStorage(state.wrongAnswers);
+        input.classList.add('wrong');
+        feedbackEl.className = 'feedback wrong';
+        feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
+        Audio.wrong();
+      }
+
+      document.getElementById('btnNext').style.display = 'inline-block';
+      document.getElementById('btnNext').focus();
+    }
+
+    function nextQuestion() {
+      state.index++;
+      if (state.index >= state.currentQuiz.length) {
+        showResult();
+        return;
+      }
+      renderQuestion();
+    }
+
+    function showResult() {
+      const total = state.currentQuiz.length;
+      const correct = state.correct;
+      const pct = total ? Math.round((correct / total) * 100) : 0;
+      const rateEl = document.getElementById('rateDisplay');
+      rateEl.textContent = pct + '%';
+      rateEl.className = 'rate ' + (pct >= 80 ? 'high' : pct >= 60 ? 'mid' : 'low');
+      document.getElementById('rateDetail').textContent = `正确 ${correct} / ${total}`;
+      const wrongSection = document.getElementById('wrongSection');
+      const wrongList = document.getElementById('wrongList');
+      if (state.currentWrong.length > 0) {
+        wrongSection.style.display = 'block';
+        wrongList.innerHTML = state.currentWrong.map(function (item) {
+          return '<div class="wrong-item"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div></div>';
+        }).join('');
+      } else {
+        wrongSection.style.display = 'none';
+      }
+      showScreen('screen-result');
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    document.getElementById('btnStart').addEventListener('click', () => {
+      startQuiz(state.wordBank);
+    });
+
+    document.getElementById('btnParse').addEventListener('click', () => {
+      const text = document.getElementById('wordInput').value.trim();
+      const list = parseNumberedWordList(text);
+      if (list.length === 0) {
+        alert('未解析到单词。请按格式粘贴：一行「序号. 单词」，下一行写英文解释。');
+        return;
+      }
+      state.wordBank = list;
+      updateWordCount();
+      alert('已解析到 ' + list.length + ' 个单词，词库已更新。点击「开始测验」即可。');
+    });
+
+    document.getElementById('answerInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (document.getElementById('btnNext').style.display === 'inline-block') nextQuestion();
+        else submitAnswer();
+      }
+    });
+
+    document.getElementById('btnNext').addEventListener('click', nextQuestion);
+
+    document.getElementById('btnAgain').addEventListener('click', () => {
+      showScreen('screen-home');
+      startQuiz(state.wordBank);
+    });
+
+    updateWordCount();
+  </script>
+</body>
+</html>
