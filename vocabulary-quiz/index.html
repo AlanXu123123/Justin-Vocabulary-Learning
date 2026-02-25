@@ -137,6 +137,14 @@
     .wrong-item { margin-bottom: 0.85rem; padding: 0.6rem 0.75rem; background: rgba(239,68,68,0.08); border-radius: 8px; border-left: 3px solid var(--wrong); }
     .wrong-item .word { font-weight: 600; color: var(--text); }
     .wrong-item .def { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
+    .word-list-card h3 { font-size: 1rem; color: var(--text); margin-bottom: 0.25rem; }
+    .word-list-card .count-hint { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .word-list-wrap { max-height: 420px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: #25252b; }
+    .word-list-item { display: flex; gap: 0.75rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2e; font-size: 0.9rem; align-items: baseline; }
+    .word-list-item:last-child { border-bottom: none; }
+    .word-list-item .idx { color: var(--muted); min-width: 2rem; }
+    .word-list-item .word { font-weight: 600; color: var(--accent); min-width: 8rem; }
+    .word-list-item .def { color: var(--muted); flex: 1; }
     .screen { display: none; }
     .screen.active { display: block; }
   </style>
@@ -149,13 +157,28 @@
     <!-- 首页：直接开始 或 粘贴列表 -->
     <div id="screen-home" class="screen active">
       <div class="card">
-        <p style="margin-bottom: 1rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。</p>
-        <button type="button" class="btn" id="btnStart">开始测验</button>
+        <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">内置</span></span></p>
+        <div class="google-doc-area" style="margin-top: 0.75rem;">
+          <label class="hint">从 Google Doc 同步词库（在 Doc 里更新后，点「刷新词库」即可）</label>
+          <input type="url" id="vocabSourceUrl" placeholder="粘贴部署后的链接，例如 https://script.google.com/macros/s/xxx/exec" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
+          <div style="margin-top:0.5rem;">
+            <button type="button" class="btn btn-secondary" id="btnSaveUrl">保存并加载</button>
+            <button type="button" class="btn btn-secondary" id="btnRefreshVocab" style="margin-left:0.35rem;">刷新词库</button>
+          </div>
+        </div>
+        <button type="button" class="btn" id="btnStart" style="margin-top: 1rem;">开始测验</button>
       </div>
       <div class="card import-area">
         <label>或粘贴自己的列表（格式：序号. 单词，下一行写英文解释）</label>
         <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
         <button type="button" class="btn btn-secondary" id="btnParse">解析并替换词库</button>
+      </div>
+      <div class="card word-list-card">
+        <h3>词库列表</h3>
+        <p class="count-hint">共 <strong id="wordListCount">0</strong> 个单词</p>
+        <div class="word-list-wrap" id="wordListContent">
+          <p class="hint" style="padding:1rem;">暂无单词，请先加载或粘贴词库。</p>
+        </div>
       </div>
     </div>
 
@@ -193,6 +216,7 @@
 
   <script>
     const STORAGE_WRONG = 'vocab_quiz_wrong';
+    const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
       { word: 'aggressor', definition: 'a person or country that starts a fight or attack' },
@@ -398,9 +422,64 @@
 
     let state = { wordBank: DEFAULT_WORDS.slice(), currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
 
+    function getVocabUrl() {
+      try { return localStorage.getItem(STORAGE_VOCAB_URL) || ''; } catch (_) { return ''; }
+    }
+    function setVocabUrl(url) {
+      try { localStorage.setItem(STORAGE_VOCAB_URL, url || ''); } catch (_) {}
+    }
+
     function updateWordCount() {
+      const n = state.wordBank.length;
       const el = document.getElementById('wordCount');
-      if (el) el.textContent = state.wordBank.length;
+      if (el) el.textContent = n;
+      const countEl = document.getElementById('wordListCount');
+      if (countEl) countEl.textContent = n;
+      renderWordList();
+    }
+
+    function renderWordList() {
+      const wrap = document.getElementById('wordListContent');
+      if (!wrap) return;
+      if (state.wordBank.length === 0) {
+        wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词，请先加载或粘贴词库。</p>';
+        return;
+      }
+      wrap.innerHTML = state.wordBank.map(function (item, i) {
+        return '<div class="word-list-item"><span class="idx">' + (i + 1) + '.</span><span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition) + '</span></div>';
+      }).join('');
+    }
+
+    function setSourceLabel(text) {
+      const el = document.getElementById('sourceLabel');
+      if (el) el.textContent = text;
+    }
+
+    function loadWordBankFromUrl(url) {
+      return fetch(url, { method: 'GET', mode: 'cors' })
+        .then(function (r) { return r.json(); })
+        .then(function (arr) {
+          if (Array.isArray(arr) && arr.length > 0) {
+            state.wordBank = arr.filter(function (x) { return x && x.word; });
+            updateWordCount();
+            setSourceLabel('Google Doc');
+            return true;
+          }
+          return false;
+        });
+    }
+
+    function tryLoadFromGoogleDoc() {
+      const url = getVocabUrl();
+      if (!url) return Promise.resolve(false);
+      setSourceLabel('加载中…');
+      return loadWordBankFromUrl(url).then(function (ok) {
+        if (!ok) setSourceLabel('内置（加载失败）');
+        return ok;
+      }).catch(function () {
+        setSourceLabel('内置（加载失败）');
+        return false;
+      });
     }
 
     function showScreen(id) {
@@ -505,7 +584,35 @@
       return div.innerHTML;
     }
 
-    document.getElementById('btnStart').addEventListener('click', () => {
+    document.getElementById('btnSaveUrl').addEventListener('click', function () {
+      var url = document.getElementById('vocabSourceUrl').value.trim();
+      if (url) {
+        setVocabUrl(url);
+        tryLoadFromGoogleDoc().then(function (ok) {
+          if (ok) alert('已从 Google Doc 加载 ' + state.wordBank.length + ' 个单词。');
+          else alert('加载失败，请检查链接是否正确、Google 脚本是否已部署为「任何人可访问」。');
+        });
+      } else {
+        setVocabUrl('');
+        state.wordBank = DEFAULT_WORDS.slice();
+        updateWordCount();
+        setSourceLabel('内置');
+        alert('已清除链接，当前使用内置词库。');
+      }
+    });
+
+    document.getElementById('btnRefreshVocab').addEventListener('click', function () {
+      if (!getVocabUrl()) {
+        alert('请先填写并保存 Google 词库链接。');
+        return;
+      }
+      tryLoadFromGoogleDoc().then(function (ok) {
+        if (ok) alert('已刷新，共 ' + state.wordBank.length + ' 个单词。');
+        else alert('刷新失败，请检查网络或链接。');
+      });
+    });
+
+    document.getElementById('btnStart').addEventListener('click', function () {
       startQuiz(state.wordBank);
     });
 
@@ -535,7 +642,13 @@
       startQuiz(state.wordBank);
     });
 
-    updateWordCount();
+    (function init() {
+      var savedUrl = getVocabUrl();
+      var input = document.getElementById('vocabSourceUrl');
+      if (input && savedUrl) input.value = savedUrl;
+      updateWordCount();
+      if (savedUrl) tryLoadFromGoogleDoc();
+    })();
   </script>
 </body>
 </html>
