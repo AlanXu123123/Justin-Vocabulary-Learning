@@ -162,14 +162,14 @@
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">内置</span></span></p>
         <div style="margin-top: 0.75rem;">
           <label class="hint">每次测验题数</label>
-          <select id="quizSize" style="margin-top:0.35rem;padding:0.5rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
-            <option value="5">5 题</option>
-            <option value="10">10 题</option>
-            <option value="15">15 题</option>
-            <option value="20" selected>20 题</option>
-            <option value="25">25 题</option>
-            <option value="30">30 题</option>
-          </select>
+          <input type="number" id="quizSize" min="1" placeholder="输入题数" style="margin-top:0.35rem;padding:0.5rem;width:8rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
+          <span class="hint" id="quizSizeHint" style="margin-left:0.5rem;">（1～词库总数）</span>
+        </div>
+        <div style="margin-top: 0.5rem;">
+          <label style="display:inline-flex;align-items:center;gap:0.35rem;cursor:pointer;font-size:0.9rem;">
+            <input type="checkbox" id="quizAll" />
+            考全部单词（把词库里全部单词都考一遍）
+          </label>
         </div>
         <div class="google-doc-area" style="margin-top: 0.75rem;">
           <label class="hint">从 Google Doc 同步词库（在 Doc 里更新后，点「刷新词库」即可）</label>
@@ -395,12 +395,14 @@
     function getQuizSize() {
       try {
         var n = parseInt(localStorage.getItem(STORAGE_QUIZ_SIZE), 10);
-        if (n >= 5 && n <= 30) return n;
+        if (n >= 1) return n;
       } catch (_) {}
       return 20;
     }
     function setQuizSize(n) {
       try { localStorage.setItem(STORAGE_QUIZ_SIZE, String(n)); } catch (_) {}
+      var el = document.getElementById('quizSize');
+      if (el && !document.getElementById('quizAll').checked) el.value = String(n);
     }
 
     function pickN(allWords, wrongList, need) {
@@ -465,6 +467,16 @@
       if (el) el.textContent = n;
       const countEl = document.getElementById('wordListCount');
       if (countEl) countEl.textContent = n;
+      var sizeInput = document.getElementById('quizSize');
+      if (sizeInput) {
+        sizeInput.max = n || 999;
+        if (document.getElementById('quizAll').checked) {
+          sizeInput.value = n;
+          sizeInput.disabled = true;
+        }
+      }
+      var hint = document.getElementById('quizSizeHint');
+      if (hint) hint.textContent = n ? '（1～' + n + '）' : '（1～词库总数）';
       renderWordList();
     }
 
@@ -520,10 +532,18 @@
     }
 
     function startQuiz(wordBank) {
+      var quizAllEl = document.getElementById('quizAll');
       var sizeEl = document.getElementById('quizSize');
-      var size = sizeEl ? parseInt(sizeEl.value, 10) : getQuizSize();
-      if (size < 5 || size > 30) size = 20;
-      setQuizSize(size);
+      var size;
+      if (quizAllEl && quizAllEl.checked) {
+        size = wordBank.length;
+      } else {
+        size = sizeEl ? parseInt(sizeEl.value, 10) : getQuizSize();
+        if (!size || size < 1) size = 20;
+        size = Math.min(size, wordBank.length);
+        size = Math.max(1, size);
+        setQuizSize(size);
+      }
       state.wordBank = wordBank;
       state.wrongAnswers = getWrongFromStorage();
       state.currentQuiz = pickN(wordBank, state.wrongAnswers, size);
@@ -684,7 +704,19 @@
       if (sizeEl) {
         var saved = getQuizSize();
         sizeEl.value = String(saved);
-        sizeEl.addEventListener('change', function () { setQuizSize(parseInt(sizeEl.value, 10)); });
+        sizeEl.addEventListener('input', function () { setQuizSize(parseInt(sizeEl.value, 10) || 20); });
+      }
+      var quizAllEl = document.getElementById('quizAll');
+      if (quizAllEl) {
+        quizAllEl.addEventListener('change', function () {
+          if (quizAllEl.checked) {
+            sizeEl.value = state.wordBank.length;
+            sizeEl.disabled = true;
+          } else {
+            sizeEl.disabled = false;
+            sizeEl.value = getQuizSize();
+          }
+        });
       }
       updateWordCount();
       if (getVocabUrl()) tryLoadFromGoogleDoc();
