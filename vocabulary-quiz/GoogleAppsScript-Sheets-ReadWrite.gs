@@ -30,6 +30,17 @@ function doGet(e) {
       .createTextOutput(JSON.stringify({ ok: true, category: created.name, created: true }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+  if (action === 'deleteSheet') {
+    var delCategory = e && e.parameter ? String(e.parameter.category || '').trim() : '';
+    if (!delCategory) {
+      return ContentService.createTextOutput(JSON.stringify({ ok: false, error: '需要 category 名称' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    var deleted = deleteSheetByName(SPREADSHEET_ID, delCategory);
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, category: deleted.name, deleted: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   var data = getVocabularyFromSpreadsheetAsCategories(SPREADSHEET_ID);
   return ContentService
     .createTextOutput(JSON.stringify(data))
@@ -134,6 +145,17 @@ function createNewSheet(spreadsheetId, category) {
   sheet = ss.insertSheet(safeName);
   sheet.getRange(1, 1, 1, 3).setValues([['序列号', '单词', '释义']]);
   return { name: safeName, existed: false };
+}
+
+/** 删除指定工作表（至少保留一个工作表，避免表格为空） */
+function deleteSheetByName(spreadsheetId, category) {
+  var ss = SpreadsheetApp.openById(spreadsheetId);
+  var safeName = sanitizeSheetName(category);
+  var sheet = ss.getSheetByName(safeName);
+  if (!sheet) throw new Error('未找到该单词组：' + safeName);
+  if (ss.getSheets().length <= 1) throw new Error('至少需要保留一个单词组，无法删除最后一个工作表');
+  ss.deleteSheet(sheet);
+  return { name: safeName };
 }
 
 /** 在表格中查找或创建名为 category 的 sheet，追加 words（每行 word, definition） */

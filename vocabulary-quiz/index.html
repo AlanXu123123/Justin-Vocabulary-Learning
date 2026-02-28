@@ -188,11 +188,6 @@
         </div>
         <button type="button" class="btn" id="btnStart" style="margin-top: 1rem;">开始测验</button>
       </div>
-      <div class="card import-area">
-        <label>或粘贴自己的列表（格式：序号. 单词，下一行写英文解释）</label>
-        <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
-        <button type="button" class="btn btn-secondary" id="btnParse">解析并替换词库</button>
-      </div>
       <div class="card upload-area">
         <h3 style="font-size:1rem;margin-bottom:0.5rem;">上传到 Google Sheet / 管理工具</h3>
         <p class="hint" style="margin-bottom:0.75rem;">把当前词库按「分类」写入到当前词库来源（默认或自定义的 Google Sheet）。</p>
@@ -273,11 +268,15 @@
     <div id="modalVocab" class="modal-overlay">
       <div class="modal-dialog" style="max-width:520px;">
         <h3>词库</h3>
+        <label class="hint">粘贴自己的列表（格式：序号. 单词，下一行写英文解释）</label>
+        <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
+        <button type="button" class="btn btn-secondary" id="btnParse">解析并替换词库</button>
         <label class="hint">选择单词组（对应 Google Sheet 中的工作表）</label>
         <select id="vocabGroupSelect" class="vocab-panel-select"></select>
         <div class="vocab-panel-actions">
           <button type="button" class="btn" id="vocabUseGroup">用本组测验</button>
           <button type="button" class="btn btn-secondary" id="vocabCreateGroup">创建新单词组</button>
+          <button type="button" class="btn btn-secondary" id="vocabDeleteGroup">删除当前单词组</button>
           <button type="button" class="btn btn-secondary" id="vocabRefresh">刷新词库</button>
         </div>
         <p class="hint" style="margin-bottom:0.5rem;">列表：序列号 · 单词 · 释义（来自 Sheet）</p>
@@ -295,7 +294,7 @@
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
-    const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbxHZCy_a4CYOo21wY0e-hVgACtpJn8wlXLcuuz3vlEtHzRnEUJ_yEMW6PAjAWKPEx0/exec';
+    const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbx1Tb-Cf-TzRsSk92AxDOOPurY07GKmVxei3uZBXMPTWMUWiSbfKOSznZ3Yqr4aAaAw/exec';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
       { word: 'aggressor', definition: 'a person or country that starts a fight or attack' },
@@ -877,6 +876,38 @@
         }
       }).catch(function (err) {
         alert('创建失败（网络或权限）：' + (err.message || String(err)) + '。请确认 Apps Script 已重新部署为「任何人可访问」。');
+      });
+    });
+
+    document.getElementById('vocabDeleteGroup').addEventListener('click', function () {
+      var sel = document.getElementById('vocabGroupSelect');
+      var selected = sel ? sel.value : 'all';
+      if (!selected || selected === 'all') {
+        alert('请先选择要删除的单词组（不能是「全部」）。');
+        return;
+      }
+      var name = selected;
+      if (!confirm('确认删除单词组「' + name + '」吗？该操作会删除 Google Sheet 中同名工作表，且不可恢复。')) return;
+      var url = getVocabUrl();
+      var requestUrl = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'action=deleteSheet&category=' + encodeURIComponent(name);
+      fetch(requestUrl, { method: 'GET', mode: 'cors' }).then(function (r) { return r.json(); }).then(function (data) {
+        if (data && data.ok) {
+          state.currentCategoryId = 'all';
+          tryLoadFromSheet().then(function (ok) {
+            if (ok) {
+              fillVocabGroupSelect();
+              renderVocabListInModal();
+              updateWordCount();
+              alert('已删除单词组「' + (data.category || name) + '」。');
+            } else {
+              alert('删除后刷新失败，请手动点击「刷新词库」。');
+            }
+          });
+        } else {
+          alert('删除失败：' + (data && data.error ? data.error : '未知错误'));
+        }
+      }).catch(function (err) {
+        alert('删除失败（网络或权限）：' + (err.message || String(err)) + '。请确认 Apps Script 已重新部署。');
       });
     });
 
