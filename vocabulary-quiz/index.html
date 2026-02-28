@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>背单词测验</title>
-  <!-- 版本 2025-02-25：Google Doc 词库 + 词库列表 + 错题列表 -->
+  <!-- 默认 Google Sheet 词库，支持管理词库来源（添加/替换） -->
   <style>
     :root {
       --bg: #0f0f12;
@@ -144,11 +144,23 @@
     .word-list-wrap { max-height: 420px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: #25252b; }
     .word-list-item { display: flex; gap: 0.75rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2e; font-size: 0.9rem; align-items: baseline; }
     .word-list-item:last-child { border-bottom: none; }
-    .word-list-item .idx { color: var(--muted); min-width: 2rem; }
+    .word-list-item .idx { color: var(--muted); min-width: 3rem; }
     .word-list-item .word { font-weight: 600; color: var(--accent); min-width: 8rem; }
     .word-list-item .def { color: var(--muted); flex: 1; }
+    .vocab-panel-select { width: 100%; padding: 0.5rem; margin-bottom: 0.75rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.95rem; }
+    .vocab-panel-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
     .screen { display: none; }
     .screen.active { display: block; }
+    /* 管理词库来源弹窗 */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal-dialog { background: var(--card); border-radius: 12px; padding: 1.5rem; max-width: 420px; width: 100%; border: 1px solid #333; }
+    .modal-dialog h3 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .modal-dialog .modal-option { margin-bottom: 1rem; }
+    .modal-dialog .modal-option label { display: block; font-size: 0.9rem; color: var(--muted); margin-bottom: 0.35rem; }
+    .modal-dialog input[type="url"] { width: 100%; padding: 0.5rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.85rem; }
+    .modal-dialog .btn-row { margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .modal-dialog .btn-row .btn { margin-top: 0; }
   </style>
 </head>
 <body>
@@ -159,7 +171,7 @@
     <!-- 首页：直接开始 或 粘贴列表 -->
     <div id="screen-home" class="screen active">
       <div class="card">
-        <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">内置</span></span></p>
+        <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
         <div style="margin-top: 0.75rem;">
           <label class="hint">每次测验题数</label>
           <input type="number" id="quizSize" min="1" placeholder="输入题数" style="margin-top:0.35rem;padding:0.5rem;width:8rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
@@ -171,13 +183,8 @@
             考全部单词（把词库里全部单词都考一遍）
           </label>
         </div>
-        <div class="google-doc-area" style="margin-top: 0.75rem;">
-          <label class="hint">从 Google Doc 同步词库（在 Doc 里更新后，点「刷新词库」即可）</label>
-          <input type="url" id="vocabSourceUrl" placeholder="粘贴部署后的链接，例如 https://script.google.com/macros/s/xxx/exec" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
-          <div style="margin-top:0.5rem;">
-            <button type="button" class="btn btn-secondary" id="btnSaveUrl">保存并加载</button>
-            <button type="button" class="btn btn-secondary" id="btnRefreshVocab" style="margin-left:0.35rem;">刷新词库</button>
-          </div>
+        <div style="margin-top: 0.75rem;">
+          <button type="button" class="btn btn-secondary" id="btnManageSource">管理词库来源</button>
         </div>
         <button type="button" class="btn" id="btnStart" style="margin-top: 1rem;">开始测验</button>
       </div>
@@ -186,12 +193,19 @@
         <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
         <button type="button" class="btn btn-secondary" id="btnParse">解析并替换词库</button>
       </div>
-      <div class="card word-list-card">
-        <h3>词库列表</h3>
-        <p class="count-hint">共 <strong id="wordListCount">0</strong> 个单词</p>
-        <div class="word-list-wrap" id="wordListContent">
-          <p class="hint" style="padding:1rem;">暂无单词，请先加载或粘贴词库。</p>
+      <div class="card upload-area">
+        <h3 style="font-size:1rem;margin-bottom:0.5rem;">上传到 Google Sheet / 管理工具</h3>
+        <p class="hint" style="margin-bottom:0.75rem;">把当前词库按「分类」写入到当前词库来源（默认或自定义的 Google Sheet）。</p>
+        <div style="margin-bottom:0.5rem;">
+          <label class="hint">分类名称（将作为 Sheet 中的工作表名，如：SS10 Unit4）</label>
+          <input type="text" id="uploadCategory" placeholder="例如：SS10 Unit4" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
         </div>
+        <button type="button" class="btn btn-secondary" id="btnUploadToSheet">上传当前词库到 Google Sheet</button>
+        <span class="hint" id="uploadResult" style="display:block;margin-top:0.5rem;"></span>
+      </div>
+      <div class="card">
+        <button type="button" class="btn btn-secondary" id="btnOpenVocab">打开词库</button>
+        <span class="hint" style="margin-left:0.5rem;">当前：<span id="currentGroupLabel">默认</span>，共 <strong id="wordListCount">0</strong> 个单词</span>
       </div>
     </div>
 
@@ -225,13 +239,63 @@
         <button type="button" class="btn" id="btnAgain">再测一次</button>
       </div>
     </div>
+
+    <!-- 管理词库来源弹窗 -->
+    <div id="modalSource" class="modal-overlay">
+      <div class="modal-dialog">
+        <h3>管理词库来源</h3>
+        <p class="hint" style="margin-bottom:1rem;">选择使用默认词库，或添加/替换为其他 Google Sheet。</p>
+        <div class="modal-option">
+          <button type="button" class="btn" id="modalUseDefault">使用默认词库</button>
+          <p class="hint" style="margin-top:0.35rem;">恢复为应用内置的 Google Sheet 词库</p>
+        </div>
+        <div class="modal-option">
+          <label>替换为其他 Google Sheet（填写部署后的链接）</label>
+          <input type="url" id="modalReplaceUrl" placeholder="https://script.google.com/macros/s/xxx/exec" />
+          <div class="btn-row">
+            <button type="button" class="btn btn-secondary" id="modalReplaceBtn">替换并加载</button>
+          </div>
+        </div>
+        <div class="modal-option">
+          <label>添加其他词库（从该链接加载并合并到当前词库）</label>
+          <input type="url" id="modalAddUrl" placeholder="https://script.google.com/macros/s/xxx/exec" />
+          <div class="btn-row">
+            <button type="button" class="btn btn-secondary" id="modalAddBtn">添加并合并</button>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:1.25rem;">
+          <button type="button" class="btn btn-secondary" id="modalClose">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 词库面板弹窗 -->
+    <div id="modalVocab" class="modal-overlay">
+      <div class="modal-dialog" style="max-width:520px;">
+        <h3>词库</h3>
+        <label class="hint">选择单词组（对应 Google Sheet 中的工作表）</label>
+        <select id="vocabGroupSelect" class="vocab-panel-select"></select>
+        <div class="vocab-panel-actions">
+          <button type="button" class="btn" id="vocabUseGroup">用本组测验</button>
+          <button type="button" class="btn btn-secondary" id="vocabCreateGroup">创建新单词组</button>
+          <button type="button" class="btn btn-secondary" id="vocabRefresh">刷新词库</button>
+        </div>
+        <p class="hint" style="margin-bottom:0.5rem;">列表：序列号 · 单词 · 释义（来自 Sheet）</p>
+        <div class="word-list-wrap" id="vocabListContent" style="max-height:360px;">
+          <p class="hint" style="padding:1rem;">请先选择单词组或加载词库。</p>
+        </div>
+        <div class="btn-row" style="margin-top:1rem;">
+          <button type="button" class="btn btn-secondary" id="modalVocabClose">关闭</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
-    const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbxlsCmkVzCqB7pX3BeIq75IVT6zU9C_e0i0xwfOoa0b4-Pj2NtvY8hYjuA7g0Mii_hoSg/exec';
+    const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbxHZCy_a4CYOo21wY0e-hVgACtpJn8wlXLcuuz3vlEtHzRnEUJ_yEMW6PAjAWKPEx0/exec';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
       { word: 'aggressor', definition: 'a person or country that starts a fight or attack' },
@@ -448,25 +512,51 @@
       };
     })();
 
-    let state = { wordBank: DEFAULT_WORDS.slice(), currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
+    let state = { wordBank: DEFAULT_WORDS.slice(), categories: [], currentCategoryId: 'all', currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
 
     function getVocabUrl() {
       try {
         var saved = localStorage.getItem(STORAGE_VOCAB_URL);
         if (saved && saved.trim()) return saved.trim();
       } catch (_) {}
-      return DEFAULT_VOCAB_URL || '';
+      return DEFAULT_VOCAB_URL;
     }
     function setVocabUrl(url) {
       try { localStorage.setItem(STORAGE_VOCAB_URL, url || ''); } catch (_) {}
     }
+    function isDefaultSource() {
+      return !localStorage.getItem(STORAGE_VOCAB_URL) || localStorage.getItem(STORAGE_VOCAB_URL).trim() === '';
+    }
+
+    function getCurrentWords() {
+      if (state.currentCategoryId === 'all' || !state.categories.length) {
+        var list = [];
+        state.categories.forEach(function (c) { (c.words || []).forEach(function (w) { list.push(w); }); });
+        return list;
+      }
+      var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+      return cat ? (cat.words || []) : [];
+    }
+
+    function applyCurrentGroup() {
+      state.wordBank = getCurrentWords();
+    }
 
     function updateWordCount() {
-      const n = state.wordBank.length;
-      const el = document.getElementById('wordCount');
+      applyCurrentGroup();
+      var n = state.wordBank.length;
+      var el = document.getElementById('wordCount');
       if (el) el.textContent = n;
-      const countEl = document.getElementById('wordListCount');
+      var countEl = document.getElementById('wordListCount');
       if (countEl) countEl.textContent = n;
+      var labelEl = document.getElementById('currentGroupLabel');
+      if (labelEl) {
+        if (state.currentCategoryId === 'all') labelEl.textContent = state.categories.length ? '全部' : '默认';
+        else {
+          var c = state.categories.find(function (x) { return x.id === state.currentCategoryId; });
+          labelEl.textContent = c ? c.name : '默认';
+        }
+      }
       var sizeInput = document.getElementById('quizSize');
       if (sizeInput) {
         sizeInput.max = n || 999;
@@ -477,19 +567,34 @@
       }
       var hint = document.getElementById('quizSizeHint');
       if (hint) hint.textContent = n ? '（1～' + n + '）' : '（1～词库总数）';
-      renderWordList();
+      renderVocabListInModal();
     }
 
-    function renderWordList() {
-      const wrap = document.getElementById('wordListContent');
+    function renderVocabListInModal() {
+      var wrap = document.getElementById('vocabListContent');
       if (!wrap) return;
-      if (state.wordBank.length === 0) {
-        wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词，请先加载或粘贴词库。</p>';
+      var words = getCurrentWords();
+      if (words.length === 0) {
+        wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词，请先加载词库或选择其他单词组。</p>';
         return;
       }
-      wrap.innerHTML = state.wordBank.map(function (item, i) {
-        return '<div class="word-list-item"><span class="idx">' + (i + 1) + '.</span><span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition) + '</span></div>';
+      wrap.innerHTML = words.map(function (item) {
+        var serial = item.serial != null ? item.serial : '';
+        return '<div class="word-list-item"><span class="idx">' + escapeHtml(String(serial)) + '</span><span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition || '') + '</span></div>';
       }).join('');
+    }
+
+    function fillVocabGroupSelect() {
+      var sel = document.getElementById('vocabGroupSelect');
+      if (!sel) return;
+      sel.innerHTML = '<option value="all">全部</option>';
+      (state.categories || []).forEach(function (c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name + '（' + (c.words ? c.words.length : 0) + '）';
+        sel.appendChild(opt);
+      });
+      sel.value = state.currentCategoryId || 'all';
     }
 
     function setSourceLabel(text) {
@@ -500,27 +605,42 @@
     function loadWordBankFromUrl(url) {
       return fetch(url, { method: 'GET', mode: 'cors' })
         .then(function (r) { return r.json(); })
-        .then(function (arr) {
-          if (Array.isArray(arr) && arr.length > 0) {
-            state.wordBank = arr.filter(function (x) { return x && x.word; });
+        .then(function (data) {
+          if (data && data.categories && Array.isArray(data.categories)) {
+            state.categories = data.categories.map(function (c) {
+              return { id: c.id || c.name, name: c.name || c.id, words: (c.words || []).map(function (w) {
+                return { serial: w.serial, word: w.word, definition: w.definition };
+              }) };
+            });
+            state.currentCategoryId = 'all';
+            applyCurrentGroup();
             updateWordCount();
-            setSourceLabel('Google Doc');
+            setSourceLabel(isDefaultSource() ? '默认词库' : '自定义 Sheet');
             return true;
           }
-          // 若返回空数组，不覆盖词库，保留内置或当前词库
+          if (Array.isArray(data) && data.length > 0) {
+            var list = data.filter(function (x) { return x && x.word; }).map(function (w, i) {
+              return { serial: String(i + 1), word: w.word, definition: w.definition };
+            });
+            state.categories = [{ id: 'default', name: '默认', words: list }];
+            state.currentCategoryId = 'all';
+            state.wordBank = list;
+            updateWordCount();
+            setSourceLabel(isDefaultSource() ? '默认词库' : '自定义 Sheet');
+            return true;
+          }
           return false;
         });
     }
 
-    function tryLoadFromGoogleDoc() {
-      const url = getVocabUrl();
-      if (!url) return Promise.resolve(false);
+    function tryLoadFromSheet() {
+      var url = getVocabUrl();
       setSourceLabel('加载中…');
       return loadWordBankFromUrl(url).then(function (ok) {
-        if (!ok) setSourceLabel('内置（加载失败）');
+        if (!ok) setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
         return ok;
       }).catch(function () {
-        setSourceLabel('内置（加载失败）');
+        setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
         return false;
       });
     }
@@ -590,7 +710,7 @@
         feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
         Audio.correct();
       } else {
-        state.wrongAnswers.push({ word: item.word, definition: item.definition });
+        state.wrongAnswers.push({ word: item.word, definition: item.definition || '' });
         state.currentWrong.push({ word: item.word, definition: item.definition });
         saveWrongToStorage(state.wrongAnswers);
         input.classList.add('wrong');
@@ -639,31 +759,124 @@
       return div.innerHTML;
     }
 
-    document.getElementById('btnSaveUrl').addEventListener('click', function () {
-      var url = document.getElementById('vocabSourceUrl').value.trim();
-      if (url) {
-        setVocabUrl(url);
-        tryLoadFromGoogleDoc().then(function (ok) {
-          if (ok) alert('已从 Google Doc 加载 ' + state.wordBank.length + ' 个单词。');
-          else alert('加载失败，请检查链接是否正确、Google 脚本是否已部署为「任何人可访问」。');
-        });
-      } else {
-        setVocabUrl('');
-        state.wordBank = DEFAULT_WORDS.slice();
-        updateWordCount();
-        setSourceLabel('内置');
-        alert('已清除链接，当前使用内置词库。');
-      }
+    document.getElementById('btnManageSource').addEventListener('click', function () {
+      document.getElementById('modalReplaceUrl').value = getVocabUrl() === DEFAULT_VOCAB_URL ? '' : getVocabUrl();
+      document.getElementById('modalAddUrl').value = '';
+      document.getElementById('modalSource').classList.add('active');
     });
 
-    document.getElementById('btnRefreshVocab').addEventListener('click', function () {
-      if (!getVocabUrl()) {
-        alert('请先填写并保存 Google 词库链接。');
+    document.getElementById('modalClose').addEventListener('click', function () {
+      document.getElementById('modalSource').classList.remove('active');
+    });
+    document.getElementById('modalSource').addEventListener('click', function (e) {
+      if (e.target === document.getElementById('modalSource')) document.getElementById('modalSource').classList.remove('active');
+    });
+
+    document.getElementById('modalUseDefault').addEventListener('click', function () {
+      setVocabUrl('');
+      tryLoadFromSheet().then(function (ok) {
+        if (ok) alert('已切换为默认词库，共 ' + state.wordBank.length + ' 个单词。');
+        else alert('加载失败，请检查网络。');
+      });
+      document.getElementById('modalSource').classList.remove('active');
+    });
+
+    document.getElementById('modalReplaceBtn').addEventListener('click', function () {
+      var url = document.getElementById('modalReplaceUrl').value.trim();
+      if (!url) {
+        alert('请填写 Google Sheet 部署链接。');
         return;
       }
-      tryLoadFromGoogleDoc().then(function (ok) {
-        if (ok) alert('已刷新，共 ' + state.wordBank.length + ' 个单词。');
-        else alert('刷新失败，请检查网络或链接。');
+      setVocabUrl(url);
+      tryLoadFromSheet().then(function (ok) {
+        if (ok) alert('已替换为自定义词库，共 ' + state.wordBank.length + ' 个单词。');
+        else alert('加载失败，请检查链接是否正确、是否已部署为「任何人可访问」。');
+      });
+      document.getElementById('modalSource').classList.remove('active');
+    });
+
+    document.getElementById('modalAddBtn').addEventListener('click', function () {
+      var url = document.getElementById('modalAddUrl').value.trim();
+      if (!url) {
+        alert('请填写要添加的词库链接。');
+        return;
+      }
+      fetch(url, { method: 'GET', mode: 'cors' }).then(function (r) { return r.json(); }).then(function (data) {
+        var extra = [];
+        if (data && data.categories && Array.isArray(data.categories)) {
+          data.categories.forEach(function (c) { (c.words || []).forEach(function (w) { extra.push(w); }); });
+        } else if (Array.isArray(data)) {
+          extra = data.filter(function (x) { return x && x.word; });
+        }
+        if (extra.length === 0) {
+          alert('该链接未返回有效词库。');
+          return;
+        }
+        state.categories.push({ id: 'imported-' + Date.now(), name: '导入的单词', words: extra });
+        state.currentCategoryId = 'all';
+        updateWordCount();
+        setSourceLabel(isDefaultSource() ? '默认词库' : '自定义 Sheet');
+        alert('已添加并合并，当前共 ' + state.wordBank.length + ' 个单词。');
+        document.getElementById('modalSource').classList.remove('active');
+      }).catch(function () {
+        alert('加载失败，请检查链接与网络。');
+      });
+    });
+
+    document.getElementById('btnOpenVocab').addEventListener('click', function () {
+      fillVocabGroupSelect();
+      state.currentCategoryId = document.getElementById('vocabGroupSelect').value || 'all';
+      renderVocabListInModal();
+      document.getElementById('modalVocab').classList.add('active');
+    });
+
+    document.getElementById('modalVocabClose').addEventListener('click', function () {
+      document.getElementById('modalVocab').classList.remove('active');
+    });
+    document.getElementById('modalVocab').addEventListener('click', function (e) {
+      if (e.target === document.getElementById('modalVocab')) document.getElementById('modalVocab').classList.remove('active');
+    });
+
+    document.getElementById('vocabGroupSelect').addEventListener('change', function () {
+      state.currentCategoryId = this.value || 'all';
+      renderVocabListInModal();
+    });
+
+    document.getElementById('vocabUseGroup').addEventListener('click', function () {
+      state.currentCategoryId = document.getElementById('vocabGroupSelect').value || 'all';
+      applyCurrentGroup();
+      updateWordCount();
+      document.getElementById('modalVocab').classList.remove('active');
+    });
+
+    document.getElementById('vocabRefresh').addEventListener('click', function () {
+      tryLoadFromSheet().then(function (ok) {
+        if (ok) { fillVocabGroupSelect(); renderVocabListInModal(); }
+      });
+    });
+
+    document.getElementById('vocabCreateGroup').addEventListener('click', function () {
+      var name = prompt('请输入新单词组名称（将对应 Google Sheet 中的新工作表）：', '');
+      if (!name || !name.trim()) return;
+      var url = getVocabUrl();
+      var requestUrl = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'action=createSheet&category=' + encodeURIComponent(name.trim());
+      fetch(requestUrl, { method: 'GET', mode: 'cors' }).then(function (r) { return r.json(); }).then(function (data) {
+        if (data && data.ok) {
+          var newId = (data.category || name.trim()).replace(/[\\/*?:\[\]]/g, '_').substring(0, 100);
+          tryLoadFromSheet().then(function () {
+            fillVocabGroupSelect();
+            var sel = document.getElementById('vocabGroupSelect');
+            sel.value = newId;
+            state.currentCategoryId = newId;
+            renderVocabListInModal();
+            updateWordCount();
+            alert('已创建新单词组「' + (data.category || name) + '」，已在 Google 表格中新建工作表。请在该工作表中添加「序列号、单词、释义」后，在词库面板中刷新或重新打开词库。');
+          });
+        } else {
+          alert('创建失败：' + (data && data.error ? data.error : '未知错误'));
+        }
+      }).catch(function (err) {
+        alert('创建失败（网络或权限）：' + (err.message || String(err)) + '。请确认 Apps Script 已重新部署为「任何人可访问」。');
       });
     });
 
@@ -683,6 +896,45 @@
       alert('已解析到 ' + list.length + ' 个单词，词库已更新。点击「开始测验」即可。');
     });
 
+    document.getElementById('btnUploadToSheet').addEventListener('click', function () {
+      var url = getVocabUrl();
+      if (!url || !url.trim()) {
+        document.getElementById('uploadResult').textContent = '请先在「管理词库来源」中设置支持写入的 Google Sheet 链接。';
+        document.getElementById('uploadResult').style.color = 'var(--wrong)';
+        return;
+      }
+      var category = document.getElementById('uploadCategory').value.trim();
+      if (!category) {
+        document.getElementById('uploadResult').textContent = '请填写分类名称，例如：SS10 Unit4';
+        document.getElementById('uploadResult').style.color = 'var(--wrong)';
+        return;
+      }
+      if (state.wordBank.length === 0) {
+        document.getElementById('uploadResult').textContent = '当前词库为空，请先粘贴或加载词库。';
+        document.getElementById('uploadResult').style.color = 'var(--wrong)';
+        return;
+      }
+      var resultEl = document.getElementById('uploadResult');
+      resultEl.textContent = '上传中…';
+      resultEl.style.color = 'var(--muted)';
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: category, words: state.wordBank })
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        if (data && data.ok) {
+          resultEl.textContent = '已上传 ' + (data.appended || state.wordBank.length) + ' 个单词到分类「' + (data.category || category) + '」。可在 Google 表格中查看。';
+          resultEl.style.color = 'var(--correct)';
+        } else {
+          resultEl.textContent = '上传失败：' + (data && data.error ? data.error : '未知错误');
+          resultEl.style.color = 'var(--wrong)';
+        }
+      }).catch(function (err) {
+        resultEl.textContent = '上传失败（可能是网络或 CORS 限制）：' + (err.message || String(err));
+        resultEl.style.color = 'var(--wrong)';
+      });
+    });
+
     document.getElementById('answerInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         if (document.getElementById('btnNext').style.display === 'inline-block') nextQuestion();
@@ -698,13 +950,16 @@
     });
 
     (function init() {
-      var input = document.getElementById('vocabSourceUrl');
-      if (input) input.value = getVocabUrl();
       var sizeEl = document.getElementById('quizSize');
       if (sizeEl) {
         var saved = getQuizSize();
         sizeEl.value = String(saved);
-        sizeEl.addEventListener('input', function () { setQuizSize(parseInt(sizeEl.value, 10) || 20); });
+        sizeEl.addEventListener('input', function () {
+          var val = sizeEl.value.trim();
+          if (val === '') return;
+          var n = parseInt(val, 10);
+          if (!isNaN(n) && n >= 1) setQuizSize(n);
+        });
       }
       var quizAllEl = document.getElementById('quizAll');
       if (quizAllEl) {
@@ -718,8 +973,11 @@
           }
         });
       }
+      if (state.categories.length === 0 && state.wordBank.length > 0) {
+        state.categories = [{ id: 'default', name: '默认', words: state.wordBank.map(function (w, i) { return { serial: String(i + 1), word: w.word, definition: w.definition || '' }; }) }];
+      }
       updateWordCount();
-      if (getVocabUrl()) tryLoadFromGoogleDoc();
+      tryLoadFromSheet();
     })();
   </script>
 </body>
