@@ -149,6 +149,10 @@
     .word-list-item .def { color: var(--muted); flex: 1; }
     .vocab-panel-select { width: 100%; padding: 0.5rem; margin-bottom: 0.75rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.95rem; }
     .vocab-panel-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .quiz-nav { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: center; }
+    .quiz-nav .btn { min-width: 100px; margin-top: 0; }
+    .btn-back-home { background: none; border: 1px solid #444; color: var(--muted); padding: 0.35rem 0.7rem; font-size: 0.85rem; border-radius: 6px; cursor: pointer; margin-bottom: 0.75rem; }
+    .btn-back-home:hover { border-color: var(--accent); color: var(--text); }
     .screen { display: none; }
     .screen.active { display: block; }
     /* 管理词库来源弹窗 */
@@ -206,6 +210,7 @@
 
     <!-- 测验进行中 -->
     <div id="screen-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnQuizHome">← 返回主页</button>
       <div class="card">
         <div class="quiz-header">
           <span class="progress" id="progressText">第 1 / 1 题</span>
@@ -217,7 +222,10 @@
             <span class="feedback" id="feedback" style="display: none;"></span>
           </div>
         </div>
-        <button type="button" class="btn" id="btnNext" style="display: none;">下一题</button>
+      </div>
+      <div class="quiz-nav">
+        <button type="button" class="btn btn-secondary" id="btnPrev" disabled>Back</button>
+        <button type="button" class="btn" id="btnNavNext">Next</button>
       </div>
     </div>
 
@@ -270,7 +278,7 @@
         <h3>词库</h3>
         <label class="hint">粘贴自己的列表（格式：序号. 单词，下一行写英文解释）</label>
         <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
-        <button type="button" class="btn btn-secondary" id="btnParse">解析并替换词库</button>
+        <button type="button" class="btn btn-secondary" id="btnParse" style="margin-bottom:1.25rem;">解析并替换词库</button>
         <label class="hint">选择单词组（对应 Google Sheet 中的工作表）</label>
         <select id="vocabGroupSelect" class="vocab-panel-select"></select>
         <div class="vocab-panel-actions">
@@ -673,6 +681,7 @@
       state.index = 0;
       state.correct = 0;
       state.currentWrong = [];
+      state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
       showScreen('screen-quiz');
       renderQuestion();
     }
@@ -684,20 +693,44 @@
       const item = state.currentQuiz[idx];
       document.getElementById('questionDefinition').textContent = item.definition;
       const input = document.getElementById('answerInput');
-      input.value = '';
-      input.className = '';
-      input.disabled = false;
-      input.focus();
-      document.getElementById('feedback').style.display = 'none';
-      document.getElementById('btnNext').style.display = 'none';
+      const feedbackEl = document.getElementById('feedback');
+      document.getElementById('btnPrev').disabled = idx === 0;
+
+      const qa = state.quizAnswers[idx];
+      if (qa && qa.answered) {
+        input.value = qa.userAnswer;
+        input.disabled = true;
+        input.className = qa.correct ? 'correct' : 'wrong';
+        feedbackEl.style.display = 'inline-flex';
+        if (qa.correct) {
+          feedbackEl.className = 'feedback correct';
+          feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
+        } else {
+          feedbackEl.className = 'feedback wrong';
+          feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
+        }
+      } else {
+        input.value = '';
+        input.className = '';
+        input.disabled = false;
+        input.focus();
+        feedbackEl.style.display = 'none';
+      }
     }
 
     function submitAnswer() {
+      const qa = state.quizAnswers[state.index];
+      if (qa && qa.answered) return;
+
       const input = document.getElementById('answerInput');
       const user = input.value.trim();
+      if (!user) return;
+
       const item = state.currentQuiz[state.index];
       const correct = wordsMatch(user, item.word);
       const feedbackEl = document.getElementById('feedback');
+
+      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: correct };
 
       input.disabled = true;
       feedbackEl.style.display = 'inline-flex';
@@ -717,9 +750,12 @@
         feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         Audio.wrong();
       }
+    }
 
-      document.getElementById('btnNext').style.display = 'inline-block';
-      document.getElementById('btnNext').focus();
+    function prevQuestion() {
+      if (state.index <= 0) return;
+      state.index--;
+      renderQuestion();
     }
 
     function nextQuestion() {
@@ -827,6 +863,15 @@
       state.currentCategoryId = document.getElementById('vocabGroupSelect').value || 'all';
       renderVocabListInModal();
       document.getElementById('modalVocab').classList.add('active');
+      tryLoadFromSheet().then(function (ok) {
+        if (ok) {
+          var prev = state.currentCategoryId;
+          fillVocabGroupSelect();
+          state.currentCategoryId = document.getElementById('vocabGroupSelect').value || prev || 'all';
+          applyCurrentGroup();
+          renderVocabListInModal();
+        }
+      });
     });
 
     document.getElementById('modalVocabClose').addEventListener('click', function () {
@@ -968,12 +1013,23 @@
 
     document.getElementById('answerInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        if (document.getElementById('btnNext').style.display === 'inline-block') nextQuestion();
+        var qa = state.quizAnswers[state.index];
+        if (qa && qa.answered) nextQuestion();
         else submitAnswer();
       }
     });
 
-    document.getElementById('btnNext').addEventListener('click', nextQuestion);
+    document.getElementById('btnNavNext').addEventListener('click', function () {
+      var qa = state.quizAnswers[state.index];
+      if (qa && qa.answered) { nextQuestion(); return; }
+      var input = document.getElementById('answerInput');
+      if (input.value.trim()) { submitAnswer(); return; }
+      nextQuestion();
+    });
+    document.getElementById('btnPrev').addEventListener('click', prevQuestion);
+    document.getElementById('btnQuizHome').addEventListener('click', function () {
+      showScreen('screen-home');
+    });
 
     document.getElementById('btnAgain').addEventListener('click', () => {
       showScreen('screen-home');
@@ -1008,7 +1064,9 @@
         state.categories = [{ id: 'default', name: '默认', words: state.wordBank.map(function (w, i) { return { serial: String(i + 1), word: w.word, definition: w.definition || '' }; }) }];
       }
       updateWordCount();
-      tryLoadFromSheet();
+      tryLoadFromSheet().then(function (ok) {
+        if (ok) fillVocabGroupSelect();
+      });
     })();
   </script>
 </body>

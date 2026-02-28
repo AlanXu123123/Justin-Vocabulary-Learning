@@ -93,7 +93,7 @@ function sanitizeSheetName(name) {
   return name.replace(/[\\/*?:\[\]]/g, '_').substring(0, 100);
 }
 
-/** 按工作表返回分类结构：{ categories: [ { id, name, words: [ { serial, word, definition }, ... ] } ] }。第一行为表头跳过；序列号取第二列或第二行起的行号。 */
+/** 按工作表返回分类结构：{ categories: [ { id, name, words: [ { serial, word, definition }, ... ] } ] }。第一行为表头跳过；序列号始终为行号（从 1 开始）。 */
 function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
   var ss = SpreadsheetApp.openById(spreadsheetId);
   var sheets = ss.getSheets();
@@ -109,27 +109,23 @@ function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
     }
     var words = [];
     for (var r = startRow; r < data.length; r++) {
-      var serial = '';
+      var serial = String(r - startRow + 1);
       var word = '';
       var definition = '';
       if (data[r].length >= 3) {
-        serial = data[r][0] != null ? String(data[r][0]).trim() : '';
         word = data[r][1] != null ? String(data[r][1]).trim().toLowerCase() : '';
         definition = data[r][2] != null ? String(data[r][2]).trim() : '';
       } else if (data[r].length >= 2) {
         var a = data[r][0] != null ? String(data[r][0]).trim() : '';
         var b = data[r][1] != null ? String(data[r][1]).trim() : '';
         if (/^\d+$/.test(a)) {
-          serial = a;
           word = b.toLowerCase();
-          definition = '';
         } else {
-          serial = String(r - startRow + 1);
           word = a.toLowerCase();
           definition = b;
         }
       }
-      if (word) words.push({ serial: serial || String(r - startRow + 1), word: word, definition: definition || '(无释义)' });
+      if (word) words.push({ serial: serial, word: word, definition: definition || '(无释义)' });
     }
     categories.push({ id: name, name: name, words: words });
   }
