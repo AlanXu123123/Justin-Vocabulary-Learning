@@ -247,6 +247,7 @@
     .review-summary-item { background: #25252b; border-radius: 8px; padding: 0.5rem 0.6rem; text-align: center; border: 1px solid #333; font-size: 0.82rem; }
     .review-summary-item .rs-count { font-size: 1.15rem; font-weight: 700; color: var(--text); }
     .review-summary-item .rs-label { color: var(--muted); font-size: 0.72rem; }
+    .review-summary-item .rs-date { color: var(--accent); font-size: 0.72rem; margin-top: 0.15rem; font-weight: 600; }
 
     .review-word-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2e; font-size: 0.88rem; }
     .review-word-item:last-child { border-bottom: none; }
@@ -293,6 +294,12 @@
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
+        <div style="margin-top: 0.5rem;">
+          <label class="hint">选择单词组</label>
+          <select id="homeGroupSelect" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
+            <option value="all">全部</option>
+          </select>
+        </div>
         <div style="margin-top: 0.75rem;">
           <label class="hint">每次测验题数</label>
           <input type="number" id="quizSize" min="1" placeholder="输入题数" style="margin-top:0.35rem;padding:0.5rem;width:8rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
@@ -996,11 +1003,14 @@
       var filterGroup = document.getElementById('reviewFilterGroup');
       var catId = filterGroup ? filterGroup.value : 'all';
       var summary = getReviewSummary(catId);
+      var now = new Date();
       var levelNames = ['等级0 (1天)', '等级1 (2天)', '等级2 (4天)', '等级3 (7天)', '等级4 (15天)', '等级5 (30天)'];
       wrap.innerHTML = summary.levels.map(function (count, i) {
-        return '<div class="review-summary-item"><span class="review-level-dot review-level-' + i + '"></span><div class="rs-count">' + count + '</div><div class="rs-label">' + levelNames[i] + '</div></div>';
+        var d = new Date(now.getTime() + REVIEW_INTERVALS[i] * 86400000);
+        var dateStr = (d.getMonth() + 1) + '/' + d.getDate();
+        return '<div class="review-summary-item"><span class="review-level-dot review-level-' + i + '"></span><div class="rs-count">' + count + '</div><div class="rs-label">' + levelNames[i] + '</div><div class="rs-date">' + dateStr + '</div></div>';
       }).join('') +
-        '<div class="review-summary-item"><div class="rs-count">' + summary.due + '</div><div class="rs-label">待复习</div></div>' +
+        '<div class="review-summary-item"><div class="rs-count" style="color:var(--wrong);">' + summary.due + '</div><div class="rs-label">待复习</div><div class="rs-date">今天</div></div>' +
         '<div class="review-summary-item"><div class="rs-count">' + summary.total + '</div><div class="rs-label">总计划</div></div>';
     }
 
@@ -1285,6 +1295,20 @@
 
     function fillVocabGroupSelect() {
       var sel = document.getElementById('vocabGroupSelect');
+      if (!sel) return;
+      sel.innerHTML = '<option value="all">全部</option>';
+      (state.categories || []).forEach(function (c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name + '（' + (c.words ? c.words.length : 0) + '）';
+        sel.appendChild(opt);
+      });
+      sel.value = state.currentCategoryId || 'all';
+      fillHomeGroupSelect();
+    }
+
+    function fillHomeGroupSelect() {
+      var sel = document.getElementById('homeGroupSelect');
       if (!sel) return;
       sel.innerHTML = '<option value="all">全部</option>';
       (state.categories || []).forEach(function (c) {
@@ -1646,6 +1670,18 @@
       state.editingWordIndex = null;
       updateAddWordSectionVisibility();
       renderVocabListInModal();
+      // Sync home group select
+      var homeSel = document.getElementById('homeGroupSelect');
+      if (homeSel) homeSel.value = state.currentCategoryId;
+    });
+
+    document.getElementById('homeGroupSelect').addEventListener('change', function () {
+      state.currentCategoryId = this.value || 'all';
+      applyCurrentGroup();
+      updateWordCount();
+      // Sync vocab modal group select
+      var vocabSel = document.getElementById('vocabGroupSelect');
+      if (vocabSel) vocabSel.value = state.currentCategoryId;
     });
 
     document.getElementById('vocabUseGroup').addEventListener('click', function () {
