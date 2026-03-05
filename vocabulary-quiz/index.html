@@ -165,6 +165,112 @@
     .modal-dialog input[type="url"] { width: 100%; padding: 0.5rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.85rem; }
     .modal-dialog .btn-row { margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
     .modal-dialog .btn-row .btn { margin-top: 0; }
+    /* 添加单词表单 */
+    .add-word-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #333; }
+    .add-word-section label.add-word-label { display: block; font-size: 0.9rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .add-word-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.5rem; }
+    .add-word-row input { flex: 1; min-width: 120px; padding: 0.5rem 0.75rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+    .add-word-row input:focus { outline: none; border-color: var(--accent); }
+    .add-word-row .btn { margin-top: 0; flex-shrink: 0; }
+    /* 词库列表行操作：编辑 / 删除 */
+    .word-list-item { align-items: center; }
+    .word-list-item .item-content { display: flex; gap: 0.75rem; flex: 1; min-width: 0; align-items: baseline; }
+    .word-list-item .item-actions { display: flex; gap: 0.35rem; flex-shrink: 0; margin-left: auto; }
+    .word-list-item .btn-item-edit, .word-list-item .btn-item-delete { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none; background: transparent; color: var(--muted); }
+    .word-list-item .btn-item-edit:hover { color: var(--accent); background: rgba(99,102,241,0.15); }
+    .word-list-item .btn-item-delete:hover { color: var(--wrong); background: rgba(239,68,68,0.15); }
+    .word-list-item.editing .item-content { flex-wrap: wrap; gap: 0.5rem; }
+    .word-list-item.editing .item-content input { flex: 1; min-width: 80px; padding: 0.35rem 0.5rem; font-size: 0.85rem; background: var(--bg); border: 1px solid #333; border-radius: 4px; color: var(--text); }
+    .word-list-item.editing .item-actions .btn-item-save { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none; background: var(--correct); color: #fff; }
+    .word-list-item.editing .item-actions .btn-item-cancel { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none; background: #333; color: var(--muted); }
+
+    /* === 学习统计 & 复习系统 样式 === */
+    .review-notice { background: linear-gradient(135deg, #1e1b4b, #312e81); border: 1px solid #4338ca; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .review-notice .review-notice-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .review-notice .review-notice-text { flex: 1; font-size: 0.9rem; color: #c7d2fe; }
+    .review-notice .review-notice-text strong { color: #e0e7ff; }
+    .review-notice .btn-review-start { background: #6366f1; color: #fff; border: none; padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer; flex-shrink: 0; }
+    .review-notice .btn-review-start:hover { filter: brightness(1.15); }
+
+    .home-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .home-actions .btn { margin-top: 0; font-size: 0.85rem; padding: 0.5rem 0.9rem; }
+
+    /* Stat cards */
+    .stat-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .stat-card { background: #25252b; border-radius: 10px; padding: 0.85rem; text-align: center; border: 1px solid #333; }
+    .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .stat-card .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* Error rate bar */
+    .error-rate-bar { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 80px; }
+    .error-rate-bar-track { flex: 1; height: 6px; background: #333; border-radius: 3px; overflow: hidden; }
+    .error-rate-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .error-rate-text { font-size: 0.8rem; color: var(--muted); min-width: 3rem; text-align: right; }
+
+    /* Streak badges */
+    .streak-badge { display: inline-block; font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600; }
+    .streak-badge.good { background: rgba(34,197,94,0.15); color: var(--correct); }
+    .streak-badge.bad { background: rgba(239,68,68,0.15); color: var(--wrong); }
+
+    /* High freq word list */
+    .highfreq-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.75rem; border-bottom: 1px solid #2a2a2e; font-size: 0.88rem; }
+    .highfreq-item:last-child { border-bottom: none; }
+    .highfreq-item .rank { color: var(--muted); min-width: 1.8rem; font-weight: 600; }
+    .highfreq-item .hw { font-weight: 600; color: var(--accent); min-width: 6.5rem; }
+    .highfreq-item .hw-count { font-size: 0.78rem; color: var(--muted); min-width: 4rem; }
+
+    /* History items */
+    .history-list { max-height: 450px; overflow-y: auto; }
+    .history-item { background: #25252b; border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.65rem; border: 1px solid #333; }
+    .history-item-header { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
+    .history-item-header .history-date { font-size: 0.82rem; color: var(--muted); }
+    .history-tag { display: inline-block; font-size: 0.7rem; padding: 0.12rem 0.4rem; border-radius: 4px; font-weight: 600; }
+    .history-tag.retest { background: rgba(239,68,68,0.15); color: var(--wrong); }
+    .history-tag.review { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .history-item-rate { font-size: 1.1rem; font-weight: 700; }
+    .history-item-rate.high { color: var(--correct); }
+    .history-item-rate.mid { color: #eab308; }
+    .history-item-rate.low { color: var(--wrong); }
+    .history-item-detail { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.3rem; }
+    .history-wrong-words { font-size: 0.82rem; color: var(--wrong); }
+
+    /* Review level dots */
+    .review-level-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 0.35rem; vertical-align: middle; }
+    .review-level-0 { background: #ef4444; }
+    .review-level-1 { background: #f97316; }
+    .review-level-2 { background: #eab308; }
+    .review-level-3 { background: #84cc16; }
+    .review-level-4 { background: #22c55e; }
+    .review-level-5 { background: #06b6d4; }
+
+    .review-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+    .review-summary-item { background: #25252b; border-radius: 8px; padding: 0.5rem 0.6rem; text-align: center; border: 1px solid #333; font-size: 0.82rem; }
+    .review-summary-item .rs-count { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+    .review-summary-item .rs-label { color: var(--muted); font-size: 0.72rem; }
+
+    .review-word-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2a2e; font-size: 0.88rem; }
+    .review-word-item:last-child { border-bottom: none; }
+    .review-word-item .rw-word { font-weight: 600; color: var(--accent); min-width: 7rem; }
+    .review-word-item .rw-info { font-size: 0.78rem; color: var(--muted); }
+
+    /* Large modal for stats/history/review */
+    .modal-dialog-lg { background: var(--card); border-radius: 12px; padding: 1.5rem; max-width: 560px; width: 100%; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
+    .modal-dialog-lg h3 { font-size: 1.1rem; margin-bottom: 1rem; }
+
+    .filter-row { margin-bottom: 1rem; }
+    .filter-row select { width: 100%; padding: 0.5rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+
+    .empty-state { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 0.9rem; }
+
+    .result-stat-info { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+    .result-actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+    .result-actions .btn { margin-top: 0; }
+
+    .review-quiz-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+    .review-quiz-row input { width: 5rem; padding: 0.45rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+
+    .btn-danger { background: var(--wrong); }
+    .btn-danger:hover { filter: brightness(1.1); }
   </style>
 </head>
 <body>
@@ -174,6 +280,17 @@
 
     <!-- 首页：直接开始 或 粘贴列表 -->
     <div id="screen-home" class="screen active">
+      <!-- 艾宾浩斯复习提醒 -->
+      <div id="reviewNotice" class="review-notice" style="display:none;">
+        <span class="review-notice-icon">📖</span>
+        <span class="review-notice-text" id="reviewNoticeText"><strong>0</strong> 个单词待复习（基于艾宾浩斯遗忘曲线）</span>
+        <button type="button" class="btn-review-start" id="btnReviewFromNotice">开始复习</button>
+      </div>
+      <!-- 统计/历史入口 -->
+      <div class="home-actions">
+        <button type="button" class="btn btn-secondary" id="btnOpenStats">学习统计 &amp; 高频错词</button>
+        <button type="button" class="btn btn-secondary" id="btnOpenHistory">测验历史</button>
+      </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
         <div style="margin-top: 0.75rem;">
@@ -232,13 +349,15 @@
     <!-- 结果 -->
     <div id="screen-result" class="screen">
       <div class="card result-card">
-        <div class="result-title">测验结束</div>
+        <div class="result-title" id="resultTitle">测验结束</div>
         <div class="rate" id="rateDisplay">0%</div>
         <div class="detail" id="rateDetail">正确 0 / 20</div>
         <div class="wrong-section" id="wrongSection" style="display: none;">
-          <h3>本次答错的单词</h3>
+          <h3 id="wrongSectionTitle">本次答错的单词</h3>
           <div id="wrongList"></div>
         </div>
+        <button type="button" class="btn" id="btnRetestWrong" style="display:none;margin-right:0.5rem;background:#ef4444;">错题补测</button>
+        <button type="button" class="btn btn-secondary" id="btnViewStats">查看统计</button>
         <button type="button" class="btn" id="btnAgain">再测一次</button>
       </div>
     </div>
@@ -276,10 +395,10 @@
     <div id="modalVocab" class="modal-overlay">
       <div class="modal-dialog" style="max-width:520px;">
         <h3>词库</h3>
-        <label class="hint">粘贴自己的列表（格式：序号. 单词，下一行写英文解释）</label>
+        <p class="hint" style="margin-bottom:0.35rem;">批量导入：粘贴列表（格式：序号. 单词，下一行英文解释）后点击解析，将<strong>替换</strong>当前词库。</p>
         <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
-        <button type="button" class="btn btn-secondary" id="btnParse" style="margin-bottom:1.25rem;">解析并替换词库</button>
-        <label class="hint">选择单词组（对应 Google Sheet 中的工作表）</label>
+        <button type="button" class="btn btn-secondary" id="btnParse" style="margin-bottom:1rem;">解析并替换词库</button>
+        <label class="hint" style="display:block; margin-bottom:0.35rem;">选择单词组（对应 Google Sheet 中的工作表）</label>
         <select id="vocabGroupSelect" class="vocab-panel-select"></select>
         <div class="vocab-panel-actions">
           <button type="button" class="btn" id="vocabUseGroup">用本组测验</button>
@@ -287,12 +406,86 @@
           <button type="button" class="btn btn-secondary" id="vocabDeleteGroup">删除当前单词组</button>
           <button type="button" class="btn btn-secondary" id="vocabRefresh">刷新词库</button>
         </div>
-        <p class="hint" style="margin-bottom:0.5rem;">列表：序列号 · 单词 · 释义（来自 Sheet）</p>
+        <div id="vocabAddWordSection" class="add-word-section">
+          <p class="hint" id="addWordSectionHint" style="margin-bottom:0.5rem;">选择具体单词组后，可在此逐条添加单词。</p>
+          <div id="addWordForm" style="display:none;">
+            <label class="add-word-label">添加单词到本组</label>
+            <div class="add-word-row">
+              <input type="text" id="addWordInput" placeholder="单词" />
+              <input type="text" id="addDefInput" placeholder="单词解释" />
+              <button type="button" class="btn btn-secondary" id="btnAddWord">添加</button>
+            </div>
+          </div>
+        </div>
+        <p class="hint" style="margin-bottom:0.5rem;">本组列表：序列号 · 单词 · 释义（来自 Sheet 或本页添加）。选择具体单词组时可逐条<strong>编辑</strong>或<strong>删除</strong>。</p>
         <div class="word-list-wrap" id="vocabListContent" style="max-height:360px;">
           <p class="hint" style="padding:1rem;">请先选择单词组或加载词库。</p>
         </div>
         <div class="btn-row" style="margin-top:1rem;">
           <button type="button" class="btn btn-secondary" id="modalVocabClose">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 学习统计面板 -->
+    <div id="modalStats" class="modal-overlay">
+      <div class="modal-dialog-lg">
+        <h3>学习统计 &amp; 高频错词</h3>
+        <div class="stat-cards" id="statCards">
+          <div class="stat-card"><div class="stat-value" id="statTotalQuizzes">0</div><div class="stat-label">总测验次数</div></div>
+          <div class="stat-card"><div class="stat-value" id="statTotalWrongWords">0</div><div class="stat-label">累计错词数</div></div>
+          <div class="stat-card"><div class="stat-value" id="statAvgAccuracy">-</div><div class="stat-label">平均正确率</div></div>
+          <div class="stat-card"><div class="stat-value" id="statDueReview">0</div><div class="stat-label">待复习数</div></div>
+        </div>
+        <div class="filter-row">
+          <select id="statsFilterGroup"><option value="all">全部分组</option></select>
+        </div>
+        <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">高频错词排行</h4>
+        <div class="word-list-wrap" id="highFreqList" style="max-height:320px;">
+          <div class="empty-state">暂无错词记录</div>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button type="button" class="btn" id="btnHighFreqQuiz" disabled>测试高频错词</button>
+          <button type="button" class="btn btn-secondary" id="btnOpenReviewFromPanel">查看复习计划</button>
+          <button type="button" class="btn btn-danger" id="btnClearStats">清空统计</button>
+          <button type="button" class="btn btn-secondary" id="modalStatsClose">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测验历史面板 -->
+    <div id="modalHistory" class="modal-overlay">
+      <div class="modal-dialog-lg">
+        <h3>测验历史</h3>
+        <div class="history-list" id="historyList">
+          <div class="empty-state">暂无测验记录</div>
+        </div>
+        <div class="btn-row" style="margin-top:1rem;">
+          <button type="button" class="btn btn-secondary" id="modalHistoryClose">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 艾宾浩斯复习面板 -->
+    <div id="modalReview" class="modal-overlay">
+      <div class="modal-dialog-lg">
+        <h3>艾宾浩斯复习计划</h3>
+        <p class="hint" style="margin-bottom:0.75rem;">复习间隔：1天 → 2天 → 4天 → 7天 → 15天 → 30天 → 毕业</p>
+        <div class="review-summary" id="reviewSummary"></div>
+        <div class="filter-row">
+          <select id="reviewFilterGroup"><option value="all">全部分组</option></select>
+        </div>
+        <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">待复习单词</h4>
+        <div class="word-list-wrap" id="reviewWordList" style="max-height:280px;">
+          <div class="empty-state">暂无待复习单词</div>
+        </div>
+        <div class="review-quiz-row">
+          <label class="hint">复习题数：</label>
+          <input type="number" id="reviewQuizSize" min="1" value="10" />
+          <button type="button" class="btn" id="btnStartReviewQuiz" disabled>开始复习测验</button>
+        </div>
+        <div class="btn-row" style="margin-top:1rem;">
+          <button type="button" class="btn btn-secondary" id="modalReviewClose">关闭</button>
         </div>
       </div>
     </div>
@@ -302,6 +495,11 @@
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
+    const STORAGE_WORD_STATS = 'vocab_quiz_word_stats';
+    const STORAGE_QUIZ_HISTORY = 'vocab_quiz_history';
+    const STORAGE_REVIEW_PLAN = 'vocab_quiz_review_plan';
+    const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // days for level 0-5; level 6 = graduated
+    const MAX_HISTORY = 50;
     const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbx1Tb-Cf-TzRsSk92AxDOOPurY07GKmVxei3uZBXMPTWMUWiSbfKOSznZ3Yqr4aAaAw/exec';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
@@ -476,6 +674,478 @@
       if (el && !document.getElementById('quizAll').checked) el.value = String(n);
     }
 
+    // === 新增：数据读写函数 ===
+    function makeWordKey(categoryId, word) {
+      return (categoryId || 'unknown') + '::' + (word || '');
+    }
+
+    function getWordStatsFromStorage() {
+      try { var raw = localStorage.getItem(STORAGE_WORD_STATS); return raw ? JSON.parse(raw) : {}; } catch (_) { return {}; }
+    }
+    function saveWordStatsToStorage(stats) {
+      try { localStorage.setItem(STORAGE_WORD_STATS, JSON.stringify(stats)); } catch (_) {}
+    }
+
+    function getQuizHistoryFromStorage() {
+      try { var raw = localStorage.getItem(STORAGE_QUIZ_HISTORY); return raw ? JSON.parse(raw) : []; } catch (_) { return []; }
+    }
+    function saveQuizHistoryToStorage(history) {
+      try { localStorage.setItem(STORAGE_QUIZ_HISTORY, JSON.stringify(history.slice(0, MAX_HISTORY))); } catch (_) {}
+    }
+
+    function getReviewPlanFromStorage() {
+      try { var raw = localStorage.getItem(STORAGE_REVIEW_PLAN); return raw ? JSON.parse(raw) : {}; } catch (_) { return {}; }
+    }
+    function saveReviewPlanToStorage(plan) {
+      try { localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(plan)); } catch (_) {}
+    }
+
+    // === 核心逻辑函数 ===
+    function recordWordResult(word, definition, categoryId, isCorrect) {
+      var stats = getWordStatsFromStorage();
+      var key = makeWordKey(categoryId, word);
+      var now = Date.now();
+
+      if (stats[key]) {
+        // Already tracked word
+        stats[key].totalCount++;
+        stats[key].lastTestedAt = now;
+        if (isCorrect) {
+          stats[key].streakCorrect++;
+        } else {
+          stats[key].wrongCount++;
+          stats[key].lastWrongAt = now;
+          stats[key].streakCorrect = 0;
+        }
+      } else if (!isCorrect) {
+        // First time wrong - create record
+        stats[key] = {
+          word: word,
+          categoryId: categoryId,
+          totalCount: 1,
+          wrongCount: 1,
+          lastTestedAt: now,
+          lastWrongAt: now,
+          streakCorrect: 0,
+          firstWrongAt: now
+        };
+      }
+      // If correct and not tracked, do nothing (only track words that have been wrong)
+
+      saveWordStatsToStorage(stats);
+
+      // Update review plan
+      var plan = getReviewPlanFromStorage();
+      if (!isCorrect) {
+        // Wrong: enter or reset to level 0
+        plan[key] = {
+          word: word,
+          categoryId: categoryId,
+          definition: definition || '',
+          level: 0,
+          nextReviewAt: now + REVIEW_INTERVALS[0] * 86400000,
+          lastReviewedAt: now,
+          createdAt: plan[key] ? plan[key].createdAt : now
+        };
+      } else if (plan[key]) {
+        // Correct and in review plan: advance level
+        plan[key].lastReviewedAt = now;
+        plan[key].level = (plan[key].level || 0) + 1;
+        if (plan[key].level >= REVIEW_INTERVALS.length) {
+          // Graduated - remove from plan
+          delete plan[key];
+        } else {
+          plan[key].nextReviewAt = now + REVIEW_INTERVALS[plan[key].level] * 86400000;
+        }
+      }
+      saveReviewPlanToStorage(plan);
+    }
+
+    function recordQuizSession() {
+      var history = getQuizHistoryFromStorage();
+      var wrongWords = state.currentWrong.map(function (w) {
+        return { word: w.word, categoryId: w.categoryId || state.currentCategoryId || 'unknown', definition: w.definition || '' };
+      });
+      var allTestedWords = state.currentQuiz.map(function (w, i) {
+        var qa = state.quizAnswers[i];
+        return { word: w.word, categoryId: w.categoryId || state.currentCategoryId || 'unknown', correct: qa ? qa.correct : false };
+      });
+      var entry = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        timestamp: Date.now(),
+        categoryId: state.currentCategoryId || 'unknown',
+        totalQuestions: state.currentQuiz.length,
+        correctCount: state.correct,
+        isRetest: !!state.isRetesting,
+        isReview: !!state.isReviewQuiz,
+        wrongWords: wrongWords,
+        allTestedWords: allTestedWords
+      };
+      history.unshift(entry);
+      saveQuizHistoryToStorage(history);
+    }
+
+    // === 查询函数 ===
+    function getHighFreqWrongWords(categoryId, limit) {
+      var stats = getWordStatsFromStorage();
+      var list = Object.values(stats).filter(function (s) {
+        if (categoryId && categoryId !== 'all' && s.categoryId !== categoryId) return false;
+        return s.wrongCount > 0;
+      });
+      list.sort(function (a, b) {
+        var rateA = a.wrongCount / a.totalCount;
+        var rateB = b.wrongCount / b.totalCount;
+        if (rateB !== rateA) return rateB - rateA;
+        return b.wrongCount - a.wrongCount;
+      });
+      return limit ? list.slice(0, limit) : list;
+    }
+
+    function getWordsDueForReview(categoryId) {
+      var plan = getReviewPlanFromStorage();
+      var now = Date.now();
+      return Object.values(plan).filter(function (r) {
+        if (categoryId && categoryId !== 'all' && r.categoryId !== categoryId) return false;
+        return r.nextReviewAt <= now;
+      }).sort(function (a, b) { return a.nextReviewAt - b.nextReviewAt; });
+    }
+
+    function getReviewSummary(categoryId) {
+      var plan = getReviewPlanFromStorage();
+      var now = Date.now();
+      var summary = { total: 0, due: 0, levels: [0, 0, 0, 0, 0, 0] };
+      Object.values(plan).forEach(function (r) {
+        if (categoryId && categoryId !== 'all' && r.categoryId !== categoryId) return;
+        summary.total++;
+        var lvl = Math.min(r.level || 0, 5);
+        summary.levels[lvl]++;
+        if (r.nextReviewAt <= now) summary.due++;
+      });
+      return summary;
+    }
+
+    // === 新测验入口 ===
+    function startReviewQuiz() {
+      var dueWords = getWordsDueForReview(state.currentCategoryId);
+      if (dueWords.length === 0) {
+        alert('当前没有待复习的单词。');
+        return;
+      }
+      var sizeEl = document.getElementById('reviewQuizSize');
+      var size = sizeEl ? parseInt(sizeEl.value, 10) : 10;
+      if (!size || size < 1) size = 10;
+      size = Math.min(size, dueWords.length);
+
+      // Build quiz words from review plan - need to find definitions from categories
+      var quizWords = dueWords.slice(0, size).map(function (r) {
+        return { word: r.word, definition: r.definition || '', categoryId: r.categoryId };
+      });
+
+      state.isReviewQuiz = true;
+      state.isHighFreqQuiz = false;
+      state.currentQuiz = quizWords.sort(function () { return Math.random() - 0.5; });
+      state.index = 0;
+      state.correct = 0;
+      state.currentWrong = [];
+      state.isRetesting = false;
+      state.retestRound = 0;
+      state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
+
+      // Close modals
+      document.getElementById('modalReview').classList.remove('active');
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+
+    function startHighFreqQuiz() {
+      var filterGroup = document.getElementById('statsFilterGroup');
+      var catId = filterGroup ? filterGroup.value : 'all';
+      var highFreq = getHighFreqWrongWords(catId, 20);
+      if (highFreq.length === 0) {
+        alert('暂无高频错词可测试。');
+        return;
+      }
+
+      // Find definitions from current word bank or stats
+      var allWords = [];
+      state.categories.forEach(function (c) {
+        (c.words || []).forEach(function (w) { allWords.push({ word: w.word, definition: w.definition, categoryId: c.id }); });
+      });
+      var wordMap = {};
+      allWords.forEach(function (w) { wordMap[makeWordKey(w.categoryId, w.word)] = w; });
+
+      var quizWords = highFreq.map(function (s) {
+        var key = makeWordKey(s.categoryId, s.word);
+        var found = wordMap[key];
+        return { word: s.word, definition: found ? found.definition : '', categoryId: s.categoryId };
+      }).filter(function (w) { return w.definition; });
+
+      if (quizWords.length === 0) {
+        alert('找不到高频错词的释义，可能词库已变更。');
+        return;
+      }
+
+      state.isReviewQuiz = false;
+      state.isHighFreqQuiz = true;
+      state.currentQuiz = quizWords.sort(function () { return Math.random() - 0.5; });
+      state.index = 0;
+      state.correct = 0;
+      state.currentWrong = [];
+      state.isRetesting = false;
+      state.retestRound = 0;
+      state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
+
+      document.getElementById('modalStats').classList.remove('active');
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+
+    // === 渲染函数 ===
+    function renderHighFreqWordList() {
+      var wrap = document.getElementById('highFreqList');
+      if (!wrap) return;
+      var filterGroup = document.getElementById('statsFilterGroup');
+      var catId = filterGroup ? filterGroup.value : 'all';
+      var list = getHighFreqWrongWords(catId, 30);
+      if (list.length === 0) {
+        wrap.innerHTML = '<div class="empty-state">暂无错词记录</div>';
+        var btn = document.getElementById('btnHighFreqQuiz');
+        if (btn) btn.disabled = true;
+        return;
+      }
+      var btn = document.getElementById('btnHighFreqQuiz');
+      if (btn) btn.disabled = false;
+      wrap.innerHTML = list.map(function (s, i) {
+        var rate = s.totalCount ? Math.round((s.wrongCount / s.totalCount) * 100) : 0;
+        var barColor = rate >= 60 ? 'var(--wrong)' : rate >= 30 ? '#eab308' : 'var(--correct)';
+        var streakHtml = '';
+        if (s.streakCorrect >= 3) {
+          streakHtml = '<span class="streak-badge good">连对' + s.streakCorrect + '</span>';
+        } else if (rate >= 60) {
+          streakHtml = '<span class="streak-badge bad">高频</span>';
+        }
+        return '<div class="highfreq-item">' +
+          '<span class="rank">' + (i + 1) + '</span>' +
+          '<span class="hw">' + escapeHtml(s.word) + '</span>' +
+          '<div class="error-rate-bar"><div class="error-rate-bar-track"><div class="error-rate-bar-fill" style="width:' + rate + '%;background:' + barColor + ';"></div></div></div>' +
+          '<span class="hw-count">' + s.wrongCount + '/' + s.totalCount + '</span>' +
+          streakHtml +
+          '</div>';
+      }).join('');
+    }
+
+    function renderQuizHistory() {
+      var wrap = document.getElementById('historyList');
+      if (!wrap) return;
+      var history = getQuizHistoryFromStorage();
+      if (history.length === 0) {
+        wrap.innerHTML = '<div class="empty-state">暂无测验记录</div>';
+        return;
+      }
+      wrap.innerHTML = history.map(function (h) {
+        var pct = h.totalQuestions ? Math.round((h.correctCount / h.totalQuestions) * 100) : 0;
+        var rateClass = pct >= 80 ? 'high' : pct >= 60 ? 'mid' : 'low';
+        var date = new Date(h.timestamp);
+        var dateStr = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' ' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+        var tags = '';
+        if (h.isRetest) tags += '<span class="history-tag retest">错题补测</span>';
+        if (h.isReview) tags += '<span class="history-tag review">复习</span>';
+        var wrongHtml = '';
+        if (h.wrongWords && h.wrongWords.length > 0) {
+          wrongHtml = '<div class="history-wrong-words">错词：' + h.wrongWords.map(function (w) { return escapeHtml(w.word); }).join('、') + '</div>';
+        }
+        return '<div class="history-item">' +
+          '<div class="history-item-header">' +
+          '<span class="history-date">' + dateStr + '</span>' +
+          '<span class="history-item-detail">' + escapeHtml(h.categoryId === 'all' ? '全部' : (h.categoryId || '')) + '</span>' +
+          tags +
+          '</div>' +
+          '<span class="history-item-rate ' + rateClass + '">' + pct + '%</span> ' +
+          '<span class="history-item-detail">正确 ' + h.correctCount + '/' + h.totalQuestions + '</span>' +
+          wrongHtml +
+          '</div>';
+      }).join('');
+    }
+
+    function renderReviewWordList() {
+      var wrap = document.getElementById('reviewWordList');
+      if (!wrap) return;
+      var filterGroup = document.getElementById('reviewFilterGroup');
+      var catId = filterGroup ? filterGroup.value : 'all';
+      var dueWords = getWordsDueForReview(catId);
+      var btn = document.getElementById('btnStartReviewQuiz');
+      if (dueWords.length === 0) {
+        wrap.innerHTML = '<div class="empty-state">暂无待复习单词</div>';
+        if (btn) btn.disabled = true;
+        return;
+      }
+      if (btn) btn.disabled = false;
+      wrap.innerHTML = dueWords.map(function (r) {
+        var lvl = Math.min(r.level || 0, 5);
+        return '<div class="review-word-item">' +
+          '<span class="review-level-dot review-level-' + lvl + '"></span>' +
+          '<span class="rw-word">' + escapeHtml(r.word) + '</span>' +
+          '<span class="rw-info">等级 ' + lvl + ' · ' + escapeHtml(r.categoryId === 'all' ? '' : (r.categoryId || '')) + '</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    function renderReviewLevelSummary() {
+      var wrap = document.getElementById('reviewSummary');
+      if (!wrap) return;
+      var filterGroup = document.getElementById('reviewFilterGroup');
+      var catId = filterGroup ? filterGroup.value : 'all';
+      var summary = getReviewSummary(catId);
+      var levelNames = ['等级0 (1天)', '等级1 (2天)', '等级2 (4天)', '等级3 (7天)', '等级4 (15天)', '等级5 (30天)'];
+      wrap.innerHTML = summary.levels.map(function (count, i) {
+        return '<div class="review-summary-item"><span class="review-level-dot review-level-' + i + '"></span><div class="rs-count">' + count + '</div><div class="rs-label">' + levelNames[i] + '</div></div>';
+      }).join('') +
+        '<div class="review-summary-item"><div class="rs-count">' + summary.due + '</div><div class="rs-label">待复习</div></div>' +
+        '<div class="review-summary-item"><div class="rs-count">' + summary.total + '</div><div class="rs-label">总计划</div></div>';
+    }
+
+    function updateReviewBadge() {
+      var notice = document.getElementById('reviewNotice');
+      var textEl = document.getElementById('reviewNoticeText');
+      if (!notice || !textEl) return;
+      var due = getWordsDueForReview('all');
+      if (due.length > 0) {
+        notice.style.display = 'flex';
+        textEl.innerHTML = '<strong>' + due.length + '</strong> 个单词待复习（基于艾宾浩斯遗忘曲线）';
+      } else {
+        notice.style.display = 'none';
+      }
+    }
+
+    function renderStatsOverview() {
+      var history = getQuizHistoryFromStorage();
+      var stats = getWordStatsFromStorage();
+      var plan = getReviewPlanFromStorage();
+
+      // Total quizzes
+      var totalQuizzes = history.length;
+      document.getElementById('statTotalQuizzes').textContent = totalQuizzes;
+
+      // Total wrong words
+      var wrongWords = Object.values(stats).filter(function (s) { return s.wrongCount > 0; });
+      document.getElementById('statTotalWrongWords').textContent = wrongWords.length;
+
+      // Average accuracy
+      if (history.length > 0) {
+        var totalCorrect = 0, totalQ = 0;
+        history.forEach(function (h) { totalCorrect += h.correctCount; totalQ += h.totalQuestions; });
+        var avg = totalQ ? Math.round((totalCorrect / totalQ) * 100) : 0;
+        document.getElementById('statAvgAccuracy').textContent = avg + '%';
+      } else {
+        document.getElementById('statAvgAccuracy').textContent = '-';
+      }
+
+      // Due for review
+      var dueCount = getWordsDueForReview('all').length;
+      document.getElementById('statDueReview').textContent = dueCount;
+    }
+
+    function fillStatsFilterGroups() {
+      ['statsFilterGroup', 'reviewFilterGroup'].forEach(function (selId) {
+        var sel = document.getElementById(selId);
+        if (!sel) return;
+        sel.innerHTML = '<option value="all">全部分组</option>';
+        (state.categories || []).forEach(function (c) {
+          var opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.name;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    // === 迁移函数 ===
+    function migrateOldWrongData() {
+      if (localStorage.getItem(STORAGE_WORD_STATS)) return; // already migrated
+      var oldWrong = getWrongFromStorage();
+      if (!oldWrong || oldWrong.length === 0) return;
+
+      var stats = {};
+      var plan = {};
+      var now = Date.now();
+
+      // Build a word-to-category map from current categories
+      var wordCatMap = {};
+      state.categories.forEach(function (c) {
+        (c.words || []).forEach(function (w) {
+          if (!wordCatMap[w.word]) wordCatMap[w.word] = c.id;
+        });
+      });
+
+      // Deduplicate and count
+      var counts = {};
+      oldWrong.forEach(function (w) {
+        if (!w.word) return;
+        var catId = wordCatMap[w.word] || 'unknown';
+        var key = makeWordKey(catId, w.word);
+        if (!counts[key]) {
+          counts[key] = { word: w.word, categoryId: catId, definition: w.definition || '', count: 0 };
+        }
+        counts[key].count++;
+      });
+
+      Object.keys(counts).forEach(function (key) {
+        var c = counts[key];
+        stats[key] = {
+          word: c.word,
+          categoryId: c.categoryId,
+          totalCount: c.count,
+          wrongCount: c.count,
+          lastTestedAt: now,
+          lastWrongAt: now,
+          streakCorrect: 0,
+          firstWrongAt: now
+        };
+        plan[key] = {
+          word: c.word,
+          categoryId: c.categoryId,
+          definition: c.definition,
+          level: 0,
+          nextReviewAt: now + REVIEW_INTERVALS[0] * 86400000,
+          lastReviewedAt: now,
+          createdAt: now
+        };
+      });
+
+      saveWordStatsToStorage(stats);
+      saveReviewPlanToStorage(plan);
+      // Keep old key for compatibility
+    }
+
+    // === 清理函数 ===
+    function cleanupStatsForCategory(categoryId) {
+      if (!categoryId || categoryId === 'all') return;
+      var stats = getWordStatsFromStorage();
+      var plan = getReviewPlanFromStorage();
+      var changed = false;
+      Object.keys(stats).forEach(function (key) {
+        if (stats[key].categoryId === categoryId) { delete stats[key]; changed = true; }
+      });
+      Object.keys(plan).forEach(function (key) {
+        if (plan[key].categoryId === categoryId) { delete plan[key]; changed = true; }
+      });
+      if (changed) {
+        saveWordStatsToStorage(stats);
+        saveReviewPlanToStorage(plan);
+      }
+    }
+
+    function cleanupStatsForWord(categoryId, word) {
+      if (!word) return;
+      var key = makeWordKey(categoryId, word);
+      var stats = getWordStatsFromStorage();
+      var plan = getReviewPlanFromStorage();
+      if (stats[key]) delete stats[key];
+      if (plan[key]) delete plan[key];
+      saveWordStatsToStorage(stats);
+      saveReviewPlanToStorage(plan);
+    }
+
     function pickN(allWords, wrongList, need) {
       if (allWords.length <= need) return [...allWords].sort(() => Math.random() - 0.5);
       var wrongCount = Math.min(5, Math.max(1, Math.round(need * 0.25)));
@@ -519,7 +1189,7 @@
       };
     })();
 
-    let state = { wordBank: DEFAULT_WORDS.slice(), categories: [], currentCategoryId: 'all', currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
+    let state = { wordBank: DEFAULT_WORDS.slice(), categories: [], currentCategoryId: 'all', editingWordIndex: null, currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
 
     function getVocabUrl() {
       try {
@@ -538,11 +1208,11 @@
     function getCurrentWords() {
       if (state.currentCategoryId === 'all' || !state.categories.length) {
         var list = [];
-        state.categories.forEach(function (c) { (c.words || []).forEach(function (w) { list.push(w); }); });
+        state.categories.forEach(function (c) { (c.words || []).forEach(function (w) { list.push(Object.assign({}, w, { categoryId: c.id })); }); });
         return list;
       }
       var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
-      return cat ? (cat.words || []) : [];
+      return cat ? (cat.words || []).map(function (w) { return Object.assign({}, w, { categoryId: cat.id }); }) : [];
     }
 
     function applyCurrentGroup() {
@@ -581,14 +1251,36 @@
       var wrap = document.getElementById('vocabListContent');
       if (!wrap) return;
       var words = getCurrentWords();
+      var canEditDelete = state.currentCategoryId !== 'all' && state.currentCategoryId;
       if (words.length === 0) {
-        wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词，请先加载词库或选择其他单词组。</p>';
+        wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词。选择具体单词组后可逐条添加，或从上方粘贴列表解析。</p>';
         return;
       }
-      wrap.innerHTML = words.map(function (item) {
-        var serial = item.serial != null ? item.serial : '';
-        return '<div class="word-list-item"><span class="idx">' + escapeHtml(String(serial)) + '</span><span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition || '') + '</span></div>';
+      wrap.innerHTML = words.map(function (item, i) {
+        var serial = item.serial != null ? item.serial : String(i + 1);
+        var idxHtml = '<span class="idx">' + escapeHtml(String(serial)) + '</span>';
+        if (canEditDelete && state.editingWordIndex === i) {
+          return '<div class="word-list-item editing" data-index="' + i + '">' +
+            '<div class="item-content">' + idxHtml +
+            '<input type="text" id="editWordInput" value="' + (item.word || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" placeholder="单词" />' +
+            '<input type="text" id="editDefInput" value="' + (item.definition || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" placeholder="释义" />' +
+            '</div><div class="item-actions">' +
+            '<button type="button" class="btn-item-save">保存</button><button type="button" class="btn-item-cancel">取消</button></div></div>';
+        }
+        var actionsHtml = '';
+        if (canEditDelete) {
+          actionsHtml = '<div class="item-actions"><button type="button" class="btn-item-edit" data-index="' + i + '">编辑</button><button type="button" class="btn-item-delete" data-index="' + i + '">删除</button></div>';
+        }
+        return '<div class="word-list-item">' +
+          '<div class="item-content">' + idxHtml + '<span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition || '') + '</span></div>' +
+          actionsHtml + '</div>';
       }).join('');
+      if (canEditDelete && state.editingWordIndex !== null) {
+        setTimeout(function () {
+          var el = document.getElementById('editWordInput');
+          if (el) { el.focus(); el.select && el.select(); }
+        }, 50);
+      }
     }
 
     function fillVocabGroupSelect() {
@@ -656,6 +1348,7 @@
       document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
       const el = document.getElementById(id);
       if (el) el.classList.add('active');
+      if (id === 'screen-home') updateReviewBadge();
     }
 
     function startQuiz(wordBank) {
@@ -681,6 +1374,10 @@
       state.index = 0;
       state.correct = 0;
       state.currentWrong = [];
+      state.isRetesting = false;
+      state.isReviewQuiz = false;
+      state.isHighFreqQuiz = false;
+      state.retestRound = 0;
       state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
       showScreen('screen-quiz');
       renderQuestion();
@@ -741,14 +1438,16 @@
         feedbackEl.className = 'feedback correct';
         feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
         Audio.correct();
+        recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', true);
       } else {
         state.wrongAnswers.push({ word: item.word, definition: item.definition || '' });
-        state.currentWrong.push({ word: item.word, definition: item.definition });
+        state.currentWrong.push({ word: item.word, definition: item.definition, categoryId: item.categoryId || state.currentCategoryId || 'unknown' });
         saveWrongToStorage(state.wrongAnswers);
         input.classList.add('wrong');
         feedbackEl.className = 'feedback wrong';
         feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         Audio.wrong();
+        recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', false);
       }
     }
 
@@ -774,18 +1473,68 @@
       const rateEl = document.getElementById('rateDisplay');
       rateEl.textContent = pct + '%';
       rateEl.className = 'rate ' + (pct >= 80 ? 'high' : pct >= 60 ? 'mid' : 'low');
-      document.getElementById('rateDetail').textContent = `正确 ${correct} / ${total}`;
+      var titleEl = document.getElementById('resultTitle');
+      if (state.isRetesting) {
+        var round = state.retestRound || 1;
+        document.getElementById('rateDetail').textContent = '错题补测第 ' + round + ' 轮：正确 ' + correct + ' / ' + total;
+        if (titleEl) titleEl.textContent = '错题补测结果';
+      } else {
+        document.getElementById('rateDetail').textContent = '正确 ' + correct + ' / ' + total;
+        if (titleEl) titleEl.textContent = '测验结束';
+      }
       const wrongSection = document.getElementById('wrongSection');
       const wrongList = document.getElementById('wrongList');
       if (state.currentWrong.length > 0) {
         wrongSection.style.display = 'block';
+        var wrongTitle = document.getElementById('wrongSectionTitle');
+        if (wrongTitle) {
+          wrongTitle.textContent = state.isRetesting ? '仍然答错的单词' : '本次答错的单词';
+        }
+        var wordStats = getWordStatsFromStorage();
         wrongList.innerHTML = state.currentWrong.map(function (item) {
-          return '<div class="wrong-item"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div></div>';
+          var key = makeWordKey(item.categoryId || state.currentCategoryId || 'unknown', item.word);
+          var s = wordStats[key];
+          var statInfo = '';
+          if (s && s.totalCount) {
+            var rate = Math.round((s.wrongCount / s.totalCount) * 100);
+            statInfo = '<div class="result-stat-info">累计答错 ' + s.wrongCount + '/' + s.totalCount + ' 次, 错误率 ' + rate + '%</div>';
+          }
+          return '<div class="wrong-item"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div>' + statInfo + '</div>';
         }).join('');
       } else {
         wrongSection.style.display = 'none';
+        if (state.isRetesting) {
+          wrongSection.style.display = 'block';
+          var wrongTitle = document.getElementById('wrongSectionTitle');
+          if (wrongTitle) wrongTitle.textContent = '全部答对！';
+          wrongList.innerHTML = '<p style="color:var(--correct);font-size:0.95rem;padding:0.5rem 0;">所有错题已掌握，补测完成！</p>';
+        }
       }
+      // 显示或隐藏"错题补测"按钮：有错题才显示
+      var retestBtn = document.getElementById('btnRetestWrong');
+      if (retestBtn) {
+        retestBtn.style.display = state.currentWrong.length > 0 ? 'inline-block' : 'none';
+      }
+      // 记录测验历史
+      recordQuizSession();
       showScreen('screen-result');
+    }
+
+    function startRetest() {
+      if (state.currentWrong.length === 0) {
+        alert('没有错题，无需补测！');
+        return;
+      }
+      var wrongWords = state.currentWrong.slice();
+      state.retestRound = (state.retestRound || 0) + 1;
+      state.isRetesting = true;
+      state.currentQuiz = wrongWords.sort(function () { return Math.random() - 0.5; });
+      state.index = 0;
+      state.correct = 0;
+      state.currentWrong = [];
+      state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
+      showScreen('screen-quiz');
+      renderQuestion();
     }
 
     function escapeHtml(s) {
@@ -861,6 +1610,8 @@
     document.getElementById('btnOpenVocab').addEventListener('click', function () {
       fillVocabGroupSelect();
       state.currentCategoryId = document.getElementById('vocabGroupSelect').value || 'all';
+      state.editingWordIndex = null;
+      updateAddWordSectionVisibility();
       renderVocabListInModal();
       document.getElementById('modalVocab').classList.add('active');
       tryLoadFromSheet().then(function (ok) {
@@ -869,6 +1620,7 @@
           fillVocabGroupSelect();
           state.currentCategoryId = document.getElementById('vocabGroupSelect').value || prev || 'all';
           applyCurrentGroup();
+          updateAddWordSectionVisibility();
           renderVocabListInModal();
         }
       });
@@ -881,8 +1633,18 @@
       if (e.target === document.getElementById('modalVocab')) document.getElementById('modalVocab').classList.remove('active');
     });
 
+    function updateAddWordSectionVisibility() {
+      var isAll = state.currentCategoryId === 'all' || !state.currentCategoryId;
+      var hintEl = document.getElementById('addWordSectionHint');
+      var formEl = document.getElementById('addWordForm');
+      if (hintEl) hintEl.style.display = isAll ? 'block' : 'none';
+      if (formEl) formEl.style.display = isAll ? 'none' : 'block';
+    }
+
     document.getElementById('vocabGroupSelect').addEventListener('change', function () {
       state.currentCategoryId = this.value || 'all';
+      state.editingWordIndex = null;
+      updateAddWordSectionVisibility();
       renderVocabListInModal();
     });
 
@@ -891,6 +1653,110 @@
       applyCurrentGroup();
       updateWordCount();
       document.getElementById('modalVocab').classList.remove('active');
+    });
+
+    document.getElementById('btnAddWord').addEventListener('click', function () {
+      var wordEl = document.getElementById('addWordInput');
+      var defEl = document.getElementById('addDefInput');
+      var word = (wordEl && wordEl.value || '').trim();
+      var definition = (defEl && defEl.value || '').trim();
+      if (!word) {
+        alert('请填写单词。');
+        return;
+      }
+      if (state.currentCategoryId === 'all' || !state.currentCategoryId) {
+        alert('请先选择具体单词组再添加单词。');
+        return;
+      }
+      var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+      if (!cat) {
+        alert('未找到当前单词组，请刷新词库后重试。');
+        return;
+      }
+      if (!cat.words) cat.words = [];
+      var serial = String(cat.words.length + 1);
+      cat.words.push({ serial: serial, word: word, definition: definition || '(无释义)' });
+      applyCurrentGroup();
+      updateWordCount();
+      fillVocabGroupSelect();
+      if (wordEl) wordEl.value = '';
+      if (defEl) defEl.value = '';
+      wordEl && wordEl.focus();
+    });
+    [document.getElementById('addWordInput'), document.getElementById('addDefInput')].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') document.getElementById('btnAddWord').click();
+      });
+    });
+
+    document.getElementById('vocabListContent').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && (e.target.id === 'editWordInput' || e.target.id === 'editDefInput')) {
+        e.preventDefault();
+        var saveBtn = document.querySelector('#vocabListContent .btn-item-save');
+        if (saveBtn) saveBtn.click();
+      }
+    });
+    document.getElementById('vocabListContent').addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.classList) return;
+      if (t.classList.contains('btn-item-delete')) {
+        var idx = parseInt(t.getAttribute('data-index'), 10);
+        if (isNaN(idx)) return;
+        var words = getCurrentWords();
+        if (idx < 0 || idx >= words.length) return;
+        var item = words[idx];
+        if (!confirm('确定删除「' + (item.word || '') + '」？')) return;
+        var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+        if (cat && cat.words) {
+          cleanupStatsForWord(state.currentCategoryId, item.word);
+          cat.words.splice(idx, 1);
+          state.editingWordIndex = null;
+          applyCurrentGroup();
+          updateWordCount();
+          fillVocabGroupSelect();
+          renderVocabListInModal();
+        }
+        return;
+      }
+      if (t.classList.contains('btn-item-edit')) {
+        var idx = parseInt(t.getAttribute('data-index'), 10);
+        if (!isNaN(idx)) {
+          state.editingWordIndex = idx;
+          renderVocabListInModal();
+        }
+        return;
+      }
+      if (t.classList.contains('btn-item-cancel')) {
+        state.editingWordIndex = null;
+        renderVocabListInModal();
+        return;
+      }
+      if (t.classList.contains('btn-item-save')) {
+        var idx = state.editingWordIndex;
+        if (idx == null) return;
+        var wordEl = document.getElementById('editWordInput');
+        var defEl = document.getElementById('editDefInput');
+        var newWord = (wordEl && wordEl.value || '').trim();
+        var newDef = (defEl && defEl.value || '').trim();
+        var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+        if (!cat || !cat.words || idx < 0 || idx >= cat.words.length) {
+          state.editingWordIndex = null;
+          renderVocabListInModal();
+          return;
+        }
+        if (!newWord) {
+          alert('单词不能为空。');
+          return;
+        }
+        var serial = cat.words[idx].serial;
+        cat.words[idx] = { serial: serial != null ? serial : String(idx + 1), word: newWord, definition: newDef || '(无释义)' };
+        state.editingWordIndex = null;
+        applyCurrentGroup();
+        updateWordCount();
+        fillVocabGroupSelect();
+        renderVocabListInModal();
+      }
     });
 
     document.getElementById('vocabRefresh').addEventListener('click', function () {
@@ -943,6 +1809,7 @@
               fillVocabGroupSelect();
               renderVocabListInModal();
               updateWordCount();
+              cleanupStatsForCategory(name);
               alert('已删除单词组「' + (data.category || name) + '」。');
             } else {
               alert('删除后刷新失败，请手动点击「刷新词库」。');
@@ -1032,8 +1899,96 @@
     });
 
     document.getElementById('btnAgain').addEventListener('click', () => {
+      state.isRetesting = false;
+      state.retestRound = 0;
       showScreen('screen-home');
       startQuiz(state.wordBank);
+    });
+
+    document.getElementById('btnRetestWrong').addEventListener('click', function () {
+      startRetest();
+    });
+
+    // === 新增事件监听 ===
+    // 统计面板
+    document.getElementById('btnOpenStats').addEventListener('click', function () {
+      fillStatsFilterGroups();
+      renderStatsOverview();
+      renderHighFreqWordList();
+      document.getElementById('modalStats').classList.add('active');
+    });
+    document.getElementById('modalStatsClose').addEventListener('click', function () {
+      document.getElementById('modalStats').classList.remove('active');
+    });
+    document.getElementById('modalStats').addEventListener('click', function (e) {
+      if (e.target === document.getElementById('modalStats')) document.getElementById('modalStats').classList.remove('active');
+    });
+    document.getElementById('statsFilterGroup').addEventListener('change', function () {
+      renderHighFreqWordList();
+    });
+    document.getElementById('btnHighFreqQuiz').addEventListener('click', function () {
+      startHighFreqQuiz();
+    });
+    document.getElementById('btnClearStats').addEventListener('click', function () {
+      if (!confirm('确认清空所有学习统计数据？此操作不可恢复。')) return;
+      saveWordStatsToStorage({});
+      saveQuizHistoryToStorage([]);
+      saveReviewPlanToStorage({});
+      renderStatsOverview();
+      renderHighFreqWordList();
+      updateReviewBadge();
+      alert('统计数据已清空。');
+    });
+
+    // 历史面板
+    document.getElementById('btnOpenHistory').addEventListener('click', function () {
+      renderQuizHistory();
+      document.getElementById('modalHistory').classList.add('active');
+    });
+    document.getElementById('modalHistoryClose').addEventListener('click', function () {
+      document.getElementById('modalHistory').classList.remove('active');
+    });
+    document.getElementById('modalHistory').addEventListener('click', function (e) {
+      if (e.target === document.getElementById('modalHistory')) document.getElementById('modalHistory').classList.remove('active');
+    });
+
+    // 复习面板
+    function openReviewModal() {
+      fillStatsFilterGroups();
+      renderReviewLevelSummary();
+      renderReviewWordList();
+      document.getElementById('modalReview').classList.add('active');
+    }
+    document.getElementById('btnReviewFromNotice').addEventListener('click', function () {
+      openReviewModal();
+    });
+    document.getElementById('modalReviewClose').addEventListener('click', function () {
+      document.getElementById('modalReview').classList.remove('active');
+    });
+    document.getElementById('modalReview').addEventListener('click', function (e) {
+      if (e.target === document.getElementById('modalReview')) document.getElementById('modalReview').classList.remove('active');
+    });
+    document.getElementById('reviewFilterGroup').addEventListener('change', function () {
+      renderReviewLevelSummary();
+      renderReviewWordList();
+    });
+    document.getElementById('btnStartReviewQuiz').addEventListener('click', function () {
+      startReviewQuiz();
+    });
+    document.getElementById('btnOpenReviewFromPanel').addEventListener('click', function () {
+      document.getElementById('modalStats').classList.remove('active');
+      openReviewModal();
+    });
+
+    // 结果页查看统计按钮
+    document.getElementById('btnViewStats').addEventListener('click', function () {
+      showScreen('screen-home');
+      setTimeout(function () {
+        fillStatsFilterGroups();
+        renderStatsOverview();
+        renderHighFreqWordList();
+        document.getElementById('modalStats').classList.add('active');
+      }, 100);
     });
 
     (function init() {
@@ -1066,6 +2021,10 @@
       updateWordCount();
       tryLoadFromSheet().then(function (ok) {
         if (ok) fillVocabGroupSelect();
+        // Run migration after categories are loaded
+        migrateOldWrongData();
+        // Update review badge on home screen
+        updateReviewBadge();
       });
     })();
   </script>
