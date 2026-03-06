@@ -272,6 +272,58 @@
 
     .btn-danger { background: var(--wrong); }
     .btn-danger:hover { filter: brightness(1.1); }
+
+    /* === 艾宾浩斯复习日历 === */
+    .cal-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.75rem; }
+    .cal-nav button { background: none; border: 1px solid #444; color: var(--text); width: 2rem; height: 2rem; border-radius: 6px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+    .cal-nav button:hover { border-color: var(--accent); color: var(--accent); }
+    .cal-nav .cal-month-label { font-size: 1rem; font-weight: 600; min-width: 8rem; text-align: center; }
+    .cal-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 2px; }
+    .cal-header span { text-align: center; font-size: 0.75rem; color: var(--muted); padding: 0.25rem 0; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-cell { position: relative; background: #25252b; border-radius: 6px; min-height: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s, background 0.15s; }
+    .cal-cell:hover { border-color: #555; }
+    .cal-cell.today { border-color: var(--accent); }
+    .cal-cell.has-due { background: rgba(239,68,68,0.2); }
+    .cal-cell.has-future { background: rgba(99,102,241,0.15); }
+    .cal-cell.selected { border-color: var(--accent); background: rgba(99,102,241,0.25); }
+    .cal-cell.other-month { opacity: 0.3; }
+    .cal-cell .cal-day { font-size: 0.85rem; color: var(--text); }
+    .cal-cell .cal-badge { position: absolute; top: 1px; right: 2px; font-size: 0.6rem; font-weight: 700; background: var(--wrong); color: #fff; border-radius: 50%; min-width: 1rem; height: 1rem; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0 2px; }
+    .cal-cell.has-future .cal-badge { background: var(--accent); }
+    .cal-day-detail { margin-top: 1rem; background: #25252b; border-radius: 10px; padding: 1rem; border: 1px solid #333; }
+    .cal-day-detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+    .cal-day-detail-header h4 { font-size: 0.95rem; margin: 0; }
+    .cal-day-detail-list { max-height: 240px; overflow-y: auto; border: 1px solid #333; border-radius: 8px; background: var(--bg); }
+    .cal-day-word-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.75rem; border-bottom: 1px solid #2a2a2e; font-size: 0.85rem; }
+    .cal-day-word-item:last-child { border-bottom: none; }
+    .cal-day-word-item .cdw-word { font-weight: 600; color: var(--accent); min-width: 7rem; }
+    .cal-day-word-item .cdw-def { color: var(--muted); font-size: 0.8rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-day-word-item .cdw-level { font-size: 0.7rem; color: var(--muted); min-width: 3rem; text-align: right; }
+
+    /* === 单词卡 Flashcard === */
+    .flashcard-section { margin-bottom: 1rem; }
+    .flashcard-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
+    .flashcard-group-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; }
+    .flashcard-group-row label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+    .flashcard-group-row select { flex: 1; padding: 0.45rem 0.5rem; background: #25252b; border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.9rem; }
+    .flashcard-stage { perspective: 800px; width: 100%; margin-bottom: 0.85rem; }
+    .flashcard-inner { position: relative; width: 100%; transition: transform 0.5s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; cursor: pointer; }
+    .flashcard-inner.flipped { transform: rotateY(180deg); }
+    .flashcard-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.75rem 1.5rem; text-align: center; border: 1px solid #333; min-height: 180px; }
+    .flashcard-front { position: relative; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); }
+    .flashcard-back { position: absolute; inset: 0; transform: rotateY(180deg); background: linear-gradient(135deg, #1a2e1a 0%, #234223 100%); }
+    .flashcard-word { font-size: 1.65rem; font-weight: 700; color: #e0e7ff; letter-spacing: 0.02em; line-height: 1.3; }
+    .flashcard-back .flashcard-word { font-size: 1rem; font-weight: 400; color: #d1fae5; line-height: 1.6; }
+    .flashcard-hint { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 0.85rem; }
+    .flashcard-accuracy { font-size: 0.78rem; margin-top: 0.65rem; padding: 0.2rem 0.65rem; border-radius: 10px; background: rgba(255,255,255,0.1); }
+    .flashcard-accuracy.acc-high { color: var(--correct); }
+    .flashcard-accuracy.acc-mid { color: #eab308; }
+    .flashcard-accuracy.acc-low { color: var(--wrong); }
+    .flashcard-accuracy.acc-none { color: rgba(255,255,255,0.3); }
+    .flashcard-counter { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 0.6rem; }
+    .flashcard-nav { display: flex; gap: 0.6rem; justify-content: center; }
+    .flashcard-nav .btn { margin-top: 0; min-width: 90px; font-size: 0.9rem; padding: 0.5rem 1rem; }
   </style>
 </head>
 <body>
@@ -316,15 +368,31 @@
         </div>
         <button type="button" class="btn" id="btnStart" style="margin-top: 1rem;">开始测验</button>
       </div>
-      <div class="card upload-area">
-        <h3 style="font-size:1rem;margin-bottom:0.5rem;">上传到 Google Sheet / 管理工具</h3>
-        <p class="hint" style="margin-bottom:0.75rem;">把当前词库按「分类」写入到当前词库来源（默认或自定义的 Google Sheet）。</p>
-        <div style="margin-bottom:0.5rem;">
-          <label class="hint">分类名称（将作为 Sheet 中的工作表名，如：SS10 Unit4）</label>
-          <input type="text" id="uploadCategory" placeholder="例如：SS10 Unit4" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
+      <!-- 单词卡 -->
+      <div class="card flashcard-section" id="flashcardSection">
+        <h3>单词卡</h3>
+        <div class="flashcard-group-row">
+          <label>单词组</label>
+          <select id="flashcardGroupSelect"><option value="all">全部</option></select>
         </div>
-        <button type="button" class="btn btn-secondary" id="btnUploadToSheet">上传当前词库到 Google Sheet</button>
-        <span class="hint" id="uploadResult" style="display:block;margin-top:0.5rem;"></span>
+        <div class="flashcard-counter" id="flashcardCounter">- / -</div>
+        <div class="flashcard-stage" id="flashcardStage">
+          <div class="flashcard-inner" id="flashcardInner">
+            <div class="flashcard-face flashcard-front">
+              <div class="flashcard-word" id="flashcardFrontText">--</div>
+              <div class="flashcard-accuracy acc-none" id="flashcardAccuracy">未测试</div>
+              <div class="flashcard-hint">点击翻转查看释义</div>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <div class="flashcard-word" id="flashcardBackText">--</div>
+              <div class="flashcard-hint">点击翻转回到单词</div>
+            </div>
+          </div>
+        </div>
+        <div class="flashcard-nav">
+          <button type="button" class="btn btn-secondary" id="btnFlashcardPrev">上一个</button>
+          <button type="button" class="btn" id="btnFlashcardNext">下一个</button>
+        </div>
       </div>
       <div class="card">
         <button type="button" class="btn btn-secondary" id="btnOpenVocab">打开词库</button>
@@ -473,24 +541,24 @@
       </div>
     </div>
 
-    <!-- 艾宾浩斯复习面板 -->
+    <!-- 艾宾浩斯复习日历 -->
     <div id="modalReview" class="modal-overlay">
       <div class="modal-dialog-lg">
-        <h3>艾宾浩斯复习计划</h3>
-        <p class="hint" style="margin-bottom:0.75rem;">复习间隔：1天 → 2天 → 4天 → 7天 → 15天 → 30天 → 毕业</p>
-        <div class="review-summary" id="reviewSummary"></div>
+        <h3>艾宾浩斯复习日历</h3>
+        <p class="hint" style="margin-bottom:0.75rem;">复习间隔：1天 → 2天 → 4天 → 7天 → 15天 → 30天 → 毕业。未按时复习的单词会自动顺延到下一个复习日。</p>
         <div class="filter-row">
           <select id="reviewFilterGroup"><option value="all">全部分组</option></select>
         </div>
-        <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">待复习单词</h4>
-        <div class="word-list-wrap" id="reviewWordList" style="max-height:280px;">
-          <div class="empty-state">暂无待复习单词</div>
+        <div class="cal-nav">
+          <button type="button" id="calPrevMonth">◀</button>
+          <span class="cal-month-label" id="calMonthLabel">2026年3月</span>
+          <button type="button" id="calNextMonth">▶</button>
         </div>
-        <div class="review-quiz-row">
-          <label class="hint">复习题数：</label>
-          <input type="number" id="reviewQuizSize" min="1" value="10" />
-          <button type="button" class="btn" id="btnStartReviewQuiz" disabled>开始复习测验</button>
+        <div class="cal-header">
+          <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
         </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div id="calDayDetail" style="display:none;"></div>
         <div class="btn-row" style="margin-top:1rem;">
           <button type="button" class="btn btn-secondary" id="modalReviewClose">关闭</button>
         </div>
@@ -724,20 +792,19 @@
           stats[key].lastWrongAt = now;
           stats[key].streakCorrect = 0;
         }
-      } else if (!isCorrect) {
-        // First time wrong - create record
+      } else {
+        // First time tested - create record for ALL words
         stats[key] = {
           word: word,
           categoryId: categoryId,
           totalCount: 1,
-          wrongCount: 1,
+          wrongCount: isCorrect ? 0 : 1,
           lastTestedAt: now,
-          lastWrongAt: now,
-          streakCorrect: 0,
-          firstWrongAt: now
+          lastWrongAt: isCorrect ? null : now,
+          streakCorrect: isCorrect ? 1 : 0,
+          firstWrongAt: isCorrect ? null : now
         };
       }
-      // If correct and not tracked, do nothing (only track words that have been wrong)
 
       saveWordStatsToStorage(stats);
 
@@ -764,6 +831,17 @@
         } else {
           plan[key].nextReviewAt = now + REVIEW_INTERVALS[plan[key].level] * 86400000;
         }
+      } else {
+        // Correct and NOT in review plan: add at level 1 (next review in 2 days)
+        plan[key] = {
+          word: word,
+          categoryId: categoryId,
+          definition: definition || '',
+          level: 1,
+          nextReviewAt: now + REVIEW_INTERVALS[1] * 86400000,
+          lastReviewedAt: now,
+          createdAt: now
+        };
       }
       saveReviewPlanToStorage(plan);
     }
@@ -817,6 +895,30 @@
       }).sort(function (a, b) { return a.nextReviewAt - b.nextReviewAt; });
     }
 
+    // Reschedule overdue words: if a word's nextReviewAt is before today,
+    // advance it forward by its current level's interval repeatedly until
+    // it lands on today or a future date. Persists the changes.
+    function rescheduleOverdueWords() {
+      var plan = getReviewPlanFromStorage();
+      var today = new Date();
+      var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      var changed = false;
+      Object.keys(plan).forEach(function (key) {
+        var r = plan[key];
+        if (r.nextReviewAt < todayStart) {
+          var lvl = Math.min(r.level || 0, REVIEW_INTERVALS.length - 1);
+          var intervalMs = REVIEW_INTERVALS[lvl] * 86400000;
+          while (r.nextReviewAt < todayStart) {
+            r.nextReviewAt += intervalMs;
+          }
+          changed = true;
+        }
+      });
+      if (changed) {
+        saveReviewPlanToStorage(plan);
+      }
+    }
+
     function getReviewSummary(categoryId) {
       var plan = getReviewPlanFromStorage();
       var now = Date.now();
@@ -832,36 +934,13 @@
     }
 
     // === 新测验入口 ===
-    function startReviewQuiz() {
-      var dueWords = getWordsDueForReview(state.currentCategoryId);
-      if (dueWords.length === 0) {
-        alert('当前没有待复习的单词。');
-        return;
+    function startReviewQuiz(dateStr) {
+      // Delegate to calendar day quiz with today's date if no date given
+      if (!dateStr) {
+        var today = new Date();
+        dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
       }
-      var sizeEl = document.getElementById('reviewQuizSize');
-      var size = sizeEl ? parseInt(sizeEl.value, 10) : 10;
-      if (!size || size < 1) size = 10;
-      size = Math.min(size, dueWords.length);
-
-      // Build quiz words from review plan - need to find definitions from categories
-      var quizWords = dueWords.slice(0, size).map(function (r) {
-        return { word: r.word, definition: r.definition || '', categoryId: r.categoryId };
-      });
-
-      state.isReviewQuiz = true;
-      state.isHighFreqQuiz = false;
-      state.currentQuiz = quizWords.sort(function () { return Math.random() - 0.5; });
-      state.index = 0;
-      state.correct = 0;
-      state.currentWrong = [];
-      state.isRetesting = false;
-      state.retestRound = 0;
-      state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
-
-      // Close modals
-      document.getElementById('modalReview').classList.remove('active');
-      showScreen('screen-quiz');
-      renderQuestion();
+      startCalendarDayQuiz(dateStr);
     }
 
     function startHighFreqQuiz() {
@@ -974,45 +1053,190 @@
       }).join('');
     }
 
-    function renderReviewWordList() {
-      var wrap = document.getElementById('reviewWordList');
-      if (!wrap) return;
-      var filterGroup = document.getElementById('reviewFilterGroup');
-      var catId = filterGroup ? filterGroup.value : 'all';
-      var dueWords = getWordsDueForReview(catId);
-      var btn = document.getElementById('btnStartReviewQuiz');
-      if (dueWords.length === 0) {
-        wrap.innerHTML = '<div class="empty-state">暂无待复习单词</div>';
-        if (btn) btn.disabled = true;
-        return;
-      }
-      if (btn) btn.disabled = false;
-      wrap.innerHTML = dueWords.map(function (r) {
-        var lvl = Math.min(r.level || 0, 5);
-        return '<div class="review-word-item">' +
-          '<span class="review-level-dot review-level-' + lvl + '"></span>' +
-          '<span class="rw-word">' + escapeHtml(r.word) + '</span>' +
-          '<span class="rw-info">等级 ' + lvl + ' · ' + escapeHtml(r.categoryId === 'all' ? '' : (r.categoryId || '')) + '</span>' +
-          '</div>';
-      }).join('');
+    function getWordsForReviewOnDate(dateStr, categoryId) {
+      var plan = getReviewPlanFromStorage();
+      var parts = dateStr.split('-');
+      var y = parseInt(parts[0], 10), m = parseInt(parts[1], 10) - 1, d = parseInt(parts[2], 10);
+      var dayStart = new Date(y, m, d, 0, 0, 0, 0).getTime();
+      var dayEnd = new Date(y, m, d, 23, 59, 59, 999).getTime();
+      var today = new Date();
+      var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      var isPastOrToday = dateStr <= todayStr;
+      return Object.values(plan).filter(function (r) {
+        if (categoryId && categoryId !== 'all' && r.categoryId !== categoryId) return false;
+        if (isPastOrToday) {
+          return r.nextReviewAt <= dayEnd;
+        } else {
+          return r.nextReviewAt >= dayStart && r.nextReviewAt <= dayEnd;
+        }
+      }).sort(function (a, b) { return a.nextReviewAt - b.nextReviewAt; });
     }
 
-    function renderReviewLevelSummary() {
-      var wrap = document.getElementById('reviewSummary');
-      if (!wrap) return;
+    function getReviewCalendarData(year, month, categoryId) {
+      var plan = getReviewPlanFromStorage();
+      var today = new Date();
+      var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      var result = {};
+      Object.values(plan).forEach(function (r) {
+        if (categoryId && categoryId !== 'all' && r.categoryId !== categoryId) return;
+        var rd = new Date(r.nextReviewAt);
+        var rDateStr = rd.getFullYear() + '-' + String(rd.getMonth() + 1).padStart(2, '0') + '-' + String(rd.getDate()).padStart(2, '0');
+        // After rescheduleOverdueWords(), all dates are today or future.
+        // Words due today (nextReviewAt <= end of today) count under todayStr.
+        if (rDateStr <= todayStr) {
+          if (!result[todayStr]) result[todayStr] = 0;
+          result[todayStr]++;
+        } else {
+          if (!result[rDateStr]) result[rDateStr] = 0;
+          result[rDateStr]++;
+        }
+      });
+      return result;
+    }
+
+    function renderReviewCalendar() {
+      var grid = document.getElementById('calGrid');
+      var label = document.getElementById('calMonthLabel');
+      if (!grid || !label) return;
+
+      var year = state.calendarYear;
+      var month = state.calendarMonth;
+      label.textContent = year + '年' + (month + 1) + '月';
+
       var filterGroup = document.getElementById('reviewFilterGroup');
       var catId = filterGroup ? filterGroup.value : 'all';
-      var summary = getReviewSummary(catId);
-      var now = new Date();
-      var levelNames = ['等级0 (1天)', '等级1 (2天)', '等级2 (4天)', '等级3 (7天)', '等级4 (15天)', '等级5 (30天)'];
-      wrap.innerHTML = summary.levels.map(function (count, i) {
-        var d = new Date(now.getTime() + REVIEW_INTERVALS[i] * 86400000);
-        var dateStr = (d.getMonth() + 1) + '/' + d.getDate();
-        return '<div class="review-summary-item"><span class="review-level-dot review-level-' + i + '"></span><div class="rs-count">' + count + '</div><div class="rs-label">' + levelNames[i] + '</div><div class="rs-date">' + dateStr + '</div></div>';
-      }).join('') +
-        '<div class="review-summary-item"><div class="rs-count" style="color:var(--wrong);">' + summary.due + '</div><div class="rs-label">待复习</div><div class="rs-date">今天</div></div>' +
-        '<div class="review-summary-item"><div class="rs-count">' + summary.total + '</div><div class="rs-label">总计划</div></div>';
+      var calData = getReviewCalendarData(year, month, catId);
+
+      var today = new Date();
+      var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+      var firstDay = new Date(year, month, 1);
+      var startDow = firstDay.getDay(); // 0=Sun
+      var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // Previous month fill
+      var prevMonthDays = new Date(year, month, 0).getDate();
+
+      var cells = [];
+      // Fill previous month
+      for (var i = startDow - 1; i >= 0; i--) {
+        var d = prevMonthDays - i;
+        var pm = month === 0 ? 11 : month - 1;
+        var py = month === 0 ? year - 1 : year;
+        var ds = py + '-' + String(pm + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        cells.push({ day: d, dateStr: ds, otherMonth: true });
+      }
+      // Current month
+      for (var d = 1; d <= daysInMonth; d++) {
+        var ds = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        cells.push({ day: d, dateStr: ds, otherMonth: false });
+      }
+      // Next month fill
+      var remaining = 7 - (cells.length % 7);
+      if (remaining < 7) {
+        var nm = month === 11 ? 0 : month + 1;
+        var ny = month === 11 ? year + 1 : year;
+        for (var d = 1; d <= remaining; d++) {
+          var ds = ny + '-' + String(nm + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+          cells.push({ day: d, dateStr: ds, otherMonth: true });
+        }
+      }
+
+      grid.innerHTML = cells.map(function (c) {
+        var count = calData[c.dateStr] || 0;
+        var classes = ['cal-cell'];
+        if (c.otherMonth) classes.push('other-month');
+        if (c.dateStr === todayStr) classes.push('today');
+        if (count > 0) {
+          if (c.dateStr <= todayStr) classes.push('has-due');
+          else classes.push('has-future');
+        }
+        if (state.calendarSelectedDate === c.dateStr) classes.push('selected');
+        var badge = count > 0 ? '<span class="cal-badge">' + count + '</span>' : '';
+        return '<div class="' + classes.join(' ') + '" data-date="' + c.dateStr + '"><span class="cal-day">' + c.day + '</span>' + badge + '</div>';
+      }).join('');
+
+      // Show day detail if selected
+      if (state.calendarSelectedDate) {
+        renderCalendarDayDetail(state.calendarSelectedDate);
+      } else {
+        var detail = document.getElementById('calDayDetail');
+        if (detail) detail.style.display = 'none';
+      }
     }
+
+    function renderCalendarDayDetail(dateStr) {
+      var detail = document.getElementById('calDayDetail');
+      if (!detail) return;
+      var filterGroup = document.getElementById('reviewFilterGroup');
+      var catId = filterGroup ? filterGroup.value : 'all';
+      var words = getWordsForReviewOnDate(dateStr, catId);
+
+      var parts = dateStr.split('-');
+      var displayDate = parseInt(parts[1], 10) + '月' + parseInt(parts[2], 10) + '日';
+
+      if (words.length === 0) {
+        detail.innerHTML = '<div class="cal-day-detail"><div class="cal-day-detail-header"><h4>' + displayDate + ' — 无待复习单词</h4></div></div>';
+        detail.style.display = 'block';
+        return;
+      }
+
+      var listHtml = words.map(function (r) {
+        var lvl = Math.min(r.level || 0, 5);
+        return '<div class="cal-day-word-item">' +
+          '<span class="review-level-dot review-level-' + lvl + '"></span>' +
+          '<span class="cdw-word">' + escapeHtml(r.word) + '</span>' +
+          '<span class="cdw-def">' + escapeHtml(r.definition || '') + '</span>' +
+          '<span class="cdw-level">Lv' + lvl + '</span>' +
+          '</div>';
+      }).join('');
+
+      detail.innerHTML = '<div class="cal-day-detail">' +
+        '<div class="cal-day-detail-header">' +
+        '<h4>' + displayDate + ' 待复习 (' + words.length + '个单词)</h4>' +
+        '<button type="button" class="btn" id="btnCalDayQuiz" data-date="' + dateStr + '" style="margin-top:0;font-size:0.85rem;padding:0.4rem 0.8rem;">开始测验</button>' +
+        '</div>' +
+        '<div class="cal-day-detail-list">' + listHtml + '</div>' +
+        '</div>';
+      detail.style.display = 'block';
+
+      // Bind quiz button
+      var quizBtn = document.getElementById('btnCalDayQuiz');
+      if (quizBtn) {
+        quizBtn.addEventListener('click', function () {
+          startCalendarDayQuiz(this.getAttribute('data-date'));
+        });
+      }
+    }
+
+    function startCalendarDayQuiz(dateStr) {
+      var filterGroup = document.getElementById('reviewFilterGroup');
+      var catId = filterGroup ? filterGroup.value : 'all';
+      var words = getWordsForReviewOnDate(dateStr, catId);
+      if (words.length === 0) {
+        alert('该日期没有待复习的单词。');
+        return;
+      }
+
+      var quizWords = words.map(function (r) {
+        return { word: r.word, definition: r.definition || '', categoryId: r.categoryId };
+      });
+
+      state.isReviewQuiz = true;
+      state.isHighFreqQuiz = false;
+      state.currentQuiz = quizWords.sort(function () { return Math.random() - 0.5; });
+      state.index = 0;
+      state.correct = 0;
+      state.currentWrong = [];
+      state.isRetesting = false;
+      state.retestRound = 0;
+      state.quizAnswers = state.currentQuiz.map(function () { return { answered: false, userAnswer: '', correct: false }; });
+
+      document.getElementById('modalReview').classList.remove('active');
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+
 
     function updateReviewBadge() {
       var notice = document.getElementById('reviewNotice');
@@ -1199,7 +1423,7 @@
       };
     })();
 
-    let state = { wordBank: DEFAULT_WORDS.slice(), categories: [], currentCategoryId: 'all', editingWordIndex: null, currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [] };
+    let state = { wordBank: DEFAULT_WORDS.slice(), categories: [], currentCategoryId: 'all', editingWordIndex: null, currentQuiz: [], index: 0, correct: 0, wrongAnswers: [], currentWrong: [], calendarYear: new Date().getFullYear(), calendarMonth: new Date().getMonth(), calendarSelectedDate: null };
 
     function getVocabUrl() {
       try {
@@ -1875,45 +2099,6 @@
       alert('已解析到 ' + list.length + ' 个单词，词库已更新。点击「开始测验」即可。');
     });
 
-    document.getElementById('btnUploadToSheet').addEventListener('click', function () {
-      var url = getVocabUrl();
-      if (!url || !url.trim()) {
-        document.getElementById('uploadResult').textContent = '请先在「管理词库来源」中设置支持写入的 Google Sheet 链接。';
-        document.getElementById('uploadResult').style.color = 'var(--wrong)';
-        return;
-      }
-      var category = document.getElementById('uploadCategory').value.trim();
-      if (!category) {
-        document.getElementById('uploadResult').textContent = '请填写分类名称，例如：SS10 Unit4';
-        document.getElementById('uploadResult').style.color = 'var(--wrong)';
-        return;
-      }
-      if (state.wordBank.length === 0) {
-        document.getElementById('uploadResult').textContent = '当前词库为空，请先粘贴或加载词库。';
-        document.getElementById('uploadResult').style.color = 'var(--wrong)';
-        return;
-      }
-      var resultEl = document.getElementById('uploadResult');
-      resultEl.textContent = '上传中…';
-      resultEl.style.color = 'var(--muted)';
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: category, words: state.wordBank })
-      }).then(function (r) { return r.json(); }).then(function (data) {
-        if (data && data.ok) {
-          resultEl.textContent = '已上传 ' + (data.appended || state.wordBank.length) + ' 个单词到分类「' + (data.category || category) + '」。可在 Google 表格中查看。';
-          resultEl.style.color = 'var(--correct)';
-        } else {
-          resultEl.textContent = '上传失败：' + (data && data.error ? data.error : '未知错误');
-          resultEl.style.color = 'var(--wrong)';
-        }
-      }).catch(function (err) {
-        resultEl.textContent = '上传失败（可能是网络或 CORS 限制）：' + (err.message || String(err));
-        resultEl.style.color = 'var(--wrong)';
-      });
-    });
-
     document.getElementById('answerInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         var qa = state.quizAnswers[state.index];
@@ -1988,15 +2173,23 @@
       if (e.target === document.getElementById('modalHistory')) document.getElementById('modalHistory').classList.remove('active');
     });
 
-    // 复习面板
-    function openReviewModal() {
+    // 复习面板（日历）
+    function openReviewModal(selectToday) {
+      rescheduleOverdueWords();
       fillStatsFilterGroups();
-      renderReviewLevelSummary();
-      renderReviewWordList();
+      if (selectToday) {
+        var today = new Date();
+        state.calendarYear = today.getFullYear();
+        state.calendarMonth = today.getMonth();
+        state.calendarSelectedDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      } else {
+        state.calendarSelectedDate = null;
+      }
+      renderReviewCalendar();
       document.getElementById('modalReview').classList.add('active');
     }
     document.getElementById('btnReviewFromNotice').addEventListener('click', function () {
-      openReviewModal();
+      openReviewModal(true);
     });
     document.getElementById('modalReviewClose').addEventListener('click', function () {
       document.getElementById('modalReview').classList.remove('active');
@@ -2005,15 +2198,38 @@
       if (e.target === document.getElementById('modalReview')) document.getElementById('modalReview').classList.remove('active');
     });
     document.getElementById('reviewFilterGroup').addEventListener('change', function () {
-      renderReviewLevelSummary();
-      renderReviewWordList();
+      state.calendarSelectedDate = null;
+      renderReviewCalendar();
     });
-    document.getElementById('btnStartReviewQuiz').addEventListener('click', function () {
-      startReviewQuiz();
+    // Calendar navigation
+    document.getElementById('calPrevMonth').addEventListener('click', function () {
+      state.calendarMonth--;
+      if (state.calendarMonth < 0) { state.calendarMonth = 11; state.calendarYear--; }
+      state.calendarSelectedDate = null;
+      renderReviewCalendar();
+    });
+    document.getElementById('calNextMonth').addEventListener('click', function () {
+      state.calendarMonth++;
+      if (state.calendarMonth > 11) { state.calendarMonth = 0; state.calendarYear++; }
+      state.calendarSelectedDate = null;
+      renderReviewCalendar();
+    });
+    // Calendar cell click
+    document.getElementById('calGrid').addEventListener('click', function (e) {
+      var cell = e.target.closest('.cal-cell');
+      if (!cell) return;
+      var dateStr = cell.getAttribute('data-date');
+      if (!dateStr) return;
+      if (state.calendarSelectedDate === dateStr) {
+        state.calendarSelectedDate = null;
+      } else {
+        state.calendarSelectedDate = dateStr;
+      }
+      renderReviewCalendar();
     });
     document.getElementById('btnOpenReviewFromPanel').addEventListener('click', function () {
       document.getElementById('modalStats').classList.remove('active');
-      openReviewModal();
+      openReviewModal(true);
     });
 
     // 结果页查看统计按钮
@@ -2025,6 +2241,110 @@
         renderHighFreqWordList();
         document.getElementById('modalStats').classList.add('active');
       }, 100);
+    });
+
+    // === 单词卡 Flashcard ===
+    state.flashcardIndex = 0;
+    state.flashcardWords = [];
+    state.flashcardGroupId = 'all';
+
+    function getFlashcardWords(groupId) {
+      if (groupId === 'all' || !groupId || !state.categories.length) {
+        var list = [];
+        state.categories.forEach(function (c) {
+          (c.words || []).forEach(function (w) { list.push({ word: w.word, definition: w.definition, categoryId: c.id }); });
+        });
+        return list;
+      }
+      var cat = state.categories.find(function (c) { return c.id === groupId; });
+      return cat ? (cat.words || []).map(function (w) { return { word: w.word, definition: w.definition, categoryId: cat.id }; }) : [];
+    }
+
+    function fillFlashcardGroupSelect() {
+      var sel = document.getElementById('flashcardGroupSelect');
+      if (!sel) return;
+      var prev = sel.value || 'all';
+      sel.innerHTML = '<option value="all">全部</option>';
+      (state.categories || []).forEach(function (c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name + '（' + (c.words ? c.words.length : 0) + '）';
+        sel.appendChild(opt);
+      });
+      sel.value = prev;
+      state.flashcardGroupId = sel.value;
+    }
+
+    function renderFlashcard() {
+      var words = state.flashcardWords;
+      var idx = state.flashcardIndex;
+      var counter = document.getElementById('flashcardCounter');
+      var frontText = document.getElementById('flashcardFrontText');
+      var backText = document.getElementById('flashcardBackText');
+      var inner = document.getElementById('flashcardInner');
+      var accEl = document.getElementById('flashcardAccuracy');
+      if (!counter || !frontText || !backText || !inner) return;
+
+      // Always reset to front side
+      inner.classList.remove('flipped');
+
+      if (words.length === 0) {
+        counter.textContent = '- / -';
+        frontText.textContent = '暂无单词';
+        backText.textContent = '--';
+        if (accEl) { accEl.textContent = ''; accEl.className = 'flashcard-accuracy acc-none'; }
+        return;
+      }
+      var item = words[idx];
+      counter.textContent = (idx + 1) + ' / ' + words.length;
+      frontText.textContent = item.word;
+      backText.textContent = item.definition || '(无释义)';
+
+      // Show accuracy from stats
+      if (accEl) {
+        var stats = getWordStatsFromStorage();
+        var key = makeWordKey(item.categoryId, item.word);
+        var s = stats[key];
+        if (s && s.totalCount > 0) {
+          var correctCount = s.totalCount - s.wrongCount;
+          var pct = Math.round((correctCount / s.totalCount) * 100);
+          var cls = pct >= 80 ? 'acc-high' : pct >= 60 ? 'acc-mid' : 'acc-low';
+          accEl.textContent = '正确率 ' + pct + '%（' + correctCount + '/' + s.totalCount + '）';
+          accEl.className = 'flashcard-accuracy ' + cls;
+        } else {
+          accEl.textContent = '未测试';
+          accEl.className = 'flashcard-accuracy acc-none';
+        }
+      }
+    }
+
+    function initFlashcardWords() {
+      state.flashcardWords = getFlashcardWords(state.flashcardGroupId);
+      state.flashcardIndex = 0;
+      renderFlashcard();
+    }
+
+    document.getElementById('flashcardInner').addEventListener('click', function () {
+      this.classList.toggle('flipped');
+    });
+
+    document.getElementById('btnFlashcardPrev').addEventListener('click', function () {
+      if (state.flashcardWords.length === 0) return;
+      state.flashcardIndex--;
+      if (state.flashcardIndex < 0) state.flashcardIndex = state.flashcardWords.length - 1;
+      renderFlashcard();
+    });
+
+    document.getElementById('btnFlashcardNext').addEventListener('click', function () {
+      if (state.flashcardWords.length === 0) return;
+      state.flashcardIndex++;
+      if (state.flashcardIndex >= state.flashcardWords.length) state.flashcardIndex = 0;
+      renderFlashcard();
+    });
+
+    document.getElementById('flashcardGroupSelect').addEventListener('change', function () {
+      state.flashcardGroupId = this.value || 'all';
+      initFlashcardWords();
     });
 
     (function init() {
@@ -2059,8 +2379,13 @@
         if (ok) fillVocabGroupSelect();
         // Run migration after categories are loaded
         migrateOldWrongData();
+        // Reschedule any overdue words that were never tested
+        rescheduleOverdueWords();
         // Update review badge on home screen
         updateReviewBadge();
+        // Init flashcard
+        fillFlashcardGroupSelect();
+        initFlashcardWords();
       });
     })();
   </script>
