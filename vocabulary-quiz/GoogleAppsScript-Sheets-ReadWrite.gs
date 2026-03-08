@@ -51,6 +51,7 @@ function doGet(e) {
  * POST  body 格式：
  * 1) 创建新单词组：{ "action": "createSheet", "category": "新组名" }
  * 2) 追加单词：{ "category": "SS10 Unit4", "words": [ { "word": "xxx", "definition": "..." }, ... ] }
+ * 3) 写入AI数据：{ "action": "updateAI", "category": "...", "aiData": [ { "word": "...", "definitionEn": "...", "phonetic": "...", "synonyms": "...", "relatedWords": "..." }, ... ] }
  */
 function doPost(e) {
   try {
@@ -67,6 +68,17 @@ function doPost(e) {
       }
       var created = createNewSheet(SPREADSHEET_ID, cat);
       return ContentService.createTextOutput(JSON.stringify({ ok: true, category: created.name, created: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    if (body.action === 'updateAI') {
+      var aiCategory = String(body.category || '').trim();
+      var aiData = body.aiData;
+      if (!aiCategory || !Array.isArray(aiData) || aiData.length === 0) {
+        return ContentService.createTextOutput(JSON.stringify({ ok: false, error: '需要 category 和 aiData 数组' }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      var updated = updateAIDataInSheet(SPREADSHEET_ID, aiCategory, aiData);
+      return ContentService.createTextOutput(JSON.stringify({ ok: true, updated: updated, category: aiCategory }))
         .setMimeType(ContentService.MimeType.JSON);
     }
     if (!body.category || !Array.isArray(body.words) || body.words.length === 0) {
@@ -124,8 +136,20 @@ function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
           word = a.toLowerCase();
           definition = b;
         }
+      } else if (data[r].length >= 1) {
+        var val = data[r][0] != null ? String(data[r][0]).trim() : '';
+        if (val && !/^\d+$/.test(val)) {
+          word = val.toLowerCase();
+        }
       }
-      if (word) words.push({ serial: serial, word: word, definition: definition || '(无释义)' });
+      if (word) {
+        var entry = { serial: serial, word: word, definition: definition || '(无释义)' };
+        if (data[r].length >= 4 && data[r][3] != null && String(data[r][3]).trim()) entry.definitionEn = String(data[r][3]).trim();
+        if (data[r].length >= 5 && data[r][4] != null && String(data[r][4]).trim()) entry.phonetic = String(data[r][4]).trim();
+        if (data[r].length >= 6 && data[r][5] != null && String(data[r][5]).trim()) entry.synonyms = String(data[r][5]).trim();
+        if (data[r].length >= 7 && data[r][6] != null && String(data[r][6]).trim()) entry.relatedWords = String(data[r][6]).trim();
+        words.push(entry);
+      }
     }
     categories.push({ id: name, name: name, words: words });
   }
@@ -168,6 +192,73 @@ function appendWordsToSheet(spreadsheetId, category, words) {
     var serial = w.serial != null ? String(w.serial) : String(nextRow + idx);
     return [serial, w.word, w.definition || '(无释义)'];
   });
-  if (data.length > 0) sheet.getRange(nextRow, 1, nextRow + data.length - 1, 3).setValues(data);
+  if (data.length > 0) sheet.getRange(nextRow, 1, data.length, 3).setValues(data);
   return data.length;
+}
+
+/**
+ * 将 AI 解析数据写入 Sheet 的 D-G 列
+ * D=英文解释, E=音标, F=同义词, G=词形变化
+ * aiData: [ { word: "...", definitionEn: "...", phonetic: "...", synonyms: "...", relatedWords: "..." } ]
+ */
+function updateAIDataInSheet(spreadsheetId, category, aiData) {
+  var ss = SpreadsheetApp.openById(spreadsheetId);
+  var safeName = sanitizeSheetName(category);
+  var sheet = ss.getSheetByName(safeName);
+  if (!sheet) throw new Error('未找到工作表：' + safeName);
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow === 0) return 0;
+  var lastCol = Math.max(sheet.getLastColumn(), 7);
+  var allData = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+
+  var startRow = 0;
+  if (allData.length > 0) {
+    var first = allData[0][0];
+    if (typeof first === 'string' && (String(first).toLowerCase() === 'word' || String(first).toLowerCase() === '单词' || String(first).toLowerCase() === '序列号')) {
+      startRow = 1;
+      var headerRange = sheet.getRange(1, 4, 1, 4);
+      headerRange.setValues([['AI英文解释', '音标', '同义词', '词形变化']]);
+    }
+  }
+
+  var wordColIndex = -1;
+  if (allData.length > startRow) {
+    var testRow = allData[startRow];
+    if (testRow.length >= 3) {
+      wordColIndex = 1;
+    } else if (testRow.length >= 2) {
+      var a = String(testRow[0]).trim();
+      wordColIndex = /^\d+$/.test(a) ? 1 : 0;
+    } else {
+      wordColIndex = 0;
+    }
+  }
+  if (wordColIndex < 0) return 0;
+
+  var aiMap = {};
+  for (var k = 0; k < aiData.length; k++) {
+    var item = aiData[k];
+    if (item && item.word) {
+      aiMap[String(item.word).trim().toLowerCase()] = item;
+    }
+  }
+
+  var updatedCount = 0;
+  for (var r = startRow; r < allData.length; r++) {
+    var cellWord = allData[r][wordColIndex] != null ? String(allData[r][wordColIndex]).trim().toLowerCase() : '';
+    if (!cellWord) continue;
+    var ai = aiMap[cellWord];
+    if (!ai) continue;
+    var synonymsStr = ai.synonyms || '';
+    var relatedStr = ai.relatedWords || '';
+    sheet.getRange(r + 1, 4, 1, 4).setValues([[
+      ai.definitionEn || '',
+      ai.phonetic || '',
+      synonymsStr,
+      relatedStr
+    ]]);
+    updatedCount++;
+  }
+  return updatedCount;
 }

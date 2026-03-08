@@ -263,6 +263,7 @@
       background: rgba(30,30,44,0.75);
       backdrop-filter: blur(40px) saturate(1.5); -webkit-backdrop-filter: blur(40px) saturate(1.5);
       border-radius: var(--r-xl); padding: 1.5rem; max-width: 420px; width: 100%;
+      max-height: calc(100vh - 2rem); overflow-y: auto;
       border: 1px solid var(--glass-border);
       box-shadow: var(--shadow-xl), inset 0 1px 0 var(--glass-highlight);
       animation: modal-in var(--normal) var(--ease);
@@ -284,7 +285,7 @@
     .add-word-row .btn { margin-top: 0; flex-shrink: 0; }
 
     /* ===== Word list item actions ===== */
-    .word-list-item { align-items: center; }
+    .word-list-item { align-items: center; flex-wrap: wrap; }
     .word-list-item .item-content { display: flex; gap: 0.75rem; flex: 1; min-width: 0; align-items: baseline; }
     .word-list-item .item-actions { display: flex; gap: 0.35rem; flex-shrink: 0; margin-left: auto; }
     .word-list-item .btn-item-edit, .word-list-item .btn-item-delete {
@@ -528,6 +529,42 @@
     .flashcard-nav { display: flex; gap: 0.6rem; justify-content: center; }
     .flashcard-nav .btn { margin-top: 0; min-width: 90px; font-size: 0.9rem; padding: 0.5rem 1rem; }
 
+    /* ===== AI Parse in Vocab Manager ===== */
+    .btn-item-ai { padding: 0.2rem 0.45rem; font-size: 0.72rem; border-radius: var(--r-sm); cursor: pointer; border: none; background: rgba(123,127,240,0.15); color: var(--accent-light); font-family: inherit; white-space: nowrap; transition: background 0.15s; }
+    .btn-item-ai:hover { background: rgba(123,127,240,0.3); }
+    .btn-item-ai.loading { opacity: 0.5; pointer-events: none; }
+    .btn-batch-ai { margin-top: 0.5rem; padding: 0.45rem 1rem; font-size: 0.85rem; border-radius: var(--r-sm); cursor: pointer; border: none; background: linear-gradient(135deg, var(--accent), var(--accent-light)); color: #fff; font-family: inherit; font-weight: 600; transition: opacity 0.15s; }
+    .btn-batch-ai:hover { opacity: 0.85; }
+    .btn-batch-ai:disabled { opacity: 0.4; pointer-events: none; }
+    .batch-ai-progress { font-size: 0.78rem; color: var(--muted); margin-left: 0.5rem; }
+    .word-ai-info { display: flex; flex-wrap: wrap; gap: 0.25rem; flex-basis: 100%; padding: 0.35rem 0.75rem 0.15rem 3.75rem; margin: 0; background: rgba(255,255,255,0.02); border-radius: 0 0 var(--r-sm) var(--r-sm); }
+    .word-ai-info .ai-tag { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
+    .word-ai-info .ai-def-en { font-size: 0.75rem; color: var(--muted); flex-basis: 100%; margin-top: 0.15rem; line-height: 1.4; }
+
+    /* ===== AI Enhanced Word Info ===== */
+    .ai-phonetic { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; position: relative; z-index: 1; font-weight: 400; letter-spacing: 0.02em; }
+    .ai-pos { font-size: 0.72rem; color: var(--cyan); background: rgba(34,211,238,0.12); padding: 0.1rem 0.45rem; border-radius: var(--r-sm); position: relative; z-index: 1; margin-top: 0.35rem; display: inline-block; font-weight: 600; }
+    .ai-back-section { margin-top: 0.75rem; text-align: left; width: 100%; position: relative; z-index: 1; }
+    .ai-back-section .ai-section-title { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; font-weight: 600; }
+    .ai-back-section .ai-tag-list { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .ai-tag { display: inline-block; font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: var(--r-sm); background: rgba(255,255,255,0.08); color: var(--text-secondary); font-weight: 500; }
+    .ai-tag.synonym { background: rgba(123,127,240,0.15); color: var(--accent-light); }
+    .ai-tag.related { background: rgba(45,212,191,0.12); color: var(--teal); }
+    .ai-loading { font-size: 0.78rem; color: rgba(255,255,255,0.3); position: relative; z-index: 1; margin-top: 0.35rem; }
+    .ai-quiz-extra { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--separator); }
+    .ai-quiz-extra .ai-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; font-size: 0.85rem; flex-wrap: wrap; }
+    .ai-quiz-extra .ai-label { color: var(--muted); font-size: 0.78rem; min-width: 4rem; }
+    .ai-quiz-extra .ai-value { color: var(--text-secondary); }
+    .wrong-item .ai-extra { margin-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+    .wrong-item .ai-extra .ai-tag { font-size: 0.72rem; }
+
+    /* ===== AI Usage Badge ===== */
+    .ai-usage-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
+    .ai-usage-bar .usage-model { color: var(--accent-light); font-weight: 600; }
+    .ai-usage-bar .usage-sep { color: rgba(255,255,255,0.15); }
+    .ai-usage-bar .usage-tokens { color: var(--text-secondary); }
+    .ai-usage-bar .usage-calls { color: var(--muted); }
+
     /* ===== Inline style overrides ===== */
     #homeGroupSelect, #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
     #btnRetestWrong { background: linear-gradient(135deg, var(--wrong), #e11d48) !important; }
@@ -537,6 +574,13 @@
   <div class="container">
     <h1>背单词测验</h1>
     <p class="subtitle">自选题数 · 下次测验含部分错题</p>
+    <div class="ai-usage-bar" id="aiUsageBar">
+      <span class="usage-model" id="usageModel">--</span>
+      <span class="usage-sep">|</span>
+      <span class="usage-tokens" id="usageTokens">本月 tokens: --</span>
+      <span class="usage-sep">|</span>
+      <span class="usage-calls" id="usageCalls">调用: --</span>
+    </div>
 
     <!-- 首页：直接开始 或 粘贴列表 -->
     <div id="screen-home" class="screen active">
@@ -587,11 +631,14 @@
           <div class="flashcard-inner" id="flashcardInner">
             <div class="flashcard-face flashcard-front">
               <div class="flashcard-word" id="flashcardFrontText">--</div>
+              <div class="ai-phonetic" id="flashcardPhonetic"></div>
+              <div class="ai-pos" id="flashcardPos" style="display:none;"></div>
               <div class="flashcard-accuracy acc-none" id="flashcardAccuracy">未测试</div>
               <div class="flashcard-hint">点击翻转查看释义</div>
             </div>
             <div class="flashcard-face flashcard-back">
               <div class="flashcard-word" id="flashcardBackText">--</div>
+              <div id="flashcardAIBack"></div>
               <div class="flashcard-hint">点击翻转回到单词</div>
             </div>
           </div>
@@ -621,6 +668,7 @@
             <input type="text" id="answerInput" placeholder="输入单词" autocomplete="off" spellcheck="false" />
             <span class="feedback" id="feedback" style="display: none;"></span>
           </div>
+          <div class="ai-quiz-extra" id="quizAIExtra" style="display:none;"></div>
         </div>
       </div>
       <div class="quiz-nav">
@@ -677,7 +725,7 @@
 
     <!-- 词库面板弹窗 -->
     <div id="modalVocab" class="modal-overlay">
-      <div class="modal-dialog" style="max-width:520px;">
+      <div class="modal-dialog" style="max-width:520px;max-height:calc(100vh - 2rem);overflow-y:auto;">
         <h3>词库</h3>
         <p class="hint" style="margin-bottom:0.35rem;">批量导入：粘贴列表（格式：序号. 单词，下一行英文解释）后点击解析，将<strong>替换</strong>当前词库。</p>
         <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
@@ -701,7 +749,11 @@
             </div>
           </div>
         </div>
-        <p class="hint" style="margin-bottom:0.5rem;">本组列表：序列号 · 单词 · 释义（来自 Sheet 或本页添加）。选择具体单词组时可逐条<strong>编辑</strong>或<strong>删除</strong>。</p>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+          <p class="hint" style="margin:0;flex:1;">本组列表：选择具体单词组后可<strong>编辑</strong>、<strong>删除</strong>或<strong>AI解析</strong>。</p>
+          <button type="button" class="btn-batch-ai" id="btnBatchAI" style="display:none;">批量AI解析</button>
+          <span class="batch-ai-progress" id="batchAIProgress"></span>
+        </div>
         <div class="word-list-wrap" id="vocabListContent" style="max-height:360px;">
           <p class="hint" style="padding:1rem;">请先选择单词组或加载词库。</p>
         </div>
@@ -1736,6 +1788,10 @@
       if (!wrap) return;
       var words = getCurrentWords();
       var canEditDelete = state.currentCategoryId !== 'all' && state.currentCategoryId;
+
+      var batchBtn = document.getElementById('btnBatchAI');
+      if (batchBtn) batchBtn.style.display = canEditDelete && words.length > 0 ? 'inline-block' : 'none';
+
       if (words.length === 0) {
         wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词。选择具体单词组后可逐条添加，或从上方粘贴列表解析。</p>';
         return;
@@ -1753,11 +1809,33 @@
         }
         var actionsHtml = '';
         if (canEditDelete) {
-          actionsHtml = '<div class="item-actions"><button type="button" class="btn-item-edit" data-index="' + i + '">编辑</button><button type="button" class="btn-item-delete" data-index="' + i + '">删除</button></div>';
+          actionsHtml = '<div class="item-actions">' +
+            '<button type="button" class="btn-item-ai" data-index="' + i + '">AI解析</button>' +
+            '<button type="button" class="btn-item-edit" data-index="' + i + '">编辑</button>' +
+            '<button type="button" class="btn-item-delete" data-index="' + i + '">删除</button></div>';
         }
-        return '<div class="word-list-item">' +
+        var cached = aiCache[(item.word || '').toLowerCase().trim()];
+        var aiInfoHtml = '';
+        if (cached) {
+          var tags = [];
+          if (cached.phonetic) tags.push('<span class="ai-tag">' + escapeHtml(cached.phonetic) + '</span>');
+          if (cached.partOfSpeech) tags.push('<span class="ai-tag synonym">' + escapeHtml(cached.partOfSpeech) + '</span>');
+          if (cached.synonyms && cached.synonyms.length) {
+            cached.synonyms.forEach(function (s) { tags.push('<span class="ai-tag related">' + escapeHtml(s) + '</span>'); });
+          }
+          if (cached.relatedWords) {
+            var rw = cached.relatedWords;
+            if (rw.noun) tags.push('<span class="ai-tag">n. ' + escapeHtml(rw.noun) + '</span>');
+            if (rw.verb) tags.push('<span class="ai-tag">v. ' + escapeHtml(rw.verb) + '</span>');
+            if (rw.adjective) tags.push('<span class="ai-tag">adj. ' + escapeHtml(rw.adjective) + '</span>');
+            if (rw.adverb) tags.push('<span class="ai-tag">adv. ' + escapeHtml(rw.adverb) + '</span>');
+          }
+          var defEnHtml = cached.definitionEn ? '<div class="ai-def-en">EN: ' + escapeHtml(cached.definitionEn) + '</div>' : '';
+          aiInfoHtml = '<div class="word-ai-info">' + tags.join('') + defEnHtml + '</div>';
+        }
+        return '<div class="word-list-item" data-index="' + i + '">' +
           '<div class="item-content">' + idxHtml + '<span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition || '') + '</span></div>' +
-          actionsHtml + '</div>';
+          actionsHtml + aiInfoHtml + '</div>';
       }).join('');
       if (canEditDelete && state.editingWordIndex !== null) {
         setTimeout(function () {
@@ -1806,7 +1884,28 @@
           if (data && data.categories && Array.isArray(data.categories)) {
             state.categories = data.categories.map(function (c) {
               return { id: c.id || c.name, name: c.name || c.id, words: (c.words || []).map(function (w) {
-                return { serial: w.serial, word: w.word, definition: w.definition };
+                var entry = { serial: w.serial, word: w.word, definition: w.definition };
+                if (w.definitionEn || w.phonetic) {
+                  var key = (w.word || '').toLowerCase().trim();
+                  if (key && !aiCache[key]) {
+                    var cached = { word: key };
+                    if (w.definitionEn) cached.definitionEn = w.definitionEn;
+                    if (w.phonetic) cached.phonetic = w.phonetic;
+                    if (w.synonyms) cached.synonyms = w.synonyms.split(/,\s*/);
+                    if (w.relatedWords) {
+                      cached.relatedWords = {};
+                      w.relatedWords.split(/;\s*/).forEach(function (part) {
+                        var m = part.match(/^(n|v|adj|adv)\.\s*(.+)/);
+                        if (m) {
+                          var map = { n: 'noun', v: 'verb', adj: 'adjective', adv: 'adverb' };
+                          cached.relatedWords[map[m[1]] || m[1]] = m[2].trim();
+                        }
+                      });
+                    }
+                    aiCache[key] = cached;
+                  }
+                }
+                return entry;
               }) };
             });
             state.currentCategoryId = 'all';
@@ -1890,7 +1989,10 @@
       document.getElementById('questionDefinition').textContent = item.definition;
       const input = document.getElementById('answerInput');
       const feedbackEl = document.getElementById('feedback');
+      const aiExtraEl = document.getElementById('quizAIExtra');
       document.getElementById('btnPrev').disabled = idx === 0;
+
+      if (aiExtraEl) { aiExtraEl.style.display = 'none'; aiExtraEl.innerHTML = ''; }
 
       const qa = state.quizAnswers[idx];
       if (qa && qa.answered) {
@@ -1905,6 +2007,7 @@
           feedbackEl.className = 'feedback wrong';
           feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         }
+        showQuizAIExtra(item.word, idx);
       } else {
         input.value = '';
         input.className = '';
@@ -1912,6 +2015,28 @@
         input.focus();
         feedbackEl.style.display = 'none';
       }
+    }
+
+    function showQuizAIExtra(word, questionIdx) {
+      var aiExtraEl = document.getElementById('quizAIExtra');
+      if (!aiExtraEl) return;
+      lookupWordAI(word).then(function (data) {
+        if (state.index !== questionIdx) return;
+        if (!data) { aiExtraEl.style.display = 'none'; return; }
+        var html = '';
+        if (data.phonetic) html += '<div class="ai-row"><span class="ai-label">音标</span><span class="ai-value">' + escapeHtml(data.phonetic) + '</span></div>';
+        if (data.partOfSpeech) html += '<div class="ai-row"><span class="ai-label">词性</span><span class="ai-value">' + escapeHtml(data.partOfSpeech) + '</span></div>';
+        if (data.synonyms && data.synonyms.length) html += '<div class="ai-row"><span class="ai-label">同义词</span><span class="ai-value">' + data.synonyms.map(function (s) { return escapeHtml(s); }).join(', ') + '</span></div>';
+        if (data.relatedWords) {
+          var rw = [];
+          if (data.relatedWords.noun) rw.push('n. ' + data.relatedWords.noun);
+          if (data.relatedWords.verb) rw.push('v. ' + data.relatedWords.verb);
+          if (data.relatedWords.adjective) rw.push('adj. ' + data.relatedWords.adjective);
+          if (data.relatedWords.adverb) rw.push('adv. ' + data.relatedWords.adverb);
+          if (rw.length) html += '<div class="ai-row"><span class="ai-label">词形</span><span class="ai-value">' + rw.map(function (r) { return escapeHtml(r); }).join(' &nbsp;|&nbsp; ') + '</span></div>';
+        }
+        if (html) { aiExtraEl.innerHTML = html; aiExtraEl.style.display = 'block'; }
+      });
     }
 
     function submitAnswer() {
@@ -1948,6 +2073,8 @@
         Audio.wrong();
         recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', false);
       }
+
+      showQuizAIExtra(item.word, state.index);
     }
 
     function prevQuestion() {
@@ -2010,7 +2137,7 @@
           wrongTitle.textContent = state.isRetesting ? '仍然答错的单词' : '本次答错的单词';
         }
         var wordStats = getWordStatsFromStorage();
-        wrongList.innerHTML = state.currentWrong.map(function (item) {
+        wrongList.innerHTML = state.currentWrong.map(function (item, i) {
           var key = makeWordKey(item.categoryId || state.currentCategoryId || 'unknown', item.word);
           var s = wordStats[key];
           var statInfo = '';
@@ -2018,8 +2145,15 @@
             var rate = Math.round((s.wrongCount / s.totalCount) * 100);
             statInfo = '<div class="result-stat-info">累计答错 ' + s.wrongCount + '/' + s.totalCount + ' 次, 错误率 ' + rate + '%</div>';
           }
-          return '<div class="wrong-item"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div>' + statInfo + '</div>';
+          return '<div class="wrong-item" id="wrongItem' + i + '"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div>' + statInfo + '<div class="ai-extra" id="wrongAI' + i + '"></div></div>';
         }).join('');
+        state.currentWrong.forEach(function (item, i) {
+          lookupWordAI(item.word).then(function (data) {
+            var el = document.getElementById('wrongAI' + i);
+            if (!el || !data) return;
+            el.innerHTML = renderAITagsCompact(data);
+          });
+        });
       } else {
         wrongSection.style.display = 'none';
         if (state.isRetesting) {
@@ -2057,10 +2191,130 @@
       renderQuestion();
     }
 
+    // ═══════════════════════════════════════════════
+    //  AI API Integration
+    // ═══════════════════════════════════════════════
+    const AI_API_BASE = 'https://enhanceword-tbj6ixfqaa-uc.a.run.app';
+    const AI_LOOKUP_BASE = 'https://lookupword-tbj6ixfqaa-uc.a.run.app';
+    const AI_BATCH_BASE = 'https://enhancebatch-tbj6ixfqaa-uc.a.run.app';
+    const AI_USAGE_BASE = 'https://getusage-tbj6ixfqaa-uc.a.run.app';
+
+    var aiCache = {};
+
+    function loadAIUsage() {
+      fetch(AI_USAGE_BASE)
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (!resp.ok) return;
+          var modelEl = document.getElementById('usageModel');
+          var tokensEl = document.getElementById('usageTokens');
+          var callsEl = document.getElementById('usageCalls');
+          if (modelEl) modelEl.textContent = resp.model || '--';
+          if (tokensEl) tokensEl.textContent = '本月 tokens: ' + formatTokenCount(resp.totalTokens || 0);
+          if (callsEl) callsEl.textContent = '调用: ' + (resp.callCount || 0) + ' 次';
+        })
+        .catch(function () {});
+    }
+
+    function formatTokenCount(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+      return String(n);
+    }
+
+    loadAIUsage();
+
+    function fetchWordAI(word) {
+      var key = word.toLowerCase().trim();
+      if (aiCache[key]) return Promise.resolve(aiCache[key]);
+      return fetch(AI_API_BASE + '?word=' + encodeURIComponent(key))
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok && resp.data) {
+            aiCache[key] = resp.data;
+            if (resp.source === 'generated') loadAIUsage();
+            return resp.data;
+          }
+          return null;
+        })
+        .catch(function () { return null; });
+    }
+
+    function lookupWordAI(word) {
+      var key = word.toLowerCase().trim();
+      if (aiCache[key]) return Promise.resolve(aiCache[key]);
+      return fetch(AI_LOOKUP_BASE + '?word=' + encodeURIComponent(key))
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok && resp.found && resp.data) { aiCache[key] = resp.data; return resp.data; }
+          return null;
+        })
+        .catch(function () { return null; });
+    }
+
+    function renderAISynonymsHtml(synonyms) {
+      if (!synonyms || !synonyms.length) return '';
+      return '<div class="ai-back-section"><div class="ai-section-title">同义词 Synonyms</div>' +
+        '<div class="ai-tag-list">' + synonyms.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }).join('') + '</div></div>';
+    }
+
+    function renderAIRelatedHtml(related) {
+      if (!related) return '';
+      var tags = [];
+      if (related.noun) tags.push('<span class="ai-tag related">n. ' + escapeHtml(related.noun) + '</span>');
+      if (related.verb) tags.push('<span class="ai-tag related">v. ' + escapeHtml(related.verb) + '</span>');
+      if (related.adjective) tags.push('<span class="ai-tag related">adj. ' + escapeHtml(related.adjective) + '</span>');
+      if (related.adverb) tags.push('<span class="ai-tag related">adv. ' + escapeHtml(related.adverb) + '</span>');
+      if (tags.length === 0) return '';
+      return '<div class="ai-back-section" style="margin-top:0.5rem;"><div class="ai-section-title">相关词形 Word Family</div>' +
+        '<div class="ai-tag-list">' + tags.join('') + '</div></div>';
+    }
+
+    function renderAITagsCompact(data) {
+      if (!data) return '';
+      var parts = [];
+      if (data.phonetic) parts.push('<span class="ai-tag">' + escapeHtml(data.phonetic) + '</span>');
+      if (data.partOfSpeech) parts.push('<span class="ai-tag">' + escapeHtml(data.partOfSpeech) + '</span>');
+      if (data.synonyms && data.synonyms.length) {
+        parts.push.apply(parts, data.synonyms.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }));
+      }
+      return parts.length ? '<div class="ai-extra">' + parts.join('') + '</div>' : '';
+    }
+
     function escapeHtml(s) {
       const div = document.createElement('div');
       div.textContent = s;
       return div.innerHTML;
+    }
+
+    function syncAIDataToSheet(category, dataArray) {
+      if (!category || category === 'all' || !dataArray || !dataArray.length) return;
+      var url = getVocabUrl();
+      var payload = dataArray.map(function (d) {
+        var synonymsStr = (d.synonyms && d.synonyms.length) ? d.synonyms.join(', ') : '';
+        var relatedStr = '';
+        if (d.relatedWords) {
+          var parts = [];
+          if (d.relatedWords.noun) parts.push('n. ' + d.relatedWords.noun);
+          if (d.relatedWords.verb) parts.push('v. ' + d.relatedWords.verb);
+          if (d.relatedWords.adjective) parts.push('adj. ' + d.relatedWords.adjective);
+          if (d.relatedWords.adverb) parts.push('adv. ' + d.relatedWords.adverb);
+          relatedStr = parts.join('; ');
+        }
+        return {
+          word: d.word,
+          definitionEn: d.definitionEn || '',
+          phonetic: d.phonetic || '',
+          synonyms: synonymsStr,
+          relatedWords: relatedStr
+        };
+      });
+      fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'updateAI', category: category, aiData: payload })
+      }).catch(function () {});
     }
 
     document.getElementById('btnManageSource').addEventListener('click', function () {
@@ -2207,13 +2461,26 @@
       }
       if (!cat.words) cat.words = [];
       var serial = String(cat.words.length + 1);
-      cat.words.push({ serial: serial, word: word, definition: definition || '(无释义)' });
+      var newWord = { serial: serial, word: word, definition: definition || '(无释义)' };
+      cat.words.push(newWord);
       applyCurrentGroup();
       updateWordCount();
       fillVocabGroupSelect();
+      renderVocabListInModal();
       if (wordEl) wordEl.value = '';
       if (defEl) defEl.value = '';
       wordEl && wordEl.focus();
+
+      var url = getVocabUrl();
+      fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          category: state.currentCategoryId,
+          words: [{ serial: newWord.serial, word: newWord.word, definition: newWord.definition }]
+        })
+      }).catch(function () {});
     });
     [document.getElementById('addWordInput'), document.getElementById('addDefInput')].forEach(function (el) {
       if (!el) return;
@@ -2249,6 +2516,28 @@
           fillVocabGroupSelect();
           renderVocabListInModal();
         }
+        return;
+      }
+      if (t.classList.contains('btn-item-ai')) {
+        var idx = parseInt(t.getAttribute('data-index'), 10);
+        if (isNaN(idx)) return;
+        var words = getCurrentWords();
+        if (idx < 0 || idx >= words.length) return;
+        var wordObj = words[idx];
+        t.textContent = '解析中…';
+        t.classList.add('loading');
+        fetchWordAI(wordObj.word).then(function (data) {
+          t.classList.remove('loading');
+          if (data) {
+            t.textContent = '✓ 完成';
+            loadAIUsage();
+            renderVocabListInModal();
+            syncAIDataToSheet(state.currentCategoryId, [data]);
+          } else {
+            t.textContent = '失败';
+            setTimeout(function () { t.textContent = 'AI解析'; }, 2000);
+          }
+        });
         return;
       }
       if (t.classList.contains('btn-item-edit')) {
@@ -2289,6 +2578,57 @@
         fillVocabGroupSelect();
         renderVocabListInModal();
       }
+    });
+
+    document.getElementById('btnBatchAI').addEventListener('click', function () {
+      var words = getCurrentWords();
+      if (!words.length) { alert('当前没有单词。'); return; }
+      var needAI = words.filter(function (w) {
+        var key = (w.word || '').toLowerCase().trim();
+        return key && !aiCache[key];
+      });
+      if (needAI.length === 0) { alert('所有单词已有AI解析数据，无需重复解析。'); return; }
+      var btn = this;
+      var progressEl = document.getElementById('batchAIProgress');
+      if (!confirm('将对 ' + needAI.length + ' 个未解析的单词调用AI生成数据，确定继续？')) return;
+      btn.disabled = true;
+      btn.textContent = '解析中…';
+      var wordList = needAI.map(function (w) { return w.word; });
+      if (progressEl) progressEl.textContent = '正在发送请求…';
+      fetch(AI_BATCH_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ words: wordList })
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (resp) {
+        btn.disabled = false;
+        btn.textContent = '批量AI解析';
+        if (resp.ok && resp.results) {
+          var successCount = 0;
+          resp.results.forEach(function (r) {
+            if (r.ok && r.data) {
+              aiCache[r.word.toLowerCase().trim()] = r.data;
+              successCount++;
+            }
+          });
+          if (progressEl) progressEl.textContent = '完成！成功 ' + successCount + '/' + wordList.length;
+          loadAIUsage();
+          renderVocabListInModal();
+          var allAI = resp.results.filter(function (r) { return r.ok && r.data; }).map(function (r) { return r.data; });
+          if (allAI.length) syncAIDataToSheet(state.currentCategoryId, allAI);
+          setTimeout(function () { if (progressEl) progressEl.textContent = ''; }, 5000);
+        } else {
+          if (progressEl) progressEl.textContent = '批量解析失败';
+          alert('批量解析失败：' + (resp.error || '未知错误'));
+        }
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = '批量AI解析';
+        if (progressEl) progressEl.textContent = '网络错误';
+        alert('批量解析失败：' + (err.message || String(err)));
+      });
     });
 
     document.getElementById('vocabRefresh').addEventListener('click', function () {
@@ -2556,10 +2896,16 @@
       var backText = document.getElementById('flashcardBackText');
       var inner = document.getElementById('flashcardInner');
       var accEl = document.getElementById('flashcardAccuracy');
+      var phoneticEl = document.getElementById('flashcardPhonetic');
+      var posEl = document.getElementById('flashcardPos');
+      var aiBackEl = document.getElementById('flashcardAIBack');
       if (!counter || !frontText || !backText || !inner) return;
 
-      // Always reset to front side
       inner.classList.remove('flipped');
+
+      if (phoneticEl) phoneticEl.textContent = '';
+      if (posEl) { posEl.textContent = ''; posEl.style.display = 'none'; }
+      if (aiBackEl) aiBackEl.innerHTML = '';
 
       if (words.length === 0) {
         counter.textContent = '- / -';
@@ -2573,7 +2919,6 @@
       frontText.textContent = item.word;
       backText.textContent = item.definition || '(无释义)';
 
-      // Show accuracy from stats
       if (accEl) {
         var stats = getWordStatsFromStorage();
         var key = makeWordKey(item.categoryId, item.word);
@@ -2589,6 +2934,22 @@
           accEl.className = 'flashcard-accuracy acc-none';
         }
       }
+
+      if (phoneticEl) phoneticEl.innerHTML = '<span class="ai-loading">加载中...</span>';
+      var capturedIdx = idx;
+      fetchWordAI(item.word).then(function (data) {
+        if (state.flashcardIndex !== capturedIdx) return;
+        if (!data) {
+          if (phoneticEl) phoneticEl.textContent = '';
+          return;
+        }
+        if (phoneticEl) phoneticEl.textContent = data.phonetic || '';
+        if (posEl && data.partOfSpeech) { posEl.textContent = data.partOfSpeech; posEl.style.display = 'inline-block'; }
+        if (aiBackEl) {
+          var defHtml = data.definitionEn ? '<div style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-top:0.5rem;position:relative;z-index:1;text-align:left;width:100%;">AI: ' + escapeHtml(data.definitionEn) + '</div>' : '';
+          aiBackEl.innerHTML = defHtml + renderAISynonymsHtml(data.synonyms) + renderAIRelatedHtml(data.relatedWords);
+        }
+      });
     }
 
     function initFlashcardWords() {
