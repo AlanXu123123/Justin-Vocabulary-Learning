@@ -539,7 +539,7 @@
     .batch-ai-progress { font-size: 0.78rem; color: var(--muted); margin-left: 0.5rem; }
     .word-ai-info { display: flex; flex-wrap: wrap; gap: 0.25rem; flex-basis: 100%; padding: 0.35rem 0.75rem 0.15rem 3.75rem; margin: 0; background: rgba(255,255,255,0.02); border-radius: 0 0 var(--r-sm) var(--r-sm); }
     .word-ai-info .ai-tag { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
-    .word-ai-info .ai-def-en { font-size: 0.75rem; color: var(--muted); flex-basis: 100%; margin-top: 0.15rem; line-height: 1.4; }
+    .word-ai-info .ai-def-en { font-size: 0.85rem; color: var(--pink); flex-basis: 100%; margin-top: 0.2rem; line-height: 1.45; font-weight: 500; }
 
     /* ===== AI Enhanced Word Info ===== */
     .ai-phonetic { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; position: relative; z-index: 1; font-weight: 400; letter-spacing: 0.02em; }
@@ -832,6 +832,7 @@
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
     const STORAGE_WORD_STATS = 'vocab_quiz_word_stats';
+    const STORAGE_CATEGORIES_CACHE = 'vocab_quiz_categories_cache';
     const STORAGE_QUIZ_HISTORY = 'vocab_quiz_history';
     const STORAGE_REVIEW_PLAN = 'vocab_quiz_review_plan';
     const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // days for level 0-5; level 6 = graduated
@@ -1882,6 +1883,7 @@
         .then(function (r) { return r.json(); })
         .then(function (data) {
           if (data && data.categories && Array.isArray(data.categories)) {
+            var prevCatId = state.currentCategoryId;
             state.categories = data.categories.map(function (c) {
               return { id: c.id || c.name, name: c.name || c.id, words: (c.words || []).map(function (w) {
                 var entry = { serial: w.serial, word: w.word, definition: w.definition };
@@ -1908,10 +1910,12 @@
                 return entry;
               }) };
             });
-            state.currentCategoryId = 'all';
+            var stillExists = prevCatId && state.categories.some(function (c) { return c.id === prevCatId; });
+            state.currentCategoryId = stillExists ? prevCatId : 'all';
             applyCurrentGroup();
             updateWordCount();
             setSourceLabel(isDefaultSource() ? '默认词库' : '自定义 Sheet');
+            try { localStorage.setItem(STORAGE_CATEGORIES_CACHE, JSON.stringify(state.categories)); } catch (_) {}
             return true;
           }
           if (Array.isArray(data) && data.length > 0) {
@@ -1919,7 +1923,7 @@
               return { serial: String(i + 1), word: w.word, definition: w.definition };
             });
             state.categories = [{ id: 'default', name: '默认', words: list }];
-            state.currentCategoryId = 'all';
+            state.currentCategoryId = state.currentCategoryId || 'all';
             state.wordBank = list;
             updateWordCount();
             setSourceLabel(isDefaultSource() ? '默认词库' : '自定义 Sheet');
@@ -1929,11 +1933,17 @@
         });
     }
 
-    function tryLoadFromSheet() {
+    var _lastSheetLoadTime = 0;
+    function tryLoadFromSheet(force) {
+      var now = Date.now();
+      if (!force && _lastSheetLoadTime && (now - _lastSheetLoadTime < 30000) && state.categories.length > 0) {
+        return Promise.resolve(true);
+      }
       var url = getVocabUrl();
       setSourceLabel('加载中…');
       return loadWordBankFromUrl(url).then(function (ok) {
-        if (!ok) setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
+        if (ok) _lastSheetLoadTime = Date.now();
+        else setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
         return ok;
       }).catch(function () {
         setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
@@ -2383,7 +2393,8 @@
 
     document.getElementById('btnOpenVocab').addEventListener('click', function () {
       fillVocabGroupSelect();
-      state.currentCategoryId = document.getElementById('vocabGroupSelect').value || 'all';
+      var vocabSel = document.getElementById('vocabGroupSelect');
+      if (vocabSel) vocabSel.value = state.currentCategoryId || 'all';
       state.editingWordIndex = null;
       updateAddWordSectionVisibility();
       renderVocabListInModal();
@@ -2392,8 +2403,8 @@
         if (ok) {
           var prev = state.currentCategoryId;
           fillVocabGroupSelect();
-          state.currentCategoryId = document.getElementById('vocabGroupSelect').value || prev || 'all';
-          applyCurrentGroup();
+          if (vocabSel) vocabSel.value = prev || 'all';
+          state.currentCategoryId = prev || 'all';
           updateAddWordSectionVisibility();
           renderVocabListInModal();
         }
@@ -2632,7 +2643,7 @@
     });
 
     document.getElementById('vocabRefresh').addEventListener('click', function () {
-      tryLoadFromSheet().then(function (ok) {
+      tryLoadFromSheet(true).then(function (ok) {
         if (ok) { fillVocabGroupSelect(); renderVocabListInModal(); }
       });
     });
@@ -3008,18 +3019,35 @@
       if (state.categories.length === 0 && state.wordBank.length > 0) {
         state.categories = [{ id: 'default', name: '默认', words: state.wordBank.map(function (w, i) { return { serial: String(i + 1), word: w.word, definition: w.definition || '' }; }) }];
       }
+
+      try {
+        var cachedCats = localStorage.getItem(STORAGE_CATEGORIES_CACHE);
+        if (cachedCats) {
+          var parsed = JSON.parse(cachedCats);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            state.categories = parsed;
+            state.currentCategoryId = state.currentCategoryId || 'all';
+            applyCurrentGroup();
+          }
+        }
+      } catch (_) {}
+
       updateWordCount();
+      fillVocabGroupSelect();
+      fillFlashcardGroupSelect();
+      initFlashcardWords();
+      migrateOldWrongData();
+      rescheduleOverdueWords();
+      updateReviewBadge();
+
       tryLoadFromSheet().then(function (ok) {
-        if (ok) fillVocabGroupSelect();
-        // Run migration after categories are loaded
-        migrateOldWrongData();
-        // Reschedule any overdue words that were never tested
-        rescheduleOverdueWords();
-        // Update review badge on home screen
-        updateReviewBadge();
-        // Init flashcard
-        fillFlashcardGroupSelect();
-        initFlashcardWords();
+        if (ok) {
+          fillVocabGroupSelect();
+          fillFlashcardGroupSelect();
+          initFlashcardWords();
+          updateWordCount();
+          updateReviewBadge();
+        }
       });
     })();
   </script>

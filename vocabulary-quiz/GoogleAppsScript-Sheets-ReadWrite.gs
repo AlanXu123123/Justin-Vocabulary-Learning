@@ -115,16 +115,19 @@ function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
     var name = sheet.getName();
     var data = sheet.getDataRange().getValues();
     var startRow = 0;
+    var is3Col = false;
     if (data.length > 0) {
-      var first = data[0][0];
-      if (typeof first === 'string' && (String(first).toLowerCase() === 'word' || String(first).toLowerCase() === '单词' || String(first).toLowerCase() === '序列号')) startRow = 1;
+      var first = String(data[0][0]).trim().toLowerCase();
+      if (first === '序列号' || first === 'serial') { startRow = 1; is3Col = true; }
+      else if (first === 'word' || first === '单词') { startRow = 1; }
     }
+    var aiOffset = is3Col ? 3 : 2;
     var words = [];
     for (var r = startRow; r < data.length; r++) {
       var serial = String(r - startRow + 1);
       var word = '';
       var definition = '';
-      if (data[r].length >= 3) {
+      if (is3Col && data[r].length >= 3) {
         word = data[r][1] != null ? String(data[r][1]).trim().toLowerCase() : '';
         definition = data[r][2] != null ? String(data[r][2]).trim() : '';
       } else if (data[r].length >= 2) {
@@ -144,10 +147,11 @@ function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
       }
       if (word) {
         var entry = { serial: serial, word: word, definition: definition || '(无释义)' };
-        if (data[r].length >= 4 && data[r][3] != null && String(data[r][3]).trim()) entry.definitionEn = String(data[r][3]).trim();
-        if (data[r].length >= 5 && data[r][4] != null && String(data[r][4]).trim()) entry.phonetic = String(data[r][4]).trim();
-        if (data[r].length >= 6 && data[r][5] != null && String(data[r][5]).trim()) entry.synonyms = String(data[r][5]).trim();
-        if (data[r].length >= 7 && data[r][6] != null && String(data[r][6]).trim()) entry.relatedWords = String(data[r][6]).trim();
+        var ai0 = aiOffset, ai1 = aiOffset + 1, ai2 = aiOffset + 2, ai3 = aiOffset + 3;
+        if (data[r].length > ai0 && data[r][ai0] != null && String(data[r][ai0]).trim()) entry.definitionEn = String(data[r][ai0]).trim();
+        if (data[r].length > ai1 && data[r][ai1] != null && String(data[r][ai1]).trim()) entry.phonetic = String(data[r][ai1]).trim();
+        if (data[r].length > ai2 && data[r][ai2] != null && String(data[r][ai2]).trim()) entry.synonyms = String(data[r][ai2]).trim();
+        if (data[r].length > ai3 && data[r][ai3] != null && String(data[r][ai3]).trim()) entry.relatedWords = String(data[r][ai3]).trim();
         words.push(entry);
       }
     }
@@ -178,28 +182,38 @@ function deleteSheetByName(spreadsheetId, category) {
   return { name: safeName };
 }
 
-/** 在表格中查找或创建名为 category 的 sheet，追加 words（每行 word, definition） */
+/** 在表格中查找或创建名为 category 的 sheet，追加 words。自动检测表格格式。 */
 function appendWordsToSheet(spreadsheetId, category, words) {
   var ss = SpreadsheetApp.openById(spreadsheetId);
   var safeName = sanitizeSheetName(category);
   var sheet = ss.getSheetByName(safeName);
   if (!sheet) {
     sheet = ss.insertSheet(safeName);
-    sheet.getRange(1, 1, 1, 3).setValues([['序列号', '单词', '释义']]);
+  }
+  var is3Col = false;
+  if (sheet.getLastRow() > 0) {
+    var a1 = String(sheet.getRange(1, 1).getValue()).trim().toLowerCase();
+    is3Col = (a1 === '序列号' || a1 === 'serial');
   }
   var nextRow = sheet.getLastRow() + 1;
-  var data = words.map(function (w, idx) {
-    var serial = w.serial != null ? String(w.serial) : String(nextRow + idx);
-    return [serial, w.word, w.definition || '(无释义)'];
-  });
-  if (data.length > 0) sheet.getRange(nextRow, 1, data.length, 3).setValues(data);
-  return data.length;
+  if (is3Col) {
+    var data = words.map(function (w, idx) {
+      var serial = w.serial != null ? String(w.serial) : String(nextRow + idx);
+      return [serial, w.word, w.definition || '(无释义)'];
+    });
+    if (data.length > 0) sheet.getRange(nextRow, 1, data.length, 3).setValues(data);
+  } else {
+    var data = words.map(function (w) {
+      return [w.word, w.definition || ''];
+    });
+    if (data.length > 0) sheet.getRange(nextRow, 1, data.length, 2).setValues(data);
+  }
+  return words.length;
 }
 
 /**
- * 将 AI 解析数据写入 Sheet 的 D-G 列
- * D=英文解释, E=音标, F=同义词, G=词形变化
- * aiData: [ { word: "...", definitionEn: "...", phonetic: "...", synonyms: "...", relatedWords: "..." } ]
+ * 将 AI 解析数据写入 Sheet
+ * 自动检测格式：3列表(序列号,单词,释义)→AI写D-G列；2列表(单词,释义)→AI写C-F列
  */
 function updateAIDataInSheet(spreadsheetId, category, aiData) {
   var ss = SpreadsheetApp.openById(spreadsheetId);
@@ -209,39 +223,40 @@ function updateAIDataInSheet(spreadsheetId, category, aiData) {
 
   var lastRow = sheet.getLastRow();
   if (lastRow === 0) return 0;
-  var lastCol = Math.max(sheet.getLastColumn(), 7);
-  var allData = sheet.getRange(1, 1, lastRow, lastCol).getValues();
 
+  var is3Col = false;
   var startRow = 0;
-  if (allData.length > 0) {
-    var first = allData[0][0];
-    if (typeof first === 'string' && (String(first).toLowerCase() === 'word' || String(first).toLowerCase() === '单词' || String(first).toLowerCase() === '序列号')) {
-      startRow = 1;
-      var headerRange = sheet.getRange(1, 4, 1, 4);
-      headerRange.setValues([['AI英文解释', '音标', '同义词', '词形变化']]);
-    }
+  var wordColIndex = 0;
+  var a1 = String(sheet.getRange(1, 1).getValue()).trim().toLowerCase();
+  if (a1 === '序列号' || a1 === 'serial') {
+    is3Col = true;
+    startRow = 1;
+    wordColIndex = 1;
+  } else if (a1 === 'word' || a1 === '单词') {
+    startRow = 1;
+    wordColIndex = 0;
   }
 
-  var wordColIndex = -1;
-  if (allData.length > startRow) {
-    var testRow = allData[startRow];
-    if (testRow.length >= 3) {
+  var aiStartCol = is3Col ? 4 : 3;
+
+  if (startRow === 1) {
+    sheet.getRange(1, aiStartCol, 1, 4).setValues([['AI英文解释', '音标', '同义词', '词形变化']]);
+  }
+
+  var maxCol = Math.max(sheet.getLastColumn(), aiStartCol + 3);
+  var allData = sheet.getRange(1, 1, lastRow, maxCol).getValues();
+
+  if (!is3Col && allData.length > startRow) {
+    var firstDataA = String(allData[startRow][0]).trim();
+    if (/^\d+$/.test(firstDataA) && allData[startRow].length >= 2) {
       wordColIndex = 1;
-    } else if (testRow.length >= 2) {
-      var a = String(testRow[0]).trim();
-      wordColIndex = /^\d+$/.test(a) ? 1 : 0;
-    } else {
-      wordColIndex = 0;
     }
   }
-  if (wordColIndex < 0) return 0;
 
   var aiMap = {};
   for (var k = 0; k < aiData.length; k++) {
     var item = aiData[k];
-    if (item && item.word) {
-      aiMap[String(item.word).trim().toLowerCase()] = item;
-    }
+    if (item && item.word) aiMap[String(item.word).trim().toLowerCase()] = item;
   }
 
   var updatedCount = 0;
@@ -250,13 +265,11 @@ function updateAIDataInSheet(spreadsheetId, category, aiData) {
     if (!cellWord) continue;
     var ai = aiMap[cellWord];
     if (!ai) continue;
-    var synonymsStr = ai.synonyms || '';
-    var relatedStr = ai.relatedWords || '';
-    sheet.getRange(r + 1, 4, 1, 4).setValues([[
+    sheet.getRange(r + 1, aiStartCol, 1, 4).setValues([[
       ai.definitionEn || '',
       ai.phonetic || '',
-      synonymsStr,
-      relatedStr
+      ai.synonyms || '',
+      ai.relatedWords || ''
     ]]);
     updatedCount++;
   }
