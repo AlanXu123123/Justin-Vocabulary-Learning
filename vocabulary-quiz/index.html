@@ -2056,7 +2056,7 @@
     function showQuizAIExtra(word, questionIdx) {
       var aiExtraEl = document.getElementById('quizAIExtra');
       if (!aiExtraEl) return;
-      lookupWordAI(word).then(function (data) {
+      fetchWordAI(word).then(function (data) {
         if (state.index !== questionIdx) return;
         if (!data) { aiExtraEl.style.display = 'none'; return; }
         var html = '';
@@ -2188,7 +2188,7 @@
           return '<div class="wrong-item" id="wrongItem' + i + '"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div>' + statInfo + '<div class="ai-extra" id="wrongAI' + i + '"></div></div>';
         }).join('');
         state.currentWrong.forEach(function (item, i) {
-          lookupWordAI(item.word).then(function (data) {
+          fetchWordAI(item.word).then(function (data) {
             var el = document.getElementById('wrongAI' + i);
             if (!el || !data) return;
             el.innerHTML = renderAITagsCompact(data);
