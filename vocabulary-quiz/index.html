@@ -551,12 +551,19 @@
     .ai-tag.synonym { background: rgba(123,127,240,0.15); color: var(--accent-light); }
     .ai-tag.related { background: rgba(45,212,191,0.12); color: var(--teal); }
     .ai-loading { font-size: 0.78rem; color: rgba(255,255,255,0.3); position: relative; z-index: 1; margin-top: 0.35rem; }
-    .ai-quiz-extra { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--separator); }
-    .ai-quiz-extra .ai-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; font-size: 0.85rem; flex-wrap: wrap; }
-    .ai-quiz-extra .ai-label { color: var(--muted); font-size: 0.78rem; min-width: 4rem; }
+    .ai-quiz-extra { margin-top: 0.75rem; padding: 0.65rem 0.75rem; border-top: 1px solid var(--separator); background: rgba(255,255,255,0.03); border-radius: 0 0 var(--r-md) var(--r-md); }
+    .ai-quiz-extra .ai-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.4rem; font-size: 0.85rem; flex-wrap: wrap; }
+    .ai-quiz-extra .ai-row:last-child { margin-bottom: 0; }
+    .ai-quiz-extra .ai-row-en { margin-bottom: 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .ai-quiz-extra .ai-label { color: var(--muted); font-size: 0.72rem; min-width: 3.2rem; text-align: right; flex-shrink: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
     .ai-quiz-extra .ai-value { color: var(--text-secondary); }
-    .wrong-item .ai-extra { margin-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+    .ai-quiz-extra .ai-en-text { color: var(--pink); font-size: 0.88rem; font-weight: 500; line-height: 1.45; }
+    .ai-quiz-extra .ai-phonetic-text { color: rgba(255,255,255,0.55); letter-spacing: 0.02em; }
+    .ai-quiz-extra .ai-value .ai-tag { font-size: 0.75rem; margin: 0.1rem 0.15rem; }
+    .wrong-item .ai-extra { margin-top: 0.4rem; }
     .wrong-item .ai-extra .ai-tag { font-size: 0.72rem; }
+    .ai-wrong-en { font-size: 0.82rem; color: var(--pink); font-weight: 500; line-height: 1.4; margin-bottom: 0.35rem; }
+    .ai-wrong-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
 
     /* ===== AI Usage Badge ===== */
     .ai-usage-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
@@ -2053,16 +2060,20 @@
         if (state.index !== questionIdx) return;
         if (!data) { aiExtraEl.style.display = 'none'; return; }
         var html = '';
-        if (data.phonetic) html += '<div class="ai-row"><span class="ai-label">音标</span><span class="ai-value">' + escapeHtml(data.phonetic) + '</span></div>';
+        if (data.definitionEn) html += '<div class="ai-row ai-row-en"><span class="ai-label">EN</span><span class="ai-value ai-en-text">' + escapeHtml(data.definitionEn) + '</span></div>';
+        if (data.phonetic) html += '<div class="ai-row"><span class="ai-label">音标</span><span class="ai-value ai-phonetic-text">' + escapeHtml(data.phonetic) + '</span></div>';
         if (data.partOfSpeech) html += '<div class="ai-row"><span class="ai-label">词性</span><span class="ai-value">' + escapeHtml(data.partOfSpeech) + '</span></div>';
-        if (data.synonyms && data.synonyms.length) html += '<div class="ai-row"><span class="ai-label">同义词</span><span class="ai-value">' + data.synonyms.map(function (s) { return escapeHtml(s); }).join(', ') + '</span></div>';
+        if (data.synonyms && data.synonyms.length) {
+          html += '<div class="ai-row"><span class="ai-label">同义词</span><span class="ai-value">' +
+            data.synonyms.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }).join(' ') + '</span></div>';
+        }
         if (data.relatedWords) {
           var rw = [];
-          if (data.relatedWords.noun) rw.push('n. ' + data.relatedWords.noun);
-          if (data.relatedWords.verb) rw.push('v. ' + data.relatedWords.verb);
-          if (data.relatedWords.adjective) rw.push('adj. ' + data.relatedWords.adjective);
-          if (data.relatedWords.adverb) rw.push('adv. ' + data.relatedWords.adverb);
-          if (rw.length) html += '<div class="ai-row"><span class="ai-label">词形</span><span class="ai-value">' + rw.map(function (r) { return escapeHtml(r); }).join(' &nbsp;|&nbsp; ') + '</span></div>';
+          if (data.relatedWords.noun) rw.push('<span class="ai-tag related">n. ' + escapeHtml(data.relatedWords.noun) + '</span>');
+          if (data.relatedWords.verb) rw.push('<span class="ai-tag related">v. ' + escapeHtml(data.relatedWords.verb) + '</span>');
+          if (data.relatedWords.adjective) rw.push('<span class="ai-tag related">adj. ' + escapeHtml(data.relatedWords.adjective) + '</span>');
+          if (data.relatedWords.adverb) rw.push('<span class="ai-tag related">adv. ' + escapeHtml(data.relatedWords.adverb) + '</span>');
+          if (rw.length) html += '<div class="ai-row"><span class="ai-label">词形</span><span class="ai-value">' + rw.join(' ') + '</span></div>';
         }
         if (html) { aiExtraEl.innerHTML = html; aiExtraEl.style.display = 'block'; }
       });
@@ -2301,13 +2312,22 @@
 
     function renderAITagsCompact(data) {
       if (!data) return '';
-      var parts = [];
-      if (data.phonetic) parts.push('<span class="ai-tag">' + escapeHtml(data.phonetic) + '</span>');
-      if (data.partOfSpeech) parts.push('<span class="ai-tag">' + escapeHtml(data.partOfSpeech) + '</span>');
+      var html = '';
+      if (data.definitionEn) html += '<div class="ai-wrong-en">' + escapeHtml(data.definitionEn) + '</div>';
+      var tags = [];
+      if (data.phonetic) tags.push('<span class="ai-tag">' + escapeHtml(data.phonetic) + '</span>');
+      if (data.partOfSpeech) tags.push('<span class="ai-tag">' + escapeHtml(data.partOfSpeech) + '</span>');
       if (data.synonyms && data.synonyms.length) {
-        parts.push.apply(parts, data.synonyms.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }));
+        tags.push.apply(tags, data.synonyms.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }));
       }
-      return parts.length ? '<div class="ai-extra">' + parts.join('') + '</div>' : '';
+      if (data.relatedWords) {
+        if (data.relatedWords.noun) tags.push('<span class="ai-tag related">n. ' + escapeHtml(data.relatedWords.noun) + '</span>');
+        if (data.relatedWords.verb) tags.push('<span class="ai-tag related">v. ' + escapeHtml(data.relatedWords.verb) + '</span>');
+        if (data.relatedWords.adjective) tags.push('<span class="ai-tag related">adj. ' + escapeHtml(data.relatedWords.adjective) + '</span>');
+        if (data.relatedWords.adverb) tags.push('<span class="ai-tag related">adv. ' + escapeHtml(data.relatedWords.adverb) + '</span>');
+      }
+      if (tags.length) html += '<div class="ai-wrong-tags">' + tags.join('') + '</div>';
+      return html;
     }
 
     function escapeHtml(s) {
