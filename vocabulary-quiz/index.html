@@ -498,9 +498,9 @@
       backface-visibility: hidden; -webkit-backface-visibility: hidden;
       border-radius: var(--r-xl);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 1.75rem 1.5rem; text-align: center;
+      padding: 1.5rem 1.25rem; text-align: center;
       border: 1px solid rgba(255,255,255,0.15);
-      min-height: 200px; position: relative; overflow: hidden;
+      min-height: 180px; position: relative; overflow-y: auto;
       box-shadow: var(--shadow-xl), 0 0 60px rgba(123,127,240,0.08);
     }
     .flashcard-face::after {
@@ -517,6 +517,7 @@
       position: absolute; inset: 0; transform: rotateY(180deg);
       background: linear-gradient(135deg, rgba(45,212,191,0.3) 0%, rgba(34,211,238,0.2) 50%, rgba(50,215,75,0.15) 100%);
       backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5);
+      overflow-y: auto;
     }
     .flashcard-word { font-size: 1.65rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; line-height: 1.3; position: relative; z-index: 1; text-shadow: 0 1px 8px rgba(0,0,0,0.2); }
     .flashcard-back .flashcard-word { font-size: 1rem; font-weight: 400; color: #e0fff0; line-height: 1.6; }
@@ -545,9 +546,9 @@
     /* ===== AI Enhanced Word Info ===== */
     .ai-phonetic { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; position: relative; z-index: 1; font-weight: 400; letter-spacing: 0.02em; }
     .ai-pos { font-size: 0.72rem; color: var(--cyan); background: rgba(34,211,238,0.12); padding: 0.1rem 0.45rem; border-radius: var(--r-sm); position: relative; z-index: 1; margin-top: 0.35rem; display: inline-block; font-weight: 600; }
-    .ai-back-section { margin-top: 0.75rem; text-align: left; width: 100%; position: relative; z-index: 1; }
-    .ai-back-section .ai-section-title { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; font-weight: 600; }
-    .ai-back-section .ai-tag-list { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .ai-back-section { margin-top: 0.4rem; text-align: left; width: 100%; position: relative; z-index: 1; display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; }
+    .ai-back-section .ai-section-title { font-size: 0.68rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; flex-shrink: 0; }
+    .ai-back-section .ai-tag-list { display: flex; flex-wrap: wrap; gap: 0.25rem; }
     .ai-tag { display: inline-block; font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: var(--r-sm); background: rgba(255,255,255,0.08); color: var(--text-secondary); font-weight: 500; }
     .ai-tag.synonym { background: rgba(123,127,240,0.15); color: var(--accent-light); }
     .ai-tag.related { background: rgba(45,212,191,0.12); color: var(--teal); }
@@ -2307,8 +2308,9 @@
 
     function renderAISynonymsHtml(synonyms) {
       if (!synonyms || !synonyms.length) return '';
-      return '<div class="ai-back-section"><div class="ai-section-title">同义词 Synonyms</div>' +
-        '<div class="ai-tag-list">' + synonyms.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }).join('') + '</div></div>';
+      var top = synonyms.slice(0, 1);
+      return '<div class="ai-back-section"><span class="ai-section-title">同义词</span>' +
+        '<div class="ai-tag-list">' + top.map(function (s) { return '<span class="ai-tag synonym">' + escapeHtml(s) + '</span>'; }).join('') + '</div></div>';
     }
 
     function renderAIRelatedHtml(related) {
@@ -2319,7 +2321,7 @@
       if (related.adjective) tags.push('<span class="ai-tag related">adj. ' + escapeHtml(related.adjective) + '</span>');
       if (related.adverb) tags.push('<span class="ai-tag related">adv. ' + escapeHtml(related.adverb) + '</span>');
       if (tags.length === 0) return '';
-      return '<div class="ai-back-section" style="margin-top:0.5rem;"><div class="ai-section-title">相关词形 Word Family</div>' +
+      return '<div class="ai-back-section"><span class="ai-section-title">词形</span>' +
         '<div class="ai-tag-list">' + tags.join('') + '</div></div>';
     }
 
@@ -3023,7 +3025,7 @@
         if (phoneticEl) phoneticEl.textContent = data.phonetic || '';
         if (posEl && data.partOfSpeech) { posEl.textContent = data.partOfSpeech; posEl.style.display = 'inline-block'; }
         if (aiBackEl) {
-          var defHtml = data.definitionEn ? '<div style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-top:0.5rem;position:relative;z-index:1;text-align:left;width:100%;">AI: ' + escapeHtml(data.definitionEn) + '</div>' : '';
+          var defHtml = data.definitionEn ? '<div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.35rem;position:relative;z-index:1;text-align:left;width:100%;line-height:1.35;">AI: ' + escapeHtml(data.definitionEn) + '</div>' : '';
           aiBackEl.innerHTML = defHtml + renderAISynonymsHtml(data.synonyms) + renderAIRelatedHtml(data.relatedWords);
         }
       });
