@@ -551,6 +551,7 @@
     .ai-tag.synonym { background: rgba(123,127,240,0.15); color: var(--accent-light); }
     .ai-tag.related { background: rgba(45,212,191,0.12); color: var(--teal); }
     .ai-loading { font-size: 0.78rem; color: rgba(255,255,255,0.3); position: relative; z-index: 1; margin-top: 0.35rem; }
+    .quiz-ai-def { margin-top: 0.5rem; color: var(--pink); font-size: 0.92rem; font-weight: 500; line-height: 1.5; }
     .ai-quiz-extra { margin-top: 0.75rem; padding: 0.65rem 0.75rem; border-top: 1px solid var(--separator); background: rgba(255,255,255,0.03); border-radius: 0 0 var(--r-md) var(--r-md); }
     .ai-quiz-extra .ai-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.4rem; font-size: 0.85rem; flex-wrap: wrap; }
     .ai-quiz-extra .ai-row:last-child { margin-bottom: 0; }
@@ -2022,7 +2023,18 @@
       const idx = state.index;
       document.getElementById('progressText').textContent = `第 ${idx + 1} / ${total} 题`;
       const item = state.currentQuiz[idx];
-      document.getElementById('questionDefinition').textContent = item.definition;
+      var defEl = document.getElementById('questionDefinition');
+      var manualDef = item.definition || '';
+      var cached = aiCache[(item.word || '').toLowerCase().trim()];
+      var aiDef = cached && cached.definitionEn ? cached.definitionEn : '';
+      var showManual = manualDef && manualDef !== '(无释义)';
+      if (showManual && aiDef) {
+        defEl.innerHTML = escapeHtml(manualDef) + '<div class="quiz-ai-def">' + escapeHtml(aiDef) + '</div>';
+      } else if (aiDef) {
+        defEl.innerHTML = '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(aiDef) + '</div>';
+      } else {
+        defEl.textContent = manualDef || '(无释义)';
+      }
       const input = document.getElementById('answerInput');
       const feedbackEl = document.getElementById('feedback');
       const aiExtraEl = document.getElementById('quizAIExtra');
