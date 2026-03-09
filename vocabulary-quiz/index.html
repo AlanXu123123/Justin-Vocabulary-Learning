@@ -692,6 +692,7 @@
 
     <!-- 结果 -->
     <div id="screen-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnResultHome">← 返回主页</button>
       <div class="card result-card">
         <div class="result-title" id="resultTitle">测验结束</div>
         <div class="rate" id="rateDisplay">0%</div>
@@ -2850,6 +2851,10 @@
     document.getElementById('btnPrev').addEventListener('click', prevQuestion);
     document.getElementById('btnQuizHome').addEventListener('click', function () {
       stopQuizTimer();
+      showScreen('screen-home');
+    });
+
+    document.getElementById('btnResultHome').addEventListener('click', function () {
       showScreen('screen-home');
     });
 
