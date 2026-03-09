@@ -740,9 +740,6 @@
     <div id="modalVocab" class="modal-overlay">
       <div class="modal-dialog" style="max-width:520px;max-height:calc(100vh - 2rem);overflow-y:auto;">
         <h3>词库</h3>
-        <p class="hint" style="margin-bottom:0.35rem;">批量导入：粘贴列表（格式：序号. 单词，下一行英文解释）后点击解析，将<strong>替换</strong>当前词库。</p>
-        <textarea id="wordInput" placeholder="例如：&#10;1.  guarantee&#10;a promise that something will be done or work&#10;2.  aggressor&#10;a person or country that starts a fight or attack"></textarea>
-        <button type="button" class="btn btn-secondary" id="btnParse" style="margin-bottom:1rem;">解析并替换词库</button>
         <label class="hint" style="display:block; margin-bottom:0.35rem;">选择单词组（对应 Google Sheet 中的工作表）</label>
         <select id="vocabGroupSelect" class="vocab-panel-select"></select>
         <div class="vocab-panel-actions">
@@ -2833,18 +2830,6 @@
 
     document.getElementById('btnStart').addEventListener('click', function () {
       startQuiz(state.wordBank);
-    });
-
-    document.getElementById('btnParse').addEventListener('click', () => {
-      const text = document.getElementById('wordInput').value.trim();
-      const list = parseNumberedWordList(text);
-      if (list.length === 0) {
-        alert('未解析到单词。请按格式粘贴：一行「序号. 单词」，下一行写英文解释。');
-        return;
-      }
-      state.wordBank = list;
-      updateWordCount();
-      alert('已解析到 ' + list.length + ' 个单词，词库已更新。点击「开始测验」即可。');
     });
 
     document.getElementById('answerInput').addEventListener('keydown', (e) => {
