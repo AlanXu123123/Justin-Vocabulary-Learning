@@ -519,8 +519,8 @@
       backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5);
       overflow-y: auto;
     }
-    .flashcard-word { font-size: 1.65rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; line-height: 1.3; position: relative; z-index: 1; text-shadow: 0 1px 8px rgba(0,0,0,0.2); }
-    .flashcard-back .flashcard-word { font-size: 1rem; font-weight: 400; color: #e0fff0; line-height: 1.6; }
+    .flashcard-word { font-size: 1.85rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; line-height: 1.3; position: relative; z-index: 1; text-shadow: 0 1px 8px rgba(0,0,0,0.2); }
+    .flashcard-back .flashcard-word { font-size: 1.1rem; font-weight: 400; color: #e0fff0; line-height: 1.55; }
     .flashcard-hint { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 0.85rem; position: relative; z-index: 1; }
     .flashcard-accuracy { font-size: 0.78rem; margin-top: 0.65rem; padding: 0.2rem 0.65rem; border-radius: var(--r-md); background: rgba(255,255,255,0.1); position: relative; z-index: 1; }
     .flashcard-accuracy.acc-high { color: var(--correct); }
@@ -613,6 +613,13 @@
             <option value="all">全部</option>
           </select>
         </div>
+        <div style="margin-top: 0.5rem; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+          <label class="hint" style="flex-shrink:0;">序号范围</label>
+          <input type="number" id="rangeStart" min="1" placeholder="起始" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
+          <span style="color:var(--muted);">—</span>
+          <input type="number" id="rangeEnd" min="1" placeholder="结束" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
+          <span class="hint" id="rangeHint" style="font-size:0.78rem;"></span>
+        </div>
         <div style="margin-top: 0.75rem;">
           <label class="hint">每次测验题数</label>
           <input type="number" id="quizSize" min="1" placeholder="输入题数" style="margin-top:0.35rem;padding:0.5rem;width:8rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
@@ -632,10 +639,6 @@
       <!-- 单词卡 -->
       <div class="card flashcard-section" id="flashcardSection">
         <h3>单词卡</h3>
-        <div class="flashcard-group-row">
-          <label>单词组</label>
-          <select id="flashcardGroupSelect"><option value="all">全部</option></select>
-        </div>
         <div class="flashcard-counter" id="flashcardCounter">- / -</div>
         <div class="flashcard-stage" id="flashcardStage">
           <div class="flashcard-inner" id="flashcardInner">
@@ -1752,14 +1755,35 @@
       return !localStorage.getItem(STORAGE_VOCAB_URL) || localStorage.getItem(STORAGE_VOCAB_URL).trim() === '';
     }
 
+    function getSerialRange() {
+      var startEl = document.getElementById('rangeStart');
+      var endEl = document.getElementById('rangeEnd');
+      var s = startEl ? parseInt(startEl.value, 10) : NaN;
+      var e = endEl ? parseInt(endEl.value, 10) : NaN;
+      return { start: isNaN(s) ? null : s, end: isNaN(e) ? null : e };
+    }
+
+    function applyRangeFilter(words) {
+      var range = getSerialRange();
+      if (range.start === null && range.end === null) return words;
+      var s = range.start || 1;
+      var e = range.end || words.length;
+      return words.filter(function (w, i) {
+        var idx = i + 1;
+        return idx >= s && idx <= e;
+      });
+    }
+
     function getCurrentWords() {
+      var all;
       if (state.currentCategoryId === 'all' || !state.categories.length) {
-        var list = [];
-        state.categories.forEach(function (c) { (c.words || []).forEach(function (w) { list.push(Object.assign({}, w, { categoryId: c.id })); }); });
-        return list;
+        all = [];
+        state.categories.forEach(function (c) { (c.words || []).forEach(function (w) { all.push(Object.assign({}, w, { categoryId: c.id })); }); });
+      } else {
+        var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+        all = cat ? (cat.words || []).map(function (w) { return Object.assign({}, w, { categoryId: cat.id }); }) : [];
       }
-      var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
-      return cat ? (cat.words || []).map(function (w) { return Object.assign({}, w, { categoryId: cat.id }); }) : [];
+      return applyRangeFilter(all);
     }
 
     function applyCurrentGroup() {
@@ -2490,13 +2514,46 @@
       if (homeSel) homeSel.value = state.currentCategoryId;
     });
 
-    document.getElementById('homeGroupSelect').addEventListener('change', function () {
-      state.currentCategoryId = this.value || 'all';
+    function onGroupOrRangeChange() {
+      var sel = document.getElementById('homeGroupSelect');
+      state.currentCategoryId = sel ? (sel.value || 'all') : 'all';
       applyCurrentGroup();
       updateWordCount();
-      // Sync vocab modal group select
+      initFlashcardWords();
       var vocabSel = document.getElementById('vocabGroupSelect');
       if (vocabSel) vocabSel.value = state.currentCategoryId;
+      updateRangeHint();
+    }
+
+    function updateRangeHint() {
+      var hintEl = document.getElementById('rangeHint');
+      if (!hintEl) return;
+      var allWords;
+      if (state.currentCategoryId === 'all' || !state.categories.length) {
+        allWords = [];
+        state.categories.forEach(function (c) { allWords = allWords.concat(c.words || []); });
+      } else {
+        var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+        allWords = cat ? (cat.words || []) : [];
+      }
+      var total = allWords.length;
+      var range = getSerialRange();
+      if (range.start !== null || range.end !== null) {
+        var s = range.start || 1;
+        var e = range.end || total;
+        var count = Math.max(0, Math.min(e, total) - Math.max(s, 1) + 1);
+        hintEl.textContent = '共 ' + total + ' 词，已选 ' + count + ' 词';
+      } else {
+        hintEl.textContent = total > 0 ? '共 ' + total + ' 词' : '';
+      }
+    }
+
+    document.getElementById('homeGroupSelect').addEventListener('change', onGroupOrRangeChange);
+
+    ['rangeStart', 'rangeEnd'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () {
+        onGroupOrRangeChange();
+      });
     });
 
     document.getElementById('vocabUseGroup').addEventListener('click', function () {
@@ -2940,31 +2997,13 @@
     state.flashcardWords = [];
     state.flashcardGroupId = 'all';
 
-    function getFlashcardWords(groupId) {
-      if (groupId === 'all' || !groupId || !state.categories.length) {
-        var list = [];
-        state.categories.forEach(function (c) {
-          (c.words || []).forEach(function (w) { list.push({ word: w.word, definition: w.definition, categoryId: c.id }); });
-        });
-        return list;
-      }
-      var cat = state.categories.find(function (c) { return c.id === groupId; });
-      return cat ? (cat.words || []).map(function (w) { return { word: w.word, definition: w.definition, categoryId: cat.id }; }) : [];
+    function getFlashcardWords() {
+      return getCurrentWords().map(function (w) {
+        return { word: w.word, definition: w.definition, categoryId: w.categoryId };
+      });
     }
 
     function fillFlashcardGroupSelect() {
-      var sel = document.getElementById('flashcardGroupSelect');
-      if (!sel) return;
-      var prev = sel.value || 'all';
-      sel.innerHTML = '<option value="all">全部</option>';
-      (state.categories || []).forEach(function (c) {
-        var opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name + '（' + (c.words ? c.words.length : 0) + '）';
-        sel.appendChild(opt);
-      });
-      sel.value = prev;
-      state.flashcardGroupId = sel.value;
     }
 
     function renderFlashcard() {
@@ -3032,7 +3071,7 @@
     }
 
     function initFlashcardWords() {
-      state.flashcardWords = getFlashcardWords(state.flashcardGroupId);
+      state.flashcardWords = getFlashcardWords();
       state.flashcardIndex = 0;
       renderFlashcard();
     }
@@ -3055,10 +3094,6 @@
       renderFlashcard();
     });
 
-    document.getElementById('flashcardGroupSelect').addEventListener('change', function () {
-      state.flashcardGroupId = this.value || 'all';
-      initFlashcardWords();
-    });
 
     (function init() {
       var sizeEl = document.getElementById('quizSize');
@@ -3102,8 +3137,8 @@
 
       updateWordCount();
       fillVocabGroupSelect();
-      fillFlashcardGroupSelect();
       initFlashcardWords();
+      updateRangeHint();
       migrateOldWrongData();
       rescheduleOverdueWords();
       updateReviewBadge();
@@ -3111,9 +3146,9 @@
       tryLoadFromSheet().then(function (ok) {
         if (ok) {
           fillVocabGroupSelect();
-          fillFlashcardGroupSelect();
           initFlashcardWords();
           updateWordCount();
+          updateRangeHint();
           updateReviewBadge();
         }
       });
