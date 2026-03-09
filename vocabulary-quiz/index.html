@@ -603,6 +603,7 @@
       <div class="home-actions">
         <button type="button" class="btn btn-secondary" id="btnOpenStats">学习统计 &amp; 高频错词</button>
         <button type="button" class="btn btn-secondary" id="btnOpenHistory">测验历史</button>
+        <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
@@ -2962,6 +2963,10 @@
     });
     document.getElementById('btnOpenReviewFromPanel').addEventListener('click', function () {
       document.getElementById('modalStats').classList.remove('active');
+      openReviewModal(true);
+    });
+
+    document.getElementById('btnOpenReviewHome').addEventListener('click', function () {
       openReviewModal(true);
     });
 
