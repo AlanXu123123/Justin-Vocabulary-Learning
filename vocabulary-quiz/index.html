@@ -2657,15 +2657,16 @@
         if (resp.ok && resp.results) {
           var successCount = 0;
           resp.results.forEach(function (r) {
-            if (r.ok && r.data) {
-              aiCache[r.word.toLowerCase().trim()] = r.data;
+            var d = r.data;
+            if (d && d.word && r.source !== 'error') {
+              aiCache[d.word.toLowerCase().trim()] = d;
               successCount++;
             }
           });
           if (progressEl) progressEl.textContent = '完成！成功 ' + successCount + '/' + wordList.length;
           loadAIUsage();
           renderVocabListInModal();
-          var allAI = resp.results.filter(function (r) { return r.ok && r.data; }).map(function (r) { return r.data; });
+          var allAI = resp.results.filter(function (r) { return r.data && r.data.word && r.source !== 'error'; }).map(function (r) { return r.data; });
           if (allAI.length) syncAIDataToSheet(state.currentCategoryId, allAI);
           setTimeout(function () { if (progressEl) progressEl.textContent = ''; }, 5000);
         } else {
