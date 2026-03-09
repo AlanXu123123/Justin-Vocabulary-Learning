@@ -2643,43 +2643,56 @@
       if (!confirm('将对 ' + needAI.length + ' 个未解析的单词调用AI生成数据，确定继续？')) return;
       btn.disabled = true;
       btn.textContent = '解析中…';
-      var wordList = needAI.map(function (w) { return w.word; });
-      if (progressEl) progressEl.textContent = '正在发送请求…';
-      fetch(AI_BATCH_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ words: wordList })
-      })
-      .then(function (r) { return r.json(); })
-      .then(function (resp) {
-        btn.disabled = false;
-        btn.textContent = '批量AI解析';
-        if (resp.ok && resp.results) {
-          var successCount = 0;
-          resp.results.forEach(function (r) {
-            var d = r.data;
-            if (d && d.word && r.source !== 'error') {
-              aiCache[d.word.toLowerCase().trim()] = d;
-              successCount++;
-            }
-          });
-          if (progressEl) progressEl.textContent = '完成！成功 ' + successCount + '/' + wordList.length;
+      var allWordList = needAI.map(function (w) { return w.word; });
+      var BATCH_SIZE = 25;
+      var totalBatches = Math.ceil(allWordList.length / BATCH_SIZE);
+      var totalSuccess = 0;
+      var totalProcessed = 0;
+      var allAIResults = [];
+
+      function runBatch(batchIndex) {
+        var start = batchIndex * BATCH_SIZE;
+        var chunk = allWordList.slice(start, start + BATCH_SIZE);
+        if (chunk.length === 0) {
+          btn.disabled = false;
+          btn.textContent = '批量AI解析';
+          if (progressEl) progressEl.textContent = '全部完成！成功 ' + totalSuccess + '/' + allWordList.length;
           loadAIUsage();
           renderVocabListInModal();
-          var allAI = resp.results.filter(function (r) { return r.data && r.data.word && r.source !== 'error'; }).map(function (r) { return r.data; });
-          if (allAI.length) syncAIDataToSheet(state.currentCategoryId, allAI);
-          setTimeout(function () { if (progressEl) progressEl.textContent = ''; }, 5000);
-        } else {
-          if (progressEl) progressEl.textContent = '批量解析失败';
-          alert('批量解析失败：' + (resp.error || '未知错误'));
+          if (allAIResults.length) syncAIDataToSheet(state.currentCategoryId, allAIResults);
+          setTimeout(function () { if (progressEl) progressEl.textContent = ''; }, 8000);
+          return;
         }
-      })
-      .catch(function (err) {
-        btn.disabled = false;
-        btn.textContent = '批量AI解析';
-        if (progressEl) progressEl.textContent = '网络错误';
-        alert('批量解析失败：' + (err.message || String(err)));
-      });
+        if (progressEl) progressEl.textContent = '第 ' + (batchIndex + 1) + '/' + totalBatches + ' 批（已完成 ' + totalProcessed + '/' + allWordList.length + '）';
+        fetch(AI_BATCH_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ words: chunk })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok && resp.results) {
+            resp.results.forEach(function (r) {
+              var d = r.data;
+              if (d && d.word && r.source !== 'error') {
+                aiCache[d.word.toLowerCase().trim()] = d;
+                totalSuccess++;
+                allAIResults.push(d);
+              }
+            });
+            totalProcessed += chunk.length;
+            renderVocabListInModal();
+          }
+          runBatch(batchIndex + 1);
+        })
+        .catch(function (err) {
+          totalProcessed += chunk.length;
+          console.error('[batch] chunk ' + (batchIndex + 1) + ' failed:', err);
+          if (progressEl) progressEl.textContent = '第 ' + (batchIndex + 1) + ' 批失败，继续下一批…';
+          runBatch(batchIndex + 1);
+        });
+      }
+      runBatch(0);
     });
 
     document.getElementById('vocabRefresh').addEventListener('click', function () {
