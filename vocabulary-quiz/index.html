@@ -1814,10 +1814,20 @@
       renderVocabListInModal();
     }
 
+    function getWordsWithoutRange() {
+      if (state.currentCategoryId === 'all' || !state.categories.length) {
+        var list = [];
+        state.categories.forEach(function (c) { (c.words || []).forEach(function (w) { list.push(Object.assign({}, w, { categoryId: c.id })); }); });
+        return list;
+      }
+      var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+      return cat ? (cat.words || []).map(function (w) { return Object.assign({}, w, { categoryId: cat.id }); }) : [];
+    }
+
     function renderVocabListInModal() {
       var wrap = document.getElementById('vocabListContent');
       if (!wrap) return;
-      var words = getCurrentWords();
+      var words = getWordsWithoutRange();
       var canEditDelete = state.currentCategoryId !== 'all' && state.currentCategoryId;
 
       var batchBtn = document.getElementById('btnBatchAI');
@@ -1851,16 +1861,6 @@
           var tags = [];
           if (cached.phonetic) tags.push('<span class="ai-tag">' + escapeHtml(cached.phonetic) + '</span>');
           if (cached.partOfSpeech) tags.push('<span class="ai-tag synonym">' + escapeHtml(cached.partOfSpeech) + '</span>');
-          if (cached.synonyms && cached.synonyms.length) {
-            cached.synonyms.forEach(function (s) { tags.push('<span class="ai-tag related">' + escapeHtml(s) + '</span>'); });
-          }
-          if (cached.relatedWords) {
-            var rw = cached.relatedWords;
-            if (rw.noun) tags.push('<span class="ai-tag">n. ' + escapeHtml(rw.noun) + '</span>');
-            if (rw.verb) tags.push('<span class="ai-tag">v. ' + escapeHtml(rw.verb) + '</span>');
-            if (rw.adjective) tags.push('<span class="ai-tag">adj. ' + escapeHtml(rw.adjective) + '</span>');
-            if (rw.adverb) tags.push('<span class="ai-tag">adv. ' + escapeHtml(rw.adverb) + '</span>');
-          }
           var defEnHtml = cached.definitionEn ? '<div class="ai-def-en">EN: ' + escapeHtml(cached.definitionEn) + '</div>' : '';
           aiInfoHtml = '<div class="word-ai-info">' + tags.join('') + defEnHtml + '</div>';
         }
