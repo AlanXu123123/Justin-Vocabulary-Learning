@@ -568,7 +568,17 @@
     .ai-wrong-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
 
     /* ===== AI Usage Badge ===== */
-    .ai-usage-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
+    .ai-usage-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
+    .user-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.75rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.8rem; color: var(--text-secondary); }
+    .user-bar strong { color: var(--accent-light); }
+    .btn-switch-user { background: none; border: 1px solid var(--glass-border); color: var(--accent-light); padding: 0.2rem 0.6rem; border-radius: var(--r-sm); cursor: pointer; font-size: 0.72rem; transition: background 0.2s; }
+    .btn-switch-user:hover { background: rgba(255,255,255,0.08); }
+    #modalUser .modal-dialog { text-align: center; }
+    .user-list-item { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.8rem; margin-bottom: 0.4rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-sm); cursor: pointer; transition: background 0.2s; }
+    .user-list-item:hover { background: rgba(99,102,241,0.15); }
+    .user-list-item.active { background: rgba(99,102,241,0.25); border-color: var(--accent); }
+    .user-list-item .user-name { font-weight: 600; color: var(--text-primary); }
+    .user-list-item .user-time { font-size: 0.7rem; color: var(--muted); }
     .ai-usage-bar .usage-model { color: var(--accent-light); font-weight: 600; }
     .ai-usage-bar .usage-sep { color: rgba(255,255,255,0.15); }
     .ai-usage-bar .usage-tokens { color: var(--text-secondary); }
@@ -589,6 +599,26 @@
       <span class="usage-tokens" id="usageTokens">本月 tokens: --</span>
       <span class="usage-sep">|</span>
       <span class="usage-calls" id="usageCalls">调用: --</span>
+    </div>
+
+    <div class="user-bar" id="userBar">
+      <span>👤 当前用户：<strong id="currentUserDisplay">未登录</strong></span>
+      <button type="button" class="btn-switch-user" id="btnSwitchUser">切换用户</button>
+    </div>
+
+    <!-- 用户选择弹窗 -->
+    <div id="modalUser" class="modal-overlay">
+      <div class="modal-dialog" style="max-width:380px;">
+        <h3>选择用户</h3>
+        <div id="userListWrap" style="margin-bottom:1rem;"></div>
+        <div style="border-top:1px solid var(--glass-border);padding-top:0.75rem;">
+          <label class="hint" style="display:block;margin-bottom:0.3rem;">新用户？输入用户名：</label>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="newUsernameInput" placeholder="输入用户名" style="flex:1;" />
+            <button type="button" class="btn" id="btnCreateUser">创建</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 首页：直接开始 或 粘贴列表 -->
@@ -1007,6 +1037,7 @@
 
     function saveWrongToStorage(items) {
       try { localStorage.setItem(STORAGE_WRONG, JSON.stringify(items)); } catch (_) {}
+      syncUserDataToCloud();
     }
 
     function getQuizSize() {
@@ -1032,6 +1063,7 @@
     }
     function saveWordStatsToStorage(stats) {
       try { localStorage.setItem(STORAGE_WORD_STATS, JSON.stringify(stats)); } catch (_) {}
+      syncUserDataToCloud();
     }
 
     function getQuizHistoryFromStorage() {
@@ -1039,6 +1071,7 @@
     }
     function saveQuizHistoryToStorage(history) {
       try { localStorage.setItem(STORAGE_QUIZ_HISTORY, JSON.stringify(history.slice(0, MAX_HISTORY))); } catch (_) {}
+      syncUserDataToCloud();
     }
 
     function getReviewPlanFromStorage() {
@@ -1046,6 +1079,7 @@
     }
     function saveReviewPlanToStorage(plan) {
       try { localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(plan)); } catch (_) {}
+      syncUserDataToCloud();
     }
 
     // === 核心逻辑函数 ===
@@ -2274,8 +2308,164 @@
     const AI_LOOKUP_BASE = 'https://lookupword-tbj6ixfqaa-uc.a.run.app';
     const AI_BATCH_BASE = 'https://enhancebatch-tbj6ixfqaa-uc.a.run.app';
     const AI_USAGE_BASE = 'https://getusage-tbj6ixfqaa-uc.a.run.app';
+    const USER_LIST_URL = 'https://listusers-tbj6ixfqaa-uc.a.run.app';
+    const USER_GET_URL = 'https://getuserdata-tbj6ixfqaa-uc.a.run.app';
+    const USER_SAVE_URL = 'https://saveuserdata-tbj6ixfqaa-uc.a.run.app';
+    const STORAGE_CURRENT_USER = 'vocab_quiz_current_user';
 
     var aiCache = {};
+
+    // ═══════════════════════════════════════════════
+    //  用户管理系统
+    // ═══════════════════════════════════════════════
+    var _currentUser = localStorage.getItem(STORAGE_CURRENT_USER) || '';
+    var _syncTimer = null;
+
+    function getCurrentUser() { return _currentUser; }
+
+    function setCurrentUser(username) {
+      _currentUser = username;
+      localStorage.setItem(STORAGE_CURRENT_USER, username);
+      var el = document.getElementById('currentUserDisplay');
+      if (el) el.textContent = username || '未登录';
+    }
+
+    function showUserModal() {
+      document.getElementById('modalUser').classList.add('active');
+      loadUserList();
+    }
+
+    function hideUserModal() {
+      document.getElementById('modalUser').classList.remove('active');
+    }
+
+    function loadUserList() {
+      var wrap = document.getElementById('userListWrap');
+      wrap.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;">加载中...</div>';
+      fetch(USER_LIST_URL, { redirect: 'follow', credentials: 'omit' })
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (!resp.ok || !resp.users || resp.users.length === 0) {
+            wrap.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;">暂无用户，请创建新用户</div>';
+            return;
+          }
+          var html = resp.users.map(function (u) {
+            var isActive = u.username === _currentUser ? ' active' : '';
+            var time = u.lastUpdated ? new Date(u.lastUpdated).toLocaleDateString('zh-CN') : '';
+            return '<div class="user-list-item' + isActive + '" data-username="' + u.username + '" data-display="' + (u.displayName || u.username) + '">'
+              + '<span class="user-name">' + (u.displayName || u.username) + '</span>'
+              + '<span class="user-time">' + time + '</span>'
+              + '</div>';
+          }).join('');
+          wrap.innerHTML = html;
+        })
+        .catch(function () {
+          wrap.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;">加载失败，请重试</div>';
+        });
+    }
+
+    function switchToUser(username, displayName) {
+      setCurrentUser(username);
+      hideUserModal();
+      loadUserDataFromCloud(username);
+    }
+
+    function createNewUser(displayName) {
+      if (!displayName) return;
+      var username = displayName.trim().toLowerCase().replace(/\s+/g, '_');
+      if (!username) return;
+
+      localStorage.setItem(STORAGE_WRONG, '[]');
+      localStorage.setItem(STORAGE_WORD_STATS, '{}');
+      localStorage.setItem(STORAGE_QUIZ_HISTORY, '[]');
+      localStorage.setItem(STORAGE_REVIEW_PLAN, '{}');
+
+      setCurrentUser(username);
+      hideUserModal();
+
+      fetch(USER_SAVE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: username,
+          displayName: displayName.trim(),
+          quizHistory: [],
+          wordStats: {},
+          reviewPlan: {},
+          wrongWords: [],
+        }),
+      }).catch(function (e) { console.warn('createUser save failed:', e); });
+
+      updateReviewBadge();
+    }
+
+    function loadUserDataFromCloud(username) {
+      var el = document.getElementById('currentUserDisplay');
+      if (el) el.textContent = username + ' (同步中...)';
+      fetch(USER_GET_URL + '?username=' + encodeURIComponent(username), { redirect: 'follow', credentials: 'omit' })
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok && resp.found && resp.data) {
+            var d = resp.data;
+            if (d.quizHistory) localStorage.setItem(STORAGE_QUIZ_HISTORY, JSON.stringify(d.quizHistory));
+            if (d.wordStats) localStorage.setItem(STORAGE_WORD_STATS, JSON.stringify(d.wordStats));
+            if (d.reviewPlan) localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(d.reviewPlan));
+            if (d.wrongWords) localStorage.setItem(STORAGE_WRONG, JSON.stringify(d.wrongWords));
+            if (el) el.textContent = d.displayName || username;
+          } else {
+            if (el) el.textContent = username;
+          }
+          updateReviewBadge();
+          rescheduleOverdueWords();
+        })
+        .catch(function () {
+          if (el) el.textContent = username;
+        });
+    }
+
+    function syncUserDataToCloud() {
+      if (!_currentUser) return;
+      if (_syncTimer) clearTimeout(_syncTimer);
+      _syncTimer = setTimeout(function () {
+        var payload = {
+          username: _currentUser,
+          quizHistory: getQuizHistoryFromStorage(),
+          wordStats: getWordStatsFromStorage(),
+          reviewPlan: getReviewPlanFromStorage(),
+          wrongWords: getWrongFromStorage(),
+        };
+        fetch(USER_SAVE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(function (e) { console.warn('syncUserData failed:', e); });
+      }, 2000);
+    }
+
+    // ─── 事件绑定 ───
+    document.getElementById('btnSwitchUser').addEventListener('click', showUserModal);
+
+    document.getElementById('userListWrap').addEventListener('click', function (e) {
+      var item = e.target.closest('.user-list-item');
+      if (!item) return;
+      switchToUser(item.dataset.username, item.dataset.display);
+    });
+
+    document.getElementById('btnCreateUser').addEventListener('click', function () {
+      var input = document.getElementById('newUsernameInput');
+      var name = (input.value || '').trim();
+      if (!name) { input.focus(); return; }
+      createNewUser(name);
+      input.value = '';
+    });
+
+    document.getElementById('newUsernameInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('btnCreateUser').click();
+    });
+
+    document.getElementById('modalUser').addEventListener('click', function (e) {
+      if (e.target === this && _currentUser) hideUserModal();
+    });
 
     function loadAIUsage() {
       fetch(AI_USAGE_BASE)
@@ -3163,6 +3353,14 @@
           updateReviewBadge();
         }
       });
+
+      var savedUser = localStorage.getItem(STORAGE_CURRENT_USER);
+      if (savedUser) {
+        setCurrentUser(savedUser);
+        loadUserDataFromCloud(savedUser);
+      } else {
+        showUserModal();
+      }
     })();
   </script>
 </body>
