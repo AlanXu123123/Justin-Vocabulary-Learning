@@ -508,9 +508,16 @@
     .flashcard-group-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; }
     .flashcard-group-row label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
     .flashcard-group-row select { flex: 1; padding: 0.45rem 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-sm); color: var(--text); font-size: 0.9rem; }
-    .flashcard-stage { perspective: 1000px; width: 100%; margin-bottom: 0.85rem; }
-    .flashcard-inner { position: relative; width: 100%; transition: transform 0.5s cubic-bezier(.4,.2,.2,1), height 0.3s ease; transform-style: preserve-3d; cursor: pointer; min-height: 180px; }
+    .flashcard-stage { perspective: 1000px; width: 100%; margin-bottom: 0.85rem; overflow: hidden; position: relative; }
+    .flashcard-inner { position: relative; width: 100%; transition: transform 0.5s cubic-bezier(.4,.2,.2,1), height 0.3s ease; transform-style: preserve-3d; cursor: pointer; min-height: 180px; user-select: none; -webkit-user-select: none; }
     .flashcard-inner.flipped { transform: rotateY(180deg); }
+    .flashcard-inner.swiping { transition: none; }
+    .flashcard-inner.swipe-away-left { transition: transform 0.3s ease-out, opacity 0.3s ease-out; transform: translateX(-120%) rotate(-15deg); opacity: 0; }
+    .flashcard-inner.swipe-away-right { transition: transform 0.3s ease-out, opacity 0.3s ease-out; transform: translateX(120%) rotate(15deg); opacity: 0; }
+    .flashcard-swipe-hint { position: absolute; top: 50%; transform: translateY(-50%); font-size: 1.1rem; font-weight: 700; padding: 0.4rem 0.8rem; border-radius: var(--r-md); opacity: 0; transition: opacity 0.15s; pointer-events: none; z-index: 10; }
+    .flashcard-swipe-hint.hint-left { left: 0.5rem; background: rgba(239,68,68,0.2); color: var(--wrong); border: 2px solid var(--wrong); }
+    .flashcard-swipe-hint.hint-right { right: 0.5rem; background: rgba(34,197,94,0.2); color: var(--correct); border: 2px solid var(--correct); }
+    .flashcard-swipe-hint.visible { opacity: 1; }
     .flashcard-face {
       backface-visibility: hidden; -webkit-backface-visibility: hidden;
       border-radius: var(--r-xl);
@@ -544,8 +551,13 @@
     .flashcard-accuracy.acc-low { color: var(--wrong); }
     .flashcard-accuracy.acc-none { color: rgba(255,255,255,0.35); }
     .flashcard-counter { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 0.6rem; }
-    .flashcard-nav { display: flex; gap: 0.6rem; justify-content: center; }
+    .flashcard-nav { display: flex; gap: 0.6rem; justify-content: center; align-items: center; flex-wrap: wrap; }
     .flashcard-nav .btn { margin-top: 0; min-width: 90px; font-size: 0.9rem; padding: 0.5rem 1rem; }
+    .btn-tts { background: none; border: 1px solid var(--glass-border); color: var(--accent-light); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s; margin-top: 0; }
+    .btn-tts:hover { background: rgba(255,255,255,0.1); }
+    .flashcard-settings { display: flex; align-items: center; justify-content: center; gap: 0.7rem; margin-top: 0.4rem; font-size: 0.75rem; color: var(--muted); }
+    .flashcard-settings label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+    .flashcard-settings input[type="checkbox"] { accent-color: var(--accent); }
 
     /* ===== AI Parse in Vocab Manager ===== */
     .btn-item-ai { padding: 0.2rem 0.45rem; font-size: 0.72rem; border-radius: var(--r-sm); cursor: pointer; border: none; background: rgba(123,127,240,0.15); color: var(--accent-light); font-family: inherit; white-space: nowrap; transition: background 0.15s; }
@@ -685,27 +697,33 @@
       </div>
       <!-- 单词卡 -->
       <div class="card flashcard-section" id="flashcardSection">
-        <h3>单词卡</h3>
+        <h3>单词卡 <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">← 左滑不认识 · 右滑认识 →</span></h3>
         <div class="flashcard-counter" id="flashcardCounter">- / -</div>
         <div class="flashcard-stage" id="flashcardStage">
+          <div class="flashcard-swipe-hint hint-left" id="swipeHintLeft">不认识 ✗</div>
+          <div class="flashcard-swipe-hint hint-right" id="swipeHintRight">认识 ✓</div>
           <div class="flashcard-inner" id="flashcardInner">
             <div class="flashcard-face flashcard-front">
               <div class="flashcard-word" id="flashcardFrontText">--</div>
               <div class="ai-phonetic" id="flashcardPhonetic"></div>
               <div class="ai-pos" id="flashcardPos" style="display:none;"></div>
               <div class="flashcard-accuracy acc-none" id="flashcardAccuracy">未测试</div>
-              <div class="flashcard-hint">点击翻转查看释义</div>
+              <div class="flashcard-hint">点击翻转 · 左右滑动评分</div>
             </div>
             <div class="flashcard-face flashcard-back">
               <div class="flashcard-word" id="flashcardBackText">--</div>
               <div id="flashcardAIBack"></div>
-              <div class="flashcard-hint">点击翻转回到单词</div>
+              <div class="flashcard-hint">点击翻转 · 左右滑动评分</div>
             </div>
           </div>
         </div>
         <div class="flashcard-nav">
           <button type="button" class="btn btn-secondary" id="btnFlashcardPrev">上一个</button>
+          <button type="button" class="btn-tts" id="btnTTS" title="朗读单词">🔊</button>
           <button type="button" class="btn" id="btnFlashcardNext">下一个</button>
+        </div>
+        <div class="flashcard-settings">
+          <label><input type="checkbox" id="chkAutoSpeak" /> 自动朗读</label>
         </div>
       </div>
       <div class="card">
@@ -992,6 +1010,49 @@
       if (days < 365) return Math.round(days / 30) + '个月';
       return (days / 365).toFixed(1) + '年';
     }
+
+    // ═══════════════════════════════════════════════
+    //  TTS 朗读 (Web Speech API)
+    // ═══════════════════════════════════════════════
+    var _ttsAutoSpeak = false;
+    try { _ttsAutoSpeak = localStorage.getItem('vocab_tts_auto') === 'true'; } catch (_) {}
+
+    function speakWord(text) {
+      if (!text || !('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      u.rate = 0.85;
+      speechSynthesis.speak(u);
+    }
+
+    // ═══════════════════════════════════════════════
+    //  模糊匹配 (Levenshtein Distance)
+    // ═══════════════════════════════════════════════
+    function levenshtein(a, b) {
+      var m = a.length, n = b.length;
+      var dp = [];
+      for (var i = 0; i <= m; i++) { dp[i] = [i]; }
+      for (var j = 0; j <= n; j++) { dp[0][j] = j; }
+      for (var i = 1; i <= m; i++) {
+        for (var j = 1; j <= n; j++) {
+          dp[i][j] = a[i - 1] === b[j - 1]
+            ? dp[i - 1][j - 1]
+            : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        }
+      }
+      return dp[m][n];
+    }
+
+    function wordSimilarity(answer, correct) {
+      var a = answer.toLowerCase().trim();
+      var c = correct.toLowerCase().trim();
+      if (a === c) return 1;
+      var maxLen = Math.max(a.length, c.length);
+      if (maxLen === 0) return 1;
+      return 1 - levenshtein(a, c) / maxLen;
+    }
+
     const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbx1Tb-Cf-TzRsSk92AxDOOPurY07GKmVxei3uZBXMPTWMUWiSbfKOSznZ3Yqr4aAaAw/exec';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
@@ -1137,9 +1198,11 @@
     }
 
     function wordsMatch(answer, correctWord) {
-      const a = normalizeWord(answer);
-      const c = normalizeWord(correctWord);
-      return a === c;
+      var a = normalizeWord(answer);
+      var c = normalizeWord(correctWord);
+      if (a === c) return 'exact';
+      if (wordSimilarity(a, c) >= 0.8) return 'close';
+      return false;
     }
 
     function getWrongFromStorage() {
@@ -2278,27 +2341,35 @@
     }
 
     function submitAnswer() {
-      const qa = state.quizAnswers[state.index];
+      var qa = state.quizAnswers[state.index];
       if (qa && qa.answered) return;
 
-      const input = document.getElementById('answerInput');
-      const user = input.value.trim();
+      var input = document.getElementById('answerInput');
+      var user = input.value.trim();
       if (!user) return;
 
-      const item = state.currentQuiz[state.index];
-      const correct = wordsMatch(user, item.word);
-      const feedbackEl = document.getElementById('feedback');
+      var item = state.currentQuiz[state.index];
+      var matchResult = wordsMatch(user, item.word);
+      var isCorrect = matchResult === 'exact' || matchResult === 'close';
+      var feedbackEl = document.getElementById('feedback');
 
-      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: correct, graded: false };
+      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: isCorrect, graded: false };
 
       input.disabled = true;
       feedbackEl.style.display = 'inline-flex';
 
-      if (correct) {
+      if (matchResult === 'exact') {
         state.correct++;
         input.classList.add('correct');
         feedbackEl.className = 'feedback correct';
         feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
+        Audio.correct();
+        showFSRSRating(item, true);
+      } else if (matchResult === 'close') {
+        state.correct++;
+        input.classList.add('correct');
+        feedbackEl.className = 'feedback correct';
+        feedbackEl.innerHTML = '<span class="icon">✓</span> 接近正确！正确拼写：' + item.word;
         Audio.correct();
         showFSRSRating(item, true);
       } else {
@@ -2311,6 +2382,12 @@
         Audio.wrong();
         recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', false, FSRS_GRADE.AGAIN);
         showFSRSRating(item, false);
+
+        var alreadyQueued = state.currentQuiz.slice(state.index + 1).some(function (w) { return w.word === item.word; });
+        if (!alreadyQueued) {
+          state.currentQuiz.push({ word: item.word, definition: item.definition, categoryId: item.categoryId });
+          state.quizAnswers.push({ answered: false, userAnswer: '', correct: false });
+        }
       }
 
       showQuizAIExtra(item.word, state.index);
@@ -3466,16 +3543,106 @@
       renderFlashcard();
     }
 
-    document.getElementById('flashcardInner').addEventListener('click', function () {
-      this.classList.toggle('flipped');
-      requestAnimationFrame(adjustFlashcardHeight);
+    // ─── 闪卡滑动手势系统 ───
+    var _swipe = { active: false, startX: 0, startY: 0, dx: 0, isFlip: false };
+    var _swipeThreshold = 80;
+    var _flashcardInner = document.getElementById('flashcardInner');
+
+    function onSwipeStart(x, y) {
+      if (state.flashcardWords.length === 0) return;
+      _swipe.active = true;
+      _swipe.startX = x;
+      _swipe.startY = y;
+      _swipe.dx = 0;
+      _swipe.isFlip = false;
+      _flashcardInner.classList.add('swiping');
+    }
+
+    function onSwipeMove(x, y) {
+      if (!_swipe.active) return;
+      _swipe.dx = x - _swipe.startX;
+      var dy = Math.abs(y - _swipe.startY);
+      if (dy > 50 && Math.abs(_swipe.dx) < 30) return;
+      var rotation = _swipe.dx * 0.08;
+      var baseTransform = _flashcardInner.classList.contains('flipped') ? 'rotateY(180deg) ' : '';
+      _flashcardInner.style.transform = baseTransform + 'translateX(' + _swipe.dx + 'px) rotate(' + rotation + 'deg)';
+      var hintL = document.getElementById('swipeHintLeft');
+      var hintR = document.getElementById('swipeHintRight');
+      if (_swipe.dx < -40) { hintL.classList.add('visible'); hintR.classList.remove('visible'); }
+      else if (_swipe.dx > 40) { hintR.classList.add('visible'); hintL.classList.remove('visible'); }
+      else { hintL.classList.remove('visible'); hintR.classList.remove('visible'); }
+    }
+
+    function onSwipeEnd() {
+      if (!_swipe.active) return;
+      _swipe.active = false;
+      _flashcardInner.classList.remove('swiping');
+      document.getElementById('swipeHintLeft').classList.remove('visible');
+      document.getElementById('swipeHintRight').classList.remove('visible');
+
+      if (Math.abs(_swipe.dx) > _swipeThreshold) {
+        var item = state.flashcardWords[state.flashcardIndex];
+        if (item) {
+          var grade = _swipe.dx > 0 ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN;
+          recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', grade >= FSRS_GRADE.HARD, grade);
+        }
+        var dir = _swipe.dx > 0 ? 'swipe-away-right' : 'swipe-away-left';
+        _flashcardInner.classList.add(dir);
+        setTimeout(function () {
+          _flashcardInner.classList.remove(dir);
+          _flashcardInner.style.transform = '';
+          state.flashcardIndex++;
+          if (state.flashcardIndex >= state.flashcardWords.length) state.flashcardIndex = 0;
+          renderFlashcard();
+          if (_ttsAutoSpeak && state.flashcardWords.length > 0) {
+            speakWord(state.flashcardWords[state.flashcardIndex].word);
+          }
+        }, 300);
+      } else if (Math.abs(_swipe.dx) < 10) {
+        _flashcardInner.style.transform = '';
+        _flashcardInner.classList.toggle('flipped');
+        requestAnimationFrame(adjustFlashcardHeight);
+        if (_ttsAutoSpeak) {
+          var item = state.flashcardWords[state.flashcardIndex];
+          if (item) {
+            var isBack = _flashcardInner.classList.contains('flipped');
+            if (!isBack) speakWord(item.word);
+          }
+        }
+      } else {
+        _flashcardInner.style.transform = '';
+        var baseTransform = _flashcardInner.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+        _flashcardInner.style.transform = baseTransform;
+      }
+    }
+
+    _flashcardInner.addEventListener('mousedown', function (e) { e.preventDefault(); onSwipeStart(e.clientX, e.clientY); });
+    document.addEventListener('mousemove', function (e) { onSwipeMove(e.clientX, e.clientY); });
+    document.addEventListener('mouseup', function () { onSwipeEnd(); });
+    _flashcardInner.addEventListener('touchstart', function (e) { var t = e.touches[0]; onSwipeStart(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchmove', function (e) { if (_swipe.active) { var t = e.touches[0]; onSwipeMove(t.clientX, t.clientY); } }, { passive: true });
+    document.addEventListener('touchend', function () { onSwipeEnd(); });
+
+    // ─── TTS 按钮 + 自动朗读 ───
+    document.getElementById('btnTTS').addEventListener('click', function () {
+      var item = state.flashcardWords[state.flashcardIndex];
+      if (item) speakWord(item.word);
     });
 
+    var chkAutoSpeak = document.getElementById('chkAutoSpeak');
+    chkAutoSpeak.checked = _ttsAutoSpeak;
+    chkAutoSpeak.addEventListener('change', function () {
+      _ttsAutoSpeak = this.checked;
+      try { localStorage.setItem('vocab_tts_auto', String(_ttsAutoSpeak)); } catch (_) {}
+    });
+
+    // ─── 闪卡前后按钮 ───
     document.getElementById('btnFlashcardPrev').addEventListener('click', function () {
       if (state.flashcardWords.length === 0) return;
       state.flashcardIndex--;
       if (state.flashcardIndex < 0) state.flashcardIndex = state.flashcardWords.length - 1;
       renderFlashcard();
+      if (_ttsAutoSpeak) speakWord(state.flashcardWords[state.flashcardIndex].word);
     });
 
     document.getElementById('btnFlashcardNext').addEventListener('click', function () {
@@ -3483,6 +3650,7 @@
       state.flashcardIndex++;
       if (state.flashcardIndex >= state.flashcardWords.length) state.flashcardIndex = 0;
       renderFlashcard();
+      if (_ttsAutoSpeak) speakWord(state.flashcardWords[state.flashcardIndex].word);
     });
 
 
