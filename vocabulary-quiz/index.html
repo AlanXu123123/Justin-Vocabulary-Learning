@@ -240,6 +240,23 @@
     .vocab-panel-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
     .quiz-nav { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: center; }
     .quiz-nav .btn { min-width: 100px; margin-top: 0; }
+    .fsrs-rating-row { margin-top: 0.75rem; padding: 0.6rem 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); }
+    .fsrs-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.4rem; text-align: center; }
+    .fsrs-buttons { display: flex; gap: 0.4rem; justify-content: center; }
+    .fsrs-btn { display: flex; flex-direction: column; align-items: center; padding: 0.4rem 0.7rem; border-radius: var(--r-sm); border: 1px solid var(--glass-border); background: rgba(255,255,255,0.06); cursor: pointer; transition: all 0.2s; min-width: 56px; }
+    .fsrs-btn:hover { transform: translateY(-1px); }
+    .fsrs-btn.selected { border-width: 2px; transform: scale(1.05); }
+    .fsrs-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+    .fsrs-grade-name { font-size: 0.78rem; font-weight: 600; }
+    .fsrs-interval { font-size: 0.65rem; color: var(--muted); margin-top: 0.15rem; }
+    .fsrs-again .fsrs-grade-name { color: var(--wrong); }
+    .fsrs-again:hover, .fsrs-again.selected { background: rgba(239,68,68,0.15); border-color: var(--wrong); }
+    .fsrs-hard .fsrs-grade-name { color: #f59e0b; }
+    .fsrs-hard:hover, .fsrs-hard.selected { background: rgba(245,158,11,0.15); border-color: #f59e0b; }
+    .fsrs-good .fsrs-grade-name { color: var(--correct); }
+    .fsrs-good:hover, .fsrs-good.selected { background: rgba(34,197,94,0.15); border-color: var(--correct); }
+    .fsrs-easy .fsrs-grade-name { color: var(--accent-light); }
+    .fsrs-easy:hover, .fsrs-easy.selected { background: rgba(99,102,241,0.15); border-color: var(--accent-light); }
     .btn-back-home {
       background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
       color: var(--text-secondary); padding: 0.35rem 0.7rem; font-size: 0.85rem; border-radius: var(--r-sm);
@@ -711,6 +728,15 @@
             <input type="text" id="answerInput" placeholder="输入单词" autocomplete="off" spellcheck="false" />
             <span class="feedback" id="feedback" style="display: none;"></span>
           </div>
+          <div class="fsrs-rating-row" id="fsrsRatingRow" style="display:none;">
+            <div class="fsrs-label">记忆评分：</div>
+            <div class="fsrs-buttons">
+              <button type="button" class="fsrs-btn fsrs-again" data-grade="1"><span class="fsrs-grade-name">忘了</span><span class="fsrs-interval" id="fsrsInt1"></span></button>
+              <button type="button" class="fsrs-btn fsrs-hard" data-grade="2"><span class="fsrs-grade-name">困难</span><span class="fsrs-interval" id="fsrsInt2"></span></button>
+              <button type="button" class="fsrs-btn fsrs-good" data-grade="3"><span class="fsrs-grade-name">记住</span><span class="fsrs-interval" id="fsrsInt3"></span></button>
+              <button type="button" class="fsrs-btn fsrs-easy" data-grade="4"><span class="fsrs-grade-name">简单</span><span class="fsrs-interval" id="fsrsInt4"></span></button>
+            </div>
+          </div>
           <div class="ai-quiz-extra" id="quizAIExtra" style="display:none;"></div>
         </div>
       </div>
@@ -876,8 +902,96 @@
     const STORAGE_CATEGORIES_CACHE = 'vocab_quiz_categories_cache';
     const STORAGE_QUIZ_HISTORY = 'vocab_quiz_history';
     const STORAGE_REVIEW_PLAN = 'vocab_quiz_review_plan';
-    const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // days for level 0-5; level 6 = graduated
+    const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // legacy, kept for migration
     const MAX_HISTORY = 50;
+
+    // ═══════════════════════════════════════════════
+    //  FSRS v5 核心算法 (Free Spaced Repetition Scheduler)
+    //  基于 Anki 开源 FSRS，从百万条复习数据 ML 训练所得参数
+    // ═══════════════════════════════════════════════
+    var FSRS_W = [
+      0.40255, 1.18385, 3.173, 15.69105,
+      7.1949, 0.5345, 1.4604, 0.0046,
+      1.54575, 0.1192, 1.01925, 1.9395,
+      0.11, 0.29605, 2.2698, 0.2315,
+      2.9898, 0.51655, 0.6621
+    ];
+    var FSRS_F = 19 / 81;
+    var FSRS_C = -0.5;
+    var FSRS_DESIRED_RETENTION = 0.9;
+    var FSRS_GRADE = { AGAIN: 1, HARD: 2, GOOD: 3, EASY: 4 };
+
+    function fsrsClampD(d) { return Math.min(10, Math.max(1, d)); }
+
+    function fsrsRetrievability(daysSince, s) {
+      if (s <= 0) return 0;
+      return Math.pow(1 + FSRS_F * (daysSince / s), FSRS_C);
+    }
+
+    function fsrsInterval(s) {
+      return Math.max(1, Math.round(
+        (s / FSRS_F) * (Math.pow(FSRS_DESIRED_RETENTION, 1 / FSRS_C) - 1)
+      ));
+    }
+
+    function fsrsInitS(grade) { return FSRS_W[grade - 1]; }
+
+    function fsrsInitD(grade) {
+      return fsrsClampD(FSRS_W[4] - Math.exp(FSRS_W[5] * (grade - 1)) + 1);
+    }
+
+    function fsrsNextS(d, s, r, grade) {
+      if (grade === FSRS_GRADE.AGAIN) {
+        var df = Math.pow(d, -FSRS_W[12]);
+        var sf = Math.pow(s + 1, FSRS_W[13]) - 1;
+        var rf = Math.exp(FSRS_W[14] * (1 - r));
+        return Math.min(df * sf * rf * FSRS_W[11], s);
+      }
+      var td = 11 - d;
+      var ts = Math.pow(s, -FSRS_W[9]);
+      var tr = Math.exp(FSRS_W[10] * (1 - r)) - 1;
+      var h = grade === FSRS_GRADE.HARD ? FSRS_W[15] : 1;
+      var b = grade === FSRS_GRADE.EASY ? FSRS_W[16] : 1;
+      return s * (1 + td * ts * tr * h * b * Math.exp(FSRS_W[8]));
+    }
+
+    function fsrsNextD(d, grade) {
+      var deltaD = -FSRS_W[6] * (grade - 3);
+      var dp = d + deltaD * ((10 - d) / 9);
+      return fsrsClampD(FSRS_W[7] * fsrsInitD(FSRS_GRADE.EASY) + (1 - FSRS_W[7]) * dp);
+    }
+
+    function fsrsSchedule(card, grade) {
+      var now = Date.now();
+      if (!card || !card.stability) {
+        var s = fsrsInitS(grade);
+        var d = fsrsInitD(grade);
+        var interval = fsrsInterval(s);
+        return { stability: s, difficulty: d, interval: interval, nextReviewAt: now + interval * 86400000, lastReviewAt: now, reps: 1 };
+      }
+      var daysSince = Math.max(0, (now - (card.lastReviewAt || now)) / 86400000);
+      var r = fsrsRetrievability(daysSince, card.stability);
+      var newS = fsrsNextS(card.difficulty, card.stability, r, grade);
+      var newD = fsrsNextD(card.difficulty, grade);
+      var interval = fsrsInterval(newS);
+      return { stability: newS, difficulty: newD, interval: interval, nextReviewAt: now + interval * 86400000, lastReviewAt: now, reps: (card.reps || 0) + 1 };
+    }
+
+    function fsrsPreviewIntervals(card) {
+      var now = Date.now();
+      var result = {};
+      [FSRS_GRADE.AGAIN, FSRS_GRADE.HARD, FSRS_GRADE.GOOD, FSRS_GRADE.EASY].forEach(function (g) {
+        result[g] = fsrsSchedule(card, g).interval;
+      });
+      return result;
+    }
+
+    function formatInterval(days) {
+      if (days < 1) return '<1天';
+      if (days < 30) return days + '天';
+      if (days < 365) return Math.round(days / 30) + '个月';
+      return (days / 365).toFixed(1) + '年';
+    }
     const DEFAULT_VOCAB_URL = 'https://script.google.com/macros/s/AKfycbx1Tb-Cf-TzRsSk92AxDOOPurY07GKmVxei3uZBXMPTWMUWiSbfKOSznZ3Yqr4aAaAw/exec';
     const DEFAULT_WORDS = [
       { word: 'guarantee', definition: 'a promise that something will be done or work' },
@@ -1082,17 +1196,17 @@
       syncUserDataToCloud();
     }
 
-    // === 核心逻辑函数 ===
-    function recordWordResult(word, definition, categoryId, isCorrect) {
+    // === 核心逻辑函数 (FSRS) ===
+    function recordWordResult(word, definition, categoryId, isCorrect, grade) {
+      if (!grade) grade = isCorrect ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN;
       var stats = getWordStatsFromStorage();
       var key = makeWordKey(categoryId, word);
       var now = Date.now();
 
       if (stats[key]) {
-        // Already tracked word
         stats[key].totalCount++;
         stats[key].lastTestedAt = now;
-        if (isCorrect) {
+        if (grade >= FSRS_GRADE.HARD) {
           stats[key].streakCorrect++;
         } else {
           stats[key].wrongCount++;
@@ -1100,56 +1214,36 @@
           stats[key].streakCorrect = 0;
         }
       } else {
-        // First time tested - create record for ALL words
         stats[key] = {
           word: word,
           categoryId: categoryId,
           totalCount: 1,
-          wrongCount: isCorrect ? 0 : 1,
+          wrongCount: grade === FSRS_GRADE.AGAIN ? 1 : 0,
           lastTestedAt: now,
-          lastWrongAt: isCorrect ? null : now,
-          streakCorrect: isCorrect ? 1 : 0,
-          firstWrongAt: isCorrect ? null : now
+          lastWrongAt: grade === FSRS_GRADE.AGAIN ? now : null,
+          streakCorrect: grade >= FSRS_GRADE.HARD ? 1 : 0,
+          firstWrongAt: grade === FSRS_GRADE.AGAIN ? now : null
         };
       }
-
       saveWordStatsToStorage(stats);
 
-      // Update review plan
       var plan = getReviewPlanFromStorage();
-      if (!isCorrect) {
-        // Wrong: enter or reset to level 0
-        plan[key] = {
-          word: word,
-          categoryId: categoryId,
-          definition: definition || '',
-          level: 0,
-          nextReviewAt: now + REVIEW_INTERVALS[0] * 86400000,
-          lastReviewedAt: now,
-          createdAt: plan[key] ? plan[key].createdAt : now
-        };
-      } else if (plan[key]) {
-        // Correct and in review plan: advance level
-        plan[key].lastReviewedAt = now;
-        plan[key].level = (plan[key].level || 0) + 1;
-        if (plan[key].level >= REVIEW_INTERVALS.length) {
-          // Graduated - remove from plan
-          delete plan[key];
-        } else {
-          plan[key].nextReviewAt = now + REVIEW_INTERVALS[plan[key].level] * 86400000;
-        }
-      } else {
-        // Correct and NOT in review plan: add at level 1 (next review in 2 days)
-        plan[key] = {
-          word: word,
-          categoryId: categoryId,
-          definition: definition || '',
-          level: 1,
-          nextReviewAt: now + REVIEW_INTERVALS[1] * 86400000,
-          lastReviewedAt: now,
-          createdAt: now
-        };
-      }
+      var existing = plan[key] || null;
+      var card = existing ? { stability: existing.stability, difficulty: existing.difficulty, lastReviewAt: existing.lastReviewAt, reps: existing.reps } : null;
+      var result = fsrsSchedule(card, grade);
+
+      plan[key] = {
+        word: word,
+        categoryId: categoryId,
+        definition: definition || '',
+        stability: result.stability,
+        difficulty: result.difficulty,
+        interval: result.interval,
+        nextReviewAt: result.nextReviewAt,
+        lastReviewAt: result.lastReviewAt,
+        reps: result.reps,
+        createdAt: existing ? existing.createdAt : now
+      };
       saveReviewPlanToStorage(plan);
     }
 
@@ -1208,34 +1302,33 @@
     // it lands on today or a future date. Persists the changes.
     function rescheduleOverdueWords() {
       var plan = getReviewPlanFromStorage();
-      var today = new Date();
-      var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      var todayStart = new Date();
+      todayStart = new Date(todayStart.getFullYear(), todayStart.getMonth(), todayStart.getDate()).getTime();
       var changed = false;
       Object.keys(plan).forEach(function (key) {
         var r = plan[key];
         if (r.nextReviewAt < todayStart) {
-          var lvl = Math.min(r.level || 0, REVIEW_INTERVALS.length - 1);
-          var intervalMs = REVIEW_INTERVALS[lvl] * 86400000;
+          var intervalMs = (r.interval || 1) * 86400000;
           while (r.nextReviewAt < todayStart) {
             r.nextReviewAt += intervalMs;
           }
           changed = true;
         }
       });
-      if (changed) {
-        saveReviewPlanToStorage(plan);
-      }
+      if (changed) saveReviewPlanToStorage(plan);
     }
 
     function getReviewSummary(categoryId) {
       var plan = getReviewPlanFromStorage();
       var now = Date.now();
-      var summary = { total: 0, due: 0, levels: [0, 0, 0, 0, 0, 0] };
+      var summary = { total: 0, due: 0, stability: { low: 0, mid: 0, high: 0 } };
       Object.values(plan).forEach(function (r) {
         if (categoryId && categoryId !== 'all' && r.categoryId !== categoryId) return;
         summary.total++;
-        var lvl = Math.min(r.level || 0, 5);
-        summary.levels[lvl]++;
+        var s = r.stability || 1;
+        if (s < 3) summary.stability.low++;
+        else if (s < 15) summary.stability.mid++;
+        else summary.stability.high++;
         if (r.nextReviewAt <= now) summary.due++;
       });
       return summary;
@@ -1499,12 +1592,14 @@
       }
 
       var listHtml = words.map(function (r) {
-        var lvl = Math.min(r.level || 0, 5);
+        var s = r.stability || 1;
+        var sLabel = s < 3 ? '初学' : (s < 15 ? '巩固' : '熟练');
+        var sClass = s < 3 ? 'review-level-0' : (s < 15 ? 'review-level-2' : 'review-level-4');
         return '<div class="cal-day-word-item">' +
-          '<span class="review-level-dot review-level-' + lvl + '"></span>' +
+          '<span class="review-level-dot ' + sClass + '"></span>' +
           '<span class="cdw-word">' + escapeHtml(r.word) + '</span>' +
           '<span class="cdw-def">' + escapeHtml(r.definition || '') + '</span>' +
-          '<span class="cdw-level">Lv' + lvl + '</span>' +
+          '<span class="cdw-level">' + sLabel + ' S:' + s.toFixed(1) + 'd</span>' +
           '</div>';
       }).join('');
 
@@ -1563,7 +1658,7 @@
       var due = getWordsDueForReview('all');
       if (due.length > 0) {
         notice.style.display = 'flex';
-        textEl.innerHTML = '<strong>' + due.length + '</strong> 个单词待复习（基于艾宾浩斯遗忘曲线）';
+        textEl.innerHTML = '<strong>' + due.length + '</strong> 个单词待复习（FSRS 智能调度）';
       } else {
         notice.style.display = 'none';
       }
@@ -1667,6 +1762,29 @@
       saveWordStatsToStorage(stats);
       saveReviewPlanToStorage(plan);
       // Keep old key for compatibility
+    }
+
+    function migrateToFSRS() {
+      var plan = getReviewPlanFromStorage();
+      var changed = false;
+      var levelToStability = [0.4, 1.2, 3.2, 7.0, 15.0, 30.0];
+      Object.keys(plan).forEach(function (key) {
+        var r = plan[key];
+        if (r.stability !== undefined) return;
+        if (r.level === undefined) return;
+        var lvl = Math.min(r.level || 0, 5);
+        r.stability = levelToStability[lvl];
+        r.difficulty = lvl <= 1 ? 6.5 : (lvl <= 3 ? 5.0 : 3.5);
+        r.reps = lvl + 1;
+        r.lastReviewAt = r.lastReviewedAt || Date.now();
+        var interval = fsrsInterval(r.stability);
+        r.interval = interval;
+        r.nextReviewAt = r.lastReviewAt + interval * 86400000;
+        delete r.level;
+        delete r.lastReviewedAt;
+        changed = true;
+      });
+      if (changed) saveReviewPlanToStorage(plan);
     }
 
     // === 清理函数 ===
@@ -2099,6 +2217,7 @@
       document.getElementById('btnPrev').disabled = idx === 0;
 
       if (aiExtraEl) { aiExtraEl.style.display = 'none'; aiExtraEl.innerHTML = ''; }
+      var fsrsRow = document.getElementById('fsrsRatingRow');
 
       const qa = state.quizAnswers[idx];
       if (qa && qa.answered) {
@@ -2113,6 +2232,14 @@
           feedbackEl.className = 'feedback wrong';
           feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         }
+        showFSRSRating(item, qa.correct);
+        if (qa.graded) {
+          var btns = fsrsRow.querySelectorAll('.fsrs-btn');
+          btns.forEach(function (b) { b.disabled = true; b.classList.remove('selected'); });
+          var selectedGrade = qa.fsrsGrade || (qa.correct ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN);
+          var selBtn = fsrsRow.querySelector('[data-grade="' + selectedGrade + '"]');
+          if (selBtn) selBtn.classList.add('selected');
+        }
         showQuizAIExtra(item.word, idx);
       } else {
         input.value = '';
@@ -2120,6 +2247,7 @@
         input.disabled = false;
         input.focus();
         feedbackEl.style.display = 'none';
+        fsrsRow.style.display = 'none';
       }
     }
 
@@ -2161,7 +2289,7 @@
       const correct = wordsMatch(user, item.word);
       const feedbackEl = document.getElementById('feedback');
 
-      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: correct };
+      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: correct, graded: false };
 
       input.disabled = true;
       feedbackEl.style.display = 'inline-flex';
@@ -2172,7 +2300,7 @@
         feedbackEl.className = 'feedback correct';
         feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
         Audio.correct();
-        recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', true);
+        showFSRSRating(item, true);
       } else {
         state.wrongAnswers.push({ word: item.word, definition: item.definition || '' });
         state.currentWrong.push({ word: item.word, definition: item.definition, categoryId: item.categoryId || state.currentCategoryId || 'unknown' });
@@ -2181,10 +2309,52 @@
         feedbackEl.className = 'feedback wrong';
         feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         Audio.wrong();
-        recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', false);
+        recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', false, FSRS_GRADE.AGAIN);
+        showFSRSRating(item, false);
       }
 
       showQuizAIExtra(item.word, state.index);
+    }
+
+    function showFSRSRating(item, isCorrect) {
+      var row = document.getElementById('fsrsRatingRow');
+      row.style.display = 'block';
+      var plan = getReviewPlanFromStorage();
+      var key = makeWordKey(item.categoryId || state.currentCategoryId || 'unknown', item.word);
+      var existing = plan[key] || null;
+      var card = existing ? { stability: existing.stability, difficulty: existing.difficulty, lastReviewAt: existing.lastReviewAt, reps: existing.reps } : null;
+      var previews = fsrsPreviewIntervals(card);
+
+      document.getElementById('fsrsInt1').textContent = formatInterval(previews[1]);
+      document.getElementById('fsrsInt2').textContent = formatInterval(previews[2]);
+      document.getElementById('fsrsInt3').textContent = formatInterval(previews[3]);
+      document.getElementById('fsrsInt4').textContent = formatInterval(previews[4]);
+
+      var btns = row.querySelectorAll('.fsrs-btn');
+      btns.forEach(function (b) { b.disabled = false; b.classList.remove('selected'); });
+
+      if (!isCorrect) {
+        btns.forEach(function (b) { b.disabled = true; });
+        var againBtn = row.querySelector('[data-grade="1"]');
+        if (againBtn) { againBtn.classList.add('selected'); againBtn.disabled = false; }
+        state.quizAnswers[state.index].graded = true;
+      }
+    }
+
+    function handleFSRSGrade(grade) {
+      var qa = state.quizAnswers[state.index];
+      if (!qa || !qa.answered || qa.graded) return;
+      qa.graded = true;
+      qa.fsrsGrade = grade;
+
+      var item = state.currentQuiz[state.index];
+      recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', true, grade);
+
+      var btns = document.querySelectorAll('#fsrsRatingRow .fsrs-btn');
+      btns.forEach(function (b) {
+        b.disabled = true;
+        if (parseInt(b.dataset.grade) === grade) b.classList.add('selected');
+      });
     }
 
     function prevQuestion() {
@@ -2194,6 +2364,10 @@
     }
 
     function nextQuestion() {
+      var qa = state.quizAnswers[state.index];
+      if (qa && qa.answered && qa.correct && !qa.graded) {
+        handleFSRSGrade(FSRS_GRADE.GOOD);
+      }
       state.index++;
       if (state.index >= state.currentQuiz.length) {
         showResult();
@@ -2203,6 +2377,14 @@
     }
 
     function showResult() {
+      state.quizAnswers.forEach(function (qa, i) {
+        if (qa && qa.answered && qa.correct && !qa.graded) {
+          var item = state.currentQuiz[i];
+          recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', true, FSRS_GRADE.GOOD);
+          qa.graded = true;
+          qa.fsrsGrade = FSRS_GRADE.GOOD;
+        }
+      });
       stopQuizTimer();
       var quizDuration = state.quizStartTime ? Date.now() - state.quizStartTime : 0;
       state.lastQuizDuration = quizDuration;
@@ -3039,6 +3221,14 @@
       nextQuestion();
     });
     document.getElementById('btnPrev').addEventListener('click', prevQuestion);
+
+    document.getElementById('fsrsRatingRow').addEventListener('click', function (e) {
+      var btn = e.target.closest('.fsrs-btn');
+      if (!btn || btn.disabled) return;
+      var grade = parseInt(btn.dataset.grade);
+      if (grade >= 1 && grade <= 4) handleFSRSGrade(grade);
+    });
+
     document.getElementById('btnQuizHome').addEventListener('click', function () {
       stopQuizTimer();
       showScreen('screen-home');
@@ -3341,6 +3531,7 @@
       initFlashcardWords();
       updateRangeHint();
       migrateOldWrongData();
+      migrateToFSRS();
       rescheduleOverdueWords();
       updateReviewBadge();
 
