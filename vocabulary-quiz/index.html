@@ -240,23 +240,9 @@
     .vocab-panel-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
     .quiz-nav { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: center; }
     .quiz-nav .btn { min-width: 100px; margin-top: 0; }
-    .fsrs-rating-row { margin-top: 0.75rem; padding: 0.6rem 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); }
-    .fsrs-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.4rem; text-align: center; }
-    .fsrs-buttons { display: flex; gap: 0.4rem; justify-content: center; }
-    .fsrs-btn { display: flex; flex-direction: column; align-items: center; padding: 0.4rem 0.7rem; border-radius: var(--r-sm); border: 1px solid var(--glass-border); background: rgba(255,255,255,0.06); cursor: pointer; transition: all 0.2s; min-width: 56px; }
-    .fsrs-btn:hover { transform: translateY(-1px); }
-    .fsrs-btn.selected { border-width: 2px; transform: scale(1.05); }
-    .fsrs-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
-    .fsrs-grade-name { font-size: 0.78rem; font-weight: 600; }
-    .fsrs-interval { font-size: 0.65rem; color: var(--muted); margin-top: 0.15rem; }
-    .fsrs-again .fsrs-grade-name { color: var(--wrong); }
-    .fsrs-again:hover, .fsrs-again.selected { background: rgba(239,68,68,0.15); border-color: var(--wrong); }
-    .fsrs-hard .fsrs-grade-name { color: #f59e0b; }
-    .fsrs-hard:hover, .fsrs-hard.selected { background: rgba(245,158,11,0.15); border-color: #f59e0b; }
-    .fsrs-good .fsrs-grade-name { color: var(--correct); }
-    .fsrs-good:hover, .fsrs-good.selected { background: rgba(34,197,94,0.15); border-color: var(--correct); }
-    .fsrs-easy .fsrs-grade-name { color: var(--accent-light); }
-    .fsrs-easy:hover, .fsrs-easy.selected { background: rgba(99,102,241,0.15); border-color: var(--accent-light); }
+    .fsrs-rating-row { margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); text-align: center; }
+    .fsrs-auto-label { font-size: 0.82rem; color: var(--text-secondary); }
+    .fsrs-auto-label strong { color: var(--accent-light); font-weight: 600; }
     .btn-back-home {
       background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
       color: var(--text-secondary); padding: 0.35rem 0.7rem; font-size: 0.85rem; border-radius: var(--r-sm);
@@ -746,15 +732,7 @@
             <input type="text" id="answerInput" placeholder="输入单词" autocomplete="off" spellcheck="false" />
             <span class="feedback" id="feedback" style="display: none;"></span>
           </div>
-          <div class="fsrs-rating-row" id="fsrsRatingRow" style="display:none;">
-            <div class="fsrs-label">记忆评分：</div>
-            <div class="fsrs-buttons">
-              <button type="button" class="fsrs-btn fsrs-again" data-grade="1"><span class="fsrs-grade-name">忘了</span><span class="fsrs-interval" id="fsrsInt1"></span></button>
-              <button type="button" class="fsrs-btn fsrs-hard" data-grade="2"><span class="fsrs-grade-name">困难</span><span class="fsrs-interval" id="fsrsInt2"></span></button>
-              <button type="button" class="fsrs-btn fsrs-good" data-grade="3"><span class="fsrs-grade-name">记住</span><span class="fsrs-interval" id="fsrsInt3"></span></button>
-              <button type="button" class="fsrs-btn fsrs-easy" data-grade="4"><span class="fsrs-grade-name">简单</span><span class="fsrs-interval" id="fsrsInt4"></span></button>
-            </div>
-          </div>
+          <div class="fsrs-rating-row" id="fsrsRatingRow" style="display:none;"></div>
           <div class="ai-quiz-extra" id="quizAIExtra" style="display:none;"></div>
         </div>
       </div>
@@ -2281,6 +2259,7 @@
 
       if (aiExtraEl) { aiExtraEl.style.display = 'none'; aiExtraEl.innerHTML = ''; }
       var fsrsRow = document.getElementById('fsrsRatingRow');
+      fsrsRow.style.display = 'none';
 
       const qa = state.quizAnswers[idx];
       if (qa && qa.answered) {
@@ -2295,13 +2274,11 @@
           feedbackEl.className = 'feedback wrong';
           feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         }
-        showFSRSRating(item, qa.correct);
-        if (qa.graded) {
-          var btns = fsrsRow.querySelectorAll('.fsrs-btn');
-          btns.forEach(function (b) { b.disabled = true; b.classList.remove('selected'); });
-          var selectedGrade = qa.fsrsGrade || (qa.correct ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN);
-          var selBtn = fsrsRow.querySelector('[data-grade="' + selectedGrade + '"]');
-          if (selBtn) selBtn.classList.add('selected');
+        if (qa.fsrsGrade) {
+          var gradeNames = { 1: '忘了', 2: '困难', 3: '记住', 4: '简单' };
+          var gradeLabel = gradeNames[qa.fsrsGrade] || '';
+          fsrsRow.style.display = 'block';
+          fsrsRow.innerHTML = '<span class="fsrs-auto-label">自动评级：<strong>' + gradeLabel + '</strong></span>';
         }
         showQuizAIExtra(item.word, idx);
       } else {
@@ -2310,7 +2287,7 @@
         input.disabled = false;
         input.focus();
         feedbackEl.style.display = 'none';
-        fsrsRow.style.display = 'none';
+        state.questionStartTime = Date.now();
       }
     }
 
@@ -2353,10 +2330,30 @@
       var isCorrect = matchResult === 'exact' || matchResult === 'close';
       var feedbackEl = document.getElementById('feedback');
 
-      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: isCorrect, graded: false };
+      var elapsed = state.questionStartTime ? (Date.now() - state.questionStartTime) / 1000 : 999;
+      var autoGrade;
+      if (matchResult === 'exact') {
+        autoGrade = elapsed <= 10 ? FSRS_GRADE.EASY : FSRS_GRADE.GOOD;
+      } else if (matchResult === 'close') {
+        autoGrade = FSRS_GRADE.HARD;
+      } else {
+        autoGrade = FSRS_GRADE.AGAIN;
+      }
+
+      state.quizAnswers[state.index] = { answered: true, userAnswer: user, correct: isCorrect, graded: true, fsrsGrade: autoGrade };
 
       input.disabled = true;
       feedbackEl.style.display = 'inline-flex';
+
+      var catId = item.categoryId || state.currentCategoryId || 'unknown';
+      recordWordResult(item.word, item.definition, catId, isCorrect, autoGrade);
+
+      var gradeNames = { 1: '忘了', 2: '困难', 3: '记住', 4: '简单' };
+      var gradeLabel = gradeNames[autoGrade] || '';
+      var fsrsRow = document.getElementById('fsrsRatingRow');
+      fsrsRow.style.display = 'block';
+      fsrsRow.innerHTML = '<span class="fsrs-auto-label">自动评级：<strong>' + gradeLabel + '</strong>' +
+        (isCorrect ? '（用时 ' + elapsed.toFixed(1) + ' 秒）' : '') + '</span>';
 
       if (matchResult === 'exact') {
         state.correct++;
@@ -2364,74 +2361,30 @@
         feedbackEl.className = 'feedback correct';
         feedbackEl.innerHTML = '<span class="icon">✓</span> 正确';
         Audio.correct();
-        showFSRSRating(item, true);
       } else if (matchResult === 'close') {
         state.correct++;
         input.classList.add('correct');
         feedbackEl.className = 'feedback correct';
         feedbackEl.innerHTML = '<span class="icon">✓</span> 接近正确！正确拼写：' + item.word;
         Audio.correct();
-        showFSRSRating(item, true);
       } else {
         state.wrongAnswers.push({ word: item.word, definition: item.definition || '' });
-        state.currentWrong.push({ word: item.word, definition: item.definition, categoryId: item.categoryId || state.currentCategoryId || 'unknown' });
+        state.currentWrong.push({ word: item.word, definition: item.definition, categoryId: catId });
         saveWrongToStorage(state.wrongAnswers);
         input.classList.add('wrong');
         feedbackEl.className = 'feedback wrong';
         feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         Audio.wrong();
-        recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', false, FSRS_GRADE.AGAIN);
-        showFSRSRating(item, false);
 
         var alreadyQueued = state.currentQuiz.slice(state.index + 1).some(function (w) { return w.word === item.word; });
-        if (!alreadyQueued) {
+        var queuedCount = state.currentQuiz.length - (state.index + 1);
+        if (!alreadyQueued && queuedCount < state.currentQuiz.length + 10) {
           state.currentQuiz.push({ word: item.word, definition: item.definition, categoryId: item.categoryId });
           state.quizAnswers.push({ answered: false, userAnswer: '', correct: false });
         }
       }
 
       showQuizAIExtra(item.word, state.index);
-    }
-
-    function showFSRSRating(item, isCorrect) {
-      var row = document.getElementById('fsrsRatingRow');
-      row.style.display = 'block';
-      var plan = getReviewPlanFromStorage();
-      var key = makeWordKey(item.categoryId || state.currentCategoryId || 'unknown', item.word);
-      var existing = plan[key] || null;
-      var card = existing ? { stability: existing.stability, difficulty: existing.difficulty, lastReviewAt: existing.lastReviewAt, reps: existing.reps } : null;
-      var previews = fsrsPreviewIntervals(card);
-
-      document.getElementById('fsrsInt1').textContent = formatInterval(previews[1]);
-      document.getElementById('fsrsInt2').textContent = formatInterval(previews[2]);
-      document.getElementById('fsrsInt3').textContent = formatInterval(previews[3]);
-      document.getElementById('fsrsInt4').textContent = formatInterval(previews[4]);
-
-      var btns = row.querySelectorAll('.fsrs-btn');
-      btns.forEach(function (b) { b.disabled = false; b.classList.remove('selected'); });
-
-      if (!isCorrect) {
-        btns.forEach(function (b) { b.disabled = true; });
-        var againBtn = row.querySelector('[data-grade="1"]');
-        if (againBtn) { againBtn.classList.add('selected'); againBtn.disabled = false; }
-        state.quizAnswers[state.index].graded = true;
-      }
-    }
-
-    function handleFSRSGrade(grade) {
-      var qa = state.quizAnswers[state.index];
-      if (!qa || !qa.answered || qa.graded) return;
-      qa.graded = true;
-      qa.fsrsGrade = grade;
-
-      var item = state.currentQuiz[state.index];
-      recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', true, grade);
-
-      var btns = document.querySelectorAll('#fsrsRatingRow .fsrs-btn');
-      btns.forEach(function (b) {
-        b.disabled = true;
-        if (parseInt(b.dataset.grade) === grade) b.classList.add('selected');
-      });
     }
 
     function prevQuestion() {
@@ -2441,10 +2394,6 @@
     }
 
     function nextQuestion() {
-      var qa = state.quizAnswers[state.index];
-      if (qa && qa.answered && qa.correct && !qa.graded) {
-        handleFSRSGrade(FSRS_GRADE.GOOD);
-      }
       state.index++;
       if (state.index >= state.currentQuiz.length) {
         showResult();
@@ -2454,14 +2403,6 @@
     }
 
     function showResult() {
-      state.quizAnswers.forEach(function (qa, i) {
-        if (qa && qa.answered && qa.correct && !qa.graded) {
-          var item = state.currentQuiz[i];
-          recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', true, FSRS_GRADE.GOOD);
-          qa.graded = true;
-          qa.fsrsGrade = FSRS_GRADE.GOOD;
-        }
-      });
       stopQuizTimer();
       var quizDuration = state.quizStartTime ? Date.now() - state.quizStartTime : 0;
       state.lastQuizDuration = quizDuration;
@@ -2517,7 +2458,7 @@
           return '<div class="wrong-item" id="wrongItem' + i + '"><span class="word">' + escapeHtml(item.word) + '</span><div class="def">' + escapeHtml(item.definition) + '</div>' + statInfo + '<div class="ai-extra" id="wrongAI' + i + '"></div></div>';
         }).join('');
         state.currentWrong.forEach(function (item, i) {
-          fetchWordAI(item.word).then(function (data) {
+          lookupWordAI(item.word).then(function (data) {
             var el = document.getElementById('wrongAI' + i);
             if (!el || !data) return;
             el.innerHTML = renderAITagsCompact(data);
@@ -2749,20 +2690,38 @@
 
     loadAIUsage();
 
+    var _aiQueue = [], _aiActive = 0, _aiMaxConcurrent = 3;
+    function _aiProcessQueue() {
+      while (_aiActive < _aiMaxConcurrent && _aiQueue.length > 0) {
+        var task = _aiQueue.shift();
+        _aiActive++;
+        task.run().then(task.resolve, task.reject).finally(function () { _aiActive--; _aiProcessQueue(); });
+      }
+    }
+
     function fetchWordAI(word) {
       var key = word.toLowerCase().trim();
       if (aiCache[key]) return Promise.resolve(aiCache[key]);
-      return fetch(AI_API_BASE + '?word=' + encodeURIComponent(key))
-        .then(function (r) { return r.json(); })
-        .then(function (resp) {
-          if (resp.ok && resp.data) {
-            aiCache[key] = resp.data;
-            if (resp.source === 'generated') loadAIUsage();
-            return resp.data;
+      return new Promise(function (resolve, reject) {
+        _aiQueue.push({
+          resolve: resolve, reject: reject,
+          run: function () {
+            if (aiCache[key]) return Promise.resolve(aiCache[key]);
+            return fetch(AI_API_BASE + '?word=' + encodeURIComponent(key))
+              .then(function (r) { return r.json(); })
+              .then(function (resp) {
+                if (resp.ok && resp.data) {
+                  aiCache[key] = resp.data;
+                  if (resp.source === 'generated') loadAIUsage();
+                  return resp.data;
+                }
+                return null;
+              })
+              .catch(function () { return null; });
           }
-          return null;
-        })
-        .catch(function () { return null; });
+        });
+        _aiProcessQueue();
+      });
     }
 
     function lookupWordAI(word) {
@@ -3299,13 +3258,6 @@
     });
     document.getElementById('btnPrev').addEventListener('click', prevQuestion);
 
-    document.getElementById('fsrsRatingRow').addEventListener('click', function (e) {
-      var btn = e.target.closest('.fsrs-btn');
-      if (!btn || btn.disabled) return;
-      var grade = parseInt(btn.dataset.grade);
-      if (grade >= 1 && grade <= 4) handleFSRSGrade(grade);
-    });
-
     document.getElementById('btnQuizHome').addEventListener('click', function () {
       stopQuizTimer();
       showScreen('screen-home');
@@ -3547,6 +3499,7 @@
     var _swipe = { active: false, startX: 0, startY: 0, dx: 0, isFlip: false };
     var _swipeThreshold = 80;
     var _flashcardInner = document.getElementById('flashcardInner');
+    var _lastTouchTime = 0;
 
     function onSwipeStart(x, y) {
       if (state.flashcardWords.length === 0) return;
@@ -3600,8 +3553,10 @@
         }, 300);
       } else if (Math.abs(_swipe.dx) < 10) {
         _flashcardInner.style.transform = '';
-        _flashcardInner.classList.toggle('flipped');
-        requestAnimationFrame(adjustFlashcardHeight);
+        requestAnimationFrame(function () {
+          _flashcardInner.classList.toggle('flipped');
+          requestAnimationFrame(adjustFlashcardHeight);
+        });
         if (_ttsAutoSpeak) {
           var item = state.flashcardWords[state.flashcardIndex];
           if (item) {
@@ -3611,17 +3566,27 @@
         }
       } else {
         _flashcardInner.style.transform = '';
-        var baseTransform = _flashcardInner.classList.contains('flipped') ? 'rotateY(180deg)' : '';
-        _flashcardInner.style.transform = baseTransform;
+        requestAnimationFrame(function () {
+          _flashcardInner.style.transform = _flashcardInner.classList.contains('flipped') ? 'rotateY(180deg)' : '';
+        });
       }
     }
 
-    _flashcardInner.addEventListener('mousedown', function (e) { e.preventDefault(); onSwipeStart(e.clientX, e.clientY); });
-    document.addEventListener('mousemove', function (e) { onSwipeMove(e.clientX, e.clientY); });
-    document.addEventListener('mouseup', function () { onSwipeEnd(); });
-    _flashcardInner.addEventListener('touchstart', function (e) { var t = e.touches[0]; onSwipeStart(t.clientX, t.clientY); }, { passive: true });
+    _flashcardInner.addEventListener('mousedown', function (e) {
+      if (Date.now() - _lastTouchTime < 500) return;
+      e.preventDefault(); onSwipeStart(e.clientX, e.clientY);
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (Date.now() - _lastTouchTime < 500) return;
+      onSwipeMove(e.clientX, e.clientY);
+    });
+    document.addEventListener('mouseup', function () {
+      if (Date.now() - _lastTouchTime < 500) return;
+      onSwipeEnd();
+    });
+    _flashcardInner.addEventListener('touchstart', function (e) { _lastTouchTime = Date.now(); var t = e.touches[0]; onSwipeStart(t.clientX, t.clientY); }, { passive: true });
     document.addEventListener('touchmove', function (e) { if (_swipe.active) { var t = e.touches[0]; onSwipeMove(t.clientX, t.clientY); } }, { passive: true });
-    document.addEventListener('touchend', function () { onSwipeEnd(); });
+    document.addEventListener('touchend', function () { _lastTouchTime = Date.now(); onSwipeEnd(); });
 
     // ─── TTS 按钮 + 自动朗读 ───
     document.getElementById('btnTTS').addEventListener('click', function () {
