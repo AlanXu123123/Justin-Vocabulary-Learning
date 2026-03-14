@@ -704,11 +704,14 @@
     <h1>背单词测验</h1>
     <p class="subtitle">自选题数 · 下次测验含部分错题</p>
     <div class="ai-usage-bar" id="aiUsageBar">
-      <span class="usage-model" id="usageModel">--</span>
-      <span class="usage-sep">|</span>
       <span class="usage-tokens" id="usageTokens">本月 tokens: --</span>
       <span class="usage-sep">|</span>
       <span class="usage-calls" id="usageCalls">调用: --</span>
+      <div style="width:100%;display:flex;gap:0.5rem;margin-top:0.15rem;flex-wrap:wrap;">
+        <span style="font-size:0.68rem;">单词AI: <span class="usage-model" id="usageModel">--</span></span>
+        <span class="usage-sep">|</span>
+        <span style="font-size:0.68rem;">语法AI: <span class="usage-model" id="usageGrammarModel">--</span></span>
+      </div>
     </div>
 
     <div class="user-bar" id="userBar">
@@ -744,7 +747,7 @@
         <button type="button" class="btn btn-secondary" id="btnOpenStats">学习统计 &amp; 高频错词</button>
         <button type="button" class="btn btn-secondary" id="btnOpenHistory">测验历史</button>
         <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
-        <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">语法专练</button>
+        <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(118,75,162,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📖 语法专项训练（AI）</button>
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
@@ -2862,9 +2865,11 @@
         .then(function (resp) {
           if (!resp.ok) return;
           var modelEl = document.getElementById('usageModel');
+          var grammarModelEl = document.getElementById('usageGrammarModel');
           var tokensEl = document.getElementById('usageTokens');
           var callsEl = document.getElementById('usageCalls');
           if (modelEl) modelEl.textContent = resp.model || '--';
+          if (grammarModelEl) grammarModelEl.textContent = resp.grammarModel || '--';
           if (tokensEl) tokensEl.textContent = '本月 tokens: ' + formatTokenCount(resp.totalTokens || 0);
           if (callsEl) callsEl.textContent = '调用: ' + (resp.callCount || 0) + ' 次';
         })
@@ -3811,9 +3816,9 @@
     // ═══════════════════════════════════════════════
     //  语法专练模块
     // ═══════════════════════════════════════════════
-    var GRAMMAR_API_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/generateGrammarQuiz';
-    var GRAMMAR_ANALYZE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/analyzeGrammarResult';
-    var GRAMMAR_PROFILE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/getGrammarProfile';
+    var GRAMMAR_API_BASE = 'https://generategrammarquiz-tbj6ixfqaa-uc.a.run.app';
+    var GRAMMAR_ANALYZE_BASE = 'https://analyzegrammarresult-tbj6ixfqaa-uc.a.run.app';
+    var GRAMMAR_PROFILE_BASE = 'https://getgrammarprofile-tbj6ixfqaa-uc.a.run.app';
 
     var GRAMMAR_TOPICS = {
       articles: { name: '冠词 Articles', icon: '📝', subRules: ['definite_the', 'indefinite_a_an', 'zero_article'] },
