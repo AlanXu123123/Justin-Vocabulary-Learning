@@ -823,6 +823,7 @@
       <div class="card">
         <h3 style="margin-bottom:0.25rem;">语法专项训练</h3>
         <p class="hint">选择语法专项，AI 将根据你的掌握情况出题并诊断分析</p>
+        <p class="hint" style="font-size:0.7rem;color:var(--accent-light);margin-top:0.2rem;">📚 20,000+ 专业题库 + 🤖 Gemini 2.5 Pro 动态出题 · 混合模式</p>
         <div class="grammar-topic-grid" id="grammarTopicGrid"></div>
         <div class="grammar-difficulty-row" id="grammarDiffRow">
           <button type="button" class="grammar-diff-btn" data-diff="beginner">入门</button>
@@ -4008,10 +4009,15 @@
 
       var expEl = document.getElementById('grammarExplanation');
       if (answered) {
-        expEl.textContent = q.explanation || '';
+        var expText = q.explanation || '';
+        var sourceTag = q.source === 'seed_bank' ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-bottom:0.3rem;">📚 专业题库</span><br>' : '<span style="display:inline-block;background:rgba(50,215,75,0.15);color:var(--correct);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-bottom:0.3rem;">🤖 AI 出题</span><br>';
+        if (!expText && q.source === 'seed_bank') {
+          expText = '正确答案是 "' + q.options[q.correctIndex] + '"。此题来自专业语法题库。';
+        }
+        expEl.innerHTML = sourceTag + escapeHtml(expText);
         expEl.classList.add('show');
       } else {
-        expEl.textContent = '';
+        expEl.innerHTML = '';
         expEl.classList.remove('show');
       }
 
@@ -4092,9 +4098,12 @@
       ringFg.style.stroke = ringColor;
       setTimeout(function () { ringFg.style.strokeDashoffset = offset; }, 100);
       document.getElementById('grammarScoreNum').textContent = score;
-      document.getElementById('grammarScoreSummary').textContent =
+      var seedC = grammarState.questions.filter(function (q) { return q.source === 'seed_bank'; }).length;
+      var aiC = grammarState.questions.length - seedC;
+      document.getElementById('grammarScoreSummary').innerHTML =
         (data.totalCorrect || 0) + ' / ' + (data.totalQuestions || grammarState.questions.length) + ' 正确 · ' +
-        GRAMMAR_TOPICS[grammarState.selectedTopic]?.name;
+        (GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '') +
+        '<br><span style="font-size:0.72rem;color:var(--muted);">📚 题库 ' + seedC + ' 题 + 🤖 AI ' + aiC + ' 题</span>';
 
       var ruleHtml = '';
       if (data.ruleAnalysis && data.ruleAnalysis.length) {
