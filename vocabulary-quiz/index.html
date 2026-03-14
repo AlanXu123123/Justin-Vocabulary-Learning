@@ -255,6 +255,101 @@
     .screen.active { display: block; animation: screen-in var(--normal) var(--ease); }
     @keyframes screen-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* ===== Grammar Module ===== */
+    .grammar-topic-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; margin-top: 0.75rem; }
+    .grammar-topic-card {
+      background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--r-md);
+      padding: 0.85rem 0.75rem; cursor: pointer; transition: all 0.25s; text-align: center;
+    }
+    .grammar-topic-card:hover { border-color: var(--accent); background: var(--glass-strong); transform: translateY(-2px); }
+    .grammar-topic-card.selected { border-color: var(--accent); background: rgba(123,127,240,0.15); }
+    .grammar-topic-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+    .grammar-topic-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .grammar-topic-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.2rem; }
+    .grammar-mastery-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 0.4rem; overflow: hidden; }
+    .grammar-mastery-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+    .grammar-difficulty-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; justify-content: center; }
+    .grammar-diff-btn {
+      padding: 0.4rem 1rem; border-radius: var(--r-sm); border: 1px solid var(--glass-border);
+      background: rgba(255,255,255,0.06); color: var(--text-secondary); cursor: pointer; font-size: 0.82rem; font-family: inherit; transition: all 0.2s;
+    }
+    .grammar-diff-btn:hover { border-color: var(--accent); color: var(--text); }
+    .grammar-diff-btn.selected { background: rgba(123,127,240,0.2); border-color: var(--accent); color: var(--text); font-weight: 600; }
+    .grammar-q-card {
+      background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--r-md);
+      padding: 1.25rem; margin-bottom: 0; position: relative;
+    }
+    .grammar-q-sentence { font-size: 1.05rem; line-height: 1.6; color: var(--text); margin-bottom: 1rem; }
+    .grammar-q-sentence .blank { color: var(--accent-light); font-weight: 700; border-bottom: 2px dashed var(--accent); padding: 0 0.15rem; }
+    .grammar-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .grammar-opt-btn {
+      display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.9rem; border-radius: var(--r-sm);
+      border: 1px solid var(--glass-border); background: rgba(255,255,255,0.04); cursor: pointer;
+      font-size: 0.92rem; color: var(--text); font-family: inherit; text-align: left; transition: all 0.2s;
+    }
+    .grammar-opt-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+    .grammar-opt-btn .opt-letter {
+      width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700; background: rgba(255,255,255,0.08); flex-shrink: 0;
+    }
+    .grammar-opt-btn.correct { border-color: var(--correct); background: rgba(50,215,75,0.12); }
+    .grammar-opt-btn.correct .opt-letter { background: var(--correct); color: #000; }
+    .grammar-opt-btn.wrong { border-color: var(--wrong); background: rgba(255,105,97,0.12); }
+    .grammar-opt-btn.wrong .opt-letter { background: var(--wrong); color: #fff; }
+    .grammar-opt-btn:disabled { cursor: default; opacity: 0.85; }
+    .grammar-explanation {
+      margin-top: 0.85rem; padding: 0.75rem; border-radius: var(--r-sm);
+      background: rgba(255,255,255,0.04); border-left: 3px solid var(--accent);
+      font-size: 0.82rem; color: var(--text-secondary); line-height: 1.55; display: none;
+    }
+    .grammar-explanation.show { display: block; animation: screen-in 0.3s; }
+    .grammar-progress-bar { display: flex; gap: 3px; margin-bottom: 1rem; }
+    .grammar-progress-dot {
+      flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.1); transition: background 0.3s;
+    }
+    .grammar-progress-dot.correct { background: var(--correct); }
+    .grammar-progress-dot.wrong { background: var(--wrong); }
+    .grammar-progress-dot.current { background: var(--accent); }
+
+    .grammar-report { padding: 0; }
+    .grammar-report-header {
+      text-align: center; padding: 1.5rem 1rem 1rem; border-bottom: 1px solid var(--glass-border);
+    }
+    .grammar-score-ring {
+      width: 100px; height: 100px; margin: 0 auto 0.75rem; position: relative;
+    }
+    .grammar-score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .grammar-score-ring .ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 8; }
+    .grammar-score-ring .ring-fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease-out; }
+    .grammar-score-num {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 700; color: var(--text);
+    }
+    .grammar-report-section { padding: 1rem; border-bottom: 1px solid var(--glass-border); }
+    .grammar-report-section:last-child { border-bottom: none; }
+    .grammar-report-title { font-size: 0.82rem; font-weight: 600; color: var(--accent-light); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem; }
+    .grammar-rule-item {
+      display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .grammar-rule-item:last-child { border-bottom: none; }
+    .grammar-rule-name { flex: 1; font-size: 0.82rem; color: var(--text-secondary); }
+    .grammar-rule-score { font-size: 0.78rem; font-weight: 600; min-width: 3rem; text-align: right; }
+    .grammar-rule-bar { width: 60px; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .grammar-rule-bar-fill { height: 100%; border-radius: 3px; }
+    .grammar-diagnosis-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap; }
+    .grammar-tip-list { list-style: none; padding: 0; margin: 0; }
+    .grammar-tip-list li { font-size: 0.82rem; color: var(--text-secondary); padding: 0.35rem 0; padding-left: 1.2rem; position: relative; line-height: 1.5; }
+    .grammar-tip-list li::before { content: "💡"; position: absolute; left: 0; }
+    .grammar-strength-list li::before { content: "✅"; }
+    .grammar-weakness-list li::before { content: "⚠️"; }
+    .grammar-loading-overlay {
+      position: fixed; inset: 0; z-index: 200; background: rgba(10,10,18,0.85);
+      backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .grammar-loading-spinner { width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .grammar-loading-text { margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); }
+
     /* ===== Modal ===== */
     .modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 100;
@@ -649,6 +744,7 @@
         <button type="button" class="btn btn-secondary" id="btnOpenStats">学习统计 &amp; 高频错词</button>
         <button type="button" class="btn btn-secondary" id="btnOpenHistory">测验历史</button>
         <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
+        <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;">语法专练</button>
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
@@ -716,6 +812,99 @@
         <button type="button" class="btn btn-secondary" id="btnOpenVocab">打开词库</button>
         <span class="hint" style="margin-left:0.5rem;">当前：<span id="currentGroupLabel">默认</span>，共 <strong id="wordListCount">0</strong> 个单词</span>
       </div>
+    </div>
+
+    <!-- ═══ 语法专练：选择专项 ═══ -->
+    <div id="screen-grammar" class="screen">
+      <button type="button" class="btn-back-home" id="btnGrammarBackHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">语法专项训练</h3>
+        <p class="hint">选择语法专项，AI 将根据你的掌握情况出题并诊断分析</p>
+        <div class="grammar-topic-grid" id="grammarTopicGrid"></div>
+        <div class="grammar-difficulty-row" id="grammarDiffRow">
+          <button type="button" class="grammar-diff-btn" data-diff="beginner">入门</button>
+          <button type="button" class="grammar-diff-btn selected" data-diff="intermediate">中级</button>
+          <button type="button" class="grammar-diff-btn" data-diff="advanced">进阶</button>
+        </div>
+        <button type="button" class="btn" id="btnStartGrammar" style="margin-top:1rem;width:100%;" disabled>开始测试</button>
+      </div>
+      <div class="card" id="grammarProfileCard" style="display:none;">
+        <h4 style="margin-bottom:0.5rem;">📊 我的语法画像</h4>
+        <div id="grammarProfileBody"></div>
+      </div>
+    </div>
+
+    <!-- ═══ 语法专练：答题 ═══ -->
+    <div id="screen-grammar-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnGrammarQuizBack">← 返回专项选择</button>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="progress" id="grammarQuizProgress">第 1 / 10 题</span>
+          <span style="font-size:0.78rem;color:var(--muted);" id="grammarQuizTopic"></span>
+        </div>
+        <div class="grammar-progress-bar" id="grammarProgressBar"></div>
+        <div class="grammar-q-card" id="grammarQCard">
+          <div class="grammar-q-sentence" id="grammarSentence"></div>
+          <div class="grammar-options" id="grammarOptions"></div>
+          <div class="grammar-explanation" id="grammarExplanation"></div>
+        </div>
+        <div class="quiz-nav" style="margin-top:1rem;">
+          <button type="button" class="btn" id="btnGrammarNext" disabled>下一题</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 语法专练：AI 诊断报告 ═══ -->
+    <div id="screen-grammar-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnGrammarResultHome">← 返回主页</button>
+      <div class="card grammar-report">
+        <div class="grammar-report-header">
+          <div class="grammar-score-ring" id="grammarScoreRing">
+            <svg viewBox="0 0 100 100">
+              <circle class="ring-bg" cx="50" cy="50" r="42" />
+              <circle class="ring-fg" id="grammarRingFg" cx="50" cy="50" r="42" stroke="var(--correct)" stroke-dasharray="264" stroke-dashoffset="264" />
+            </svg>
+            <div class="grammar-score-num" id="grammarScoreNum">0</div>
+          </div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);" id="grammarScoreSummary"></div>
+        </div>
+
+        <div class="grammar-report-section">
+          <div class="grammar-report-title">📋 各规则掌握度</div>
+          <div id="grammarRuleList"></div>
+        </div>
+
+        <div class="grammar-report-section">
+          <div class="grammar-report-title">🔍 诊断分析</div>
+          <div class="grammar-diagnosis-text" id="grammarDiagnosisText"></div>
+        </div>
+
+        <div class="grammar-report-section" id="grammarStrengthsSection">
+          <div class="grammar-report-title">✅ 掌握良好</div>
+          <ul class="grammar-tip-list grammar-strength-list" id="grammarStrengthsList"></ul>
+        </div>
+
+        <div class="grammar-report-section" id="grammarWeaknessesSection">
+          <div class="grammar-report-title">⚠️ 需要加强</div>
+          <ul class="grammar-tip-list grammar-weakness-list" id="grammarWeaknessesList"></ul>
+        </div>
+
+        <div class="grammar-report-section">
+          <div class="grammar-report-title">💡 学习建议</div>
+          <ul class="grammar-tip-list" id="grammarTipsList"></ul>
+        </div>
+
+        <div style="padding:1rem;display:flex;gap:0.5rem;">
+          <button type="button" class="btn" id="btnGrammarRetry" style="flex:1;">再测一次</button>
+          <button type="button" class="btn btn-secondary" id="btnGrammarNewTopic" style="flex:1;">换个专项</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语法加载蒙层 -->
+    <div id="grammarLoading" class="grammar-loading-overlay" style="display:none;">
+      <div class="grammar-loading-spinner"></div>
+      <div class="grammar-loading-text" id="grammarLoadingText">AI 正在出题...</div>
     </div>
 
     <!-- 测验进行中 -->
@@ -3618,6 +3807,374 @@
       if (_ttsAutoSpeak) speakWord(state.flashcardWords[state.flashcardIndex].word);
     });
 
+
+    // ═══════════════════════════════════════════════
+    //  语法专练模块
+    // ═══════════════════════════════════════════════
+    var GRAMMAR_API_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/generateGrammarQuiz';
+    var GRAMMAR_ANALYZE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/analyzeGrammarResult';
+    var GRAMMAR_PROFILE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/getGrammarProfile';
+
+    var GRAMMAR_TOPICS = {
+      articles: { name: '冠词 Articles', icon: '📝', subRules: ['definite_the', 'indefinite_a_an', 'zero_article'] },
+      tenses: { name: '时态 Tenses', icon: '⏰', subRules: ['present_simple', 'past_simple', 'present_perfect', 'past_perfect', 'future_simple', 'present_continuous'] },
+      singular_plural: { name: '单复数', icon: '🔢', subRules: ['regular_plural', 'irregular_plural', 'uncountable', 'subject_verb_agreement'] },
+      prepositions: { name: '介词', icon: '📍', subRules: ['time_prepositions', 'place_prepositions', 'direction_prepositions', 'phrasal_verbs'] },
+      passive_voice: { name: '被动语态', icon: '🔄', subRules: ['present_passive', 'past_passive', 'modal_passive'] },
+      comparatives: { name: '比较级/最高级', icon: '📊', subRules: ['comparative_form', 'superlative_form', 'irregular_comparison', 'as_as_structure'] },
+      clauses: { name: '从句', icon: '🔗', subRules: ['relative_clause', 'conditional_clause', 'adverbial_clause', 'noun_clause'] },
+      modals: { name: '情态动词', icon: '💬', subRules: ['can_could', 'must_have_to', 'should_ought_to', 'may_might'] }
+    };
+
+    var grammarState = {
+      selectedTopic: null,
+      difficulty: 'intermediate',
+      questions: [],
+      answers: [],
+      currentIndex: 0,
+      questionStartTime: 0,
+      profile: null
+    };
+
+    function showGrammarLoading(text) {
+      var el = document.getElementById('grammarLoading');
+      document.getElementById('grammarLoadingText').textContent = text || 'AI 正在出题...';
+      el.style.display = 'flex';
+    }
+    function hideGrammarLoading() {
+      document.getElementById('grammarLoading').style.display = 'none';
+    }
+
+    function loadGrammarProfile() {
+      if (!_currentUser) return Promise.resolve(null);
+      return fetch(GRAMMAR_PROFILE_BASE + '?username=' + encodeURIComponent(_currentUser))
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok && resp.found) {
+            grammarState.profile = resp.data;
+          } else {
+            grammarState.profile = null;
+          }
+          return grammarState.profile;
+        })
+        .catch(function () { grammarState.profile = null; return null; });
+    }
+
+    function renderGrammarTopicGrid() {
+      var grid = document.getElementById('grammarTopicGrid');
+      var html = '';
+      var profile = grammarState.profile || {};
+      Object.keys(GRAMMAR_TOPICS).forEach(function (key) {
+        var t = GRAMMAR_TOPICS[key];
+        var sel = grammarState.selectedTopic === key ? ' selected' : '';
+        var mastery = 0;
+        var tested = false;
+        if (profile[key]) {
+          var totalM = 0; var count = 0;
+          Object.values(profile[key]).forEach(function (v) {
+            if (v && typeof v.mastery === 'number') { totalM += v.mastery; count++; }
+          });
+          if (count > 0) { mastery = totalM / count; tested = true; }
+        }
+        var masteryPct = Math.round(mastery * 100);
+        var barColor = mastery >= 0.7 ? 'var(--correct)' : mastery >= 0.4 ? '#f59e0b' : 'var(--wrong)';
+        html += '<div class="grammar-topic-card' + sel + '" data-topic="' + key + '">' +
+          '<div class="grammar-topic-icon">' + t.icon + '</div>' +
+          '<div class="grammar-topic-name">' + escapeHtml(t.name) + '</div>' +
+          '<div class="grammar-topic-sub">' + t.subRules.length + ' 个子规则</div>' +
+          (tested ? '<div class="grammar-mastery-bar"><div class="grammar-mastery-fill" style="width:' + masteryPct + '%;background:' + barColor + ';"></div></div><div style="font-size:0.65rem;color:var(--muted);margin-top:0.15rem;">掌握度 ' + masteryPct + '%</div>' : '') +
+          '</div>';
+      });
+      grid.innerHTML = html;
+    }
+
+    function renderGrammarProfileCard() {
+      var card = document.getElementById('grammarProfileCard');
+      var body = document.getElementById('grammarProfileBody');
+      if (!grammarState.profile) { card.style.display = 'none'; return; }
+
+      var html = '';
+      var hasData = false;
+      Object.keys(GRAMMAR_TOPICS).forEach(function (key) {
+        var p = grammarState.profile[key];
+        if (!p) return;
+        var entries = Object.entries(p).filter(function (e) { return e[1] && typeof e[1].mastery === 'number'; });
+        if (entries.length === 0) return;
+        hasData = true;
+        var topicName = GRAMMAR_TOPICS[key].name;
+        html += '<div style="margin-bottom:0.75rem;"><div style="font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;">' + escapeHtml(topicName) + '</div>';
+        entries.forEach(function (e) {
+          var name = e[0]; var data = e[1];
+          var pct = Math.round(data.mastery * 100);
+          var color = data.mastery >= 0.7 ? 'var(--correct)' : data.mastery >= 0.4 ? '#f59e0b' : 'var(--wrong)';
+          html += '<div class="grammar-rule-item">' +
+            '<span class="grammar-rule-name">' + escapeHtml(name) + '</span>' +
+            '<div class="grammar-rule-bar"><div class="grammar-rule-bar-fill" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+            '<span class="grammar-rule-score" style="color:' + color + ';">' + pct + '%</span>' +
+            '</div>';
+        });
+        html += '</div>';
+      });
+
+      if (hasData) {
+        body.innerHTML = html;
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    function openGrammarHome() {
+      grammarState.selectedTopic = null;
+      document.getElementById('btnStartGrammar').disabled = true;
+      showScreen('screen-grammar');
+      loadGrammarProfile().then(function () {
+        renderGrammarTopicGrid();
+        renderGrammarProfileCard();
+      });
+    }
+
+    async function startGrammarQuiz() {
+      if (!grammarState.selectedTopic) return;
+      showGrammarLoading('AI 正在根据你的掌握情况出题...');
+      try {
+        var resp = await fetch(GRAMMAR_API_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: grammarState.selectedTopic,
+            difficulty: grammarState.difficulty,
+            username: _currentUser || ''
+          })
+        });
+        var result = await resp.json();
+        if (!result.ok || !result.data || !result.data.questions) {
+          throw new Error(result.error || '出题失败');
+        }
+        grammarState.questions = result.data.questions;
+        grammarState.answers = grammarState.questions.map(function () { return { selected: -1, timeSec: 0 }; });
+        grammarState.currentIndex = 0;
+        hideGrammarLoading();
+        showScreen('screen-grammar-quiz');
+        renderGrammarQuestion();
+      } catch (err) {
+        hideGrammarLoading();
+        alert('出题失败：' + err.message);
+      }
+    }
+
+    function renderGrammarQuestion() {
+      var idx = grammarState.currentIndex;
+      var total = grammarState.questions.length;
+      var q = grammarState.questions[idx];
+
+      document.getElementById('grammarQuizProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题';
+      document.getElementById('grammarQuizTopic').textContent = GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '';
+
+      var barHtml = '';
+      for (var i = 0; i < total; i++) {
+        var cls = 'grammar-progress-dot';
+        if (i === idx) cls += ' current';
+        else if (grammarState.answers[i].selected >= 0) {
+          cls += grammarState.answers[i].selected === grammarState.questions[i].correctIndex ? ' correct' : ' wrong';
+        }
+        barHtml += '<div class="' + cls + '"></div>';
+      }
+      document.getElementById('grammarProgressBar').innerHTML = barHtml;
+
+      var sentence = escapeHtml(q.sentence).replace(/___/g, '<span class="blank">______</span>');
+      document.getElementById('grammarSentence').innerHTML = sentence;
+
+      var optHtml = '';
+      var letters = ['A', 'B', 'C', 'D'];
+      var answered = grammarState.answers[idx].selected >= 0;
+      q.options.forEach(function (opt, j) {
+        var cls = 'grammar-opt-btn';
+        if (answered) {
+          if (j === q.correctIndex) cls += ' correct';
+          else if (j === grammarState.answers[idx].selected && j !== q.correctIndex) cls += ' wrong';
+        }
+        optHtml += '<button type="button" class="' + cls + '" data-idx="' + j + '"' + (answered ? ' disabled' : '') + '>' +
+          '<span class="opt-letter">' + letters[j] + '</span>' +
+          '<span>' + escapeHtml(opt) + '</span>' +
+          '</button>';
+      });
+      document.getElementById('grammarOptions').innerHTML = optHtml;
+
+      var expEl = document.getElementById('grammarExplanation');
+      if (answered) {
+        expEl.textContent = q.explanation || '';
+        expEl.classList.add('show');
+      } else {
+        expEl.textContent = '';
+        expEl.classList.remove('show');
+      }
+
+      var nextBtn = document.getElementById('btnGrammarNext');
+      if (idx >= total - 1 && answered) {
+        nextBtn.textContent = '查看诊断报告';
+      } else {
+        nextBtn.textContent = '下一题';
+      }
+      nextBtn.disabled = !answered;
+
+      grammarState.questionStartTime = Date.now();
+    }
+
+    function selectGrammarOption(optIdx) {
+      var idx = grammarState.currentIndex;
+      if (grammarState.answers[idx].selected >= 0) return;
+
+      var elapsed = (Date.now() - grammarState.questionStartTime) / 1000;
+      grammarState.answers[idx] = { selected: optIdx, timeSec: Math.round(elapsed * 10) / 10 };
+
+      var q = grammarState.questions[idx];
+      if (optIdx === q.correctIndex) {
+        Audio.correct();
+      } else {
+        Audio.wrong();
+      }
+
+      renderGrammarQuestion();
+    }
+
+    function grammarNext() {
+      var idx = grammarState.currentIndex;
+      var total = grammarState.questions.length;
+      if (idx >= total - 1) {
+        submitGrammarForAnalysis();
+        return;
+      }
+      grammarState.currentIndex++;
+      renderGrammarQuestion();
+    }
+
+    async function submitGrammarForAnalysis() {
+      showGrammarLoading('AI 正在深度分析你的语法掌握情况...');
+      try {
+        var resp = await fetch(GRAMMAR_ANALYZE_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: grammarState.selectedTopic,
+            questions: grammarState.questions,
+            answers: grammarState.answers,
+            username: _currentUser || ''
+          })
+        });
+        var result = await resp.json();
+        if (!result.ok || !result.data) {
+          throw new Error(result.error || '分析失败');
+        }
+        hideGrammarLoading();
+        loadAIUsage();
+        renderGrammarReport(result.data);
+        showScreen('screen-grammar-result');
+      } catch (err) {
+        hideGrammarLoading();
+        alert('分析失败：' + err.message + '\n将显示简要结果。');
+        renderGrammarReportFallback();
+        showScreen('screen-grammar-result');
+      }
+    }
+
+    function renderGrammarReport(data) {
+      var score = data.score || 0;
+      var ringFg = document.getElementById('grammarRingFg');
+      var circumference = 264;
+      var offset = circumference - (score / 100) * circumference;
+      var ringColor = score >= 80 ? 'var(--correct)' : score >= 50 ? '#f59e0b' : 'var(--wrong)';
+      ringFg.style.stroke = ringColor;
+      setTimeout(function () { ringFg.style.strokeDashoffset = offset; }, 100);
+      document.getElementById('grammarScoreNum').textContent = score;
+      document.getElementById('grammarScoreSummary').textContent =
+        (data.totalCorrect || 0) + ' / ' + (data.totalQuestions || grammarState.questions.length) + ' 正确 · ' +
+        GRAMMAR_TOPICS[grammarState.selectedTopic]?.name;
+
+      var ruleHtml = '';
+      if (data.ruleAnalysis && data.ruleAnalysis.length) {
+        data.ruleAnalysis.forEach(function (ra) {
+          var pct = Math.round((ra.mastery || 0) * 100);
+          var color = ra.mastery >= 0.7 ? 'var(--correct)' : ra.mastery >= 0.4 ? '#f59e0b' : 'var(--wrong)';
+          var weakIcon = ra.isSystemicWeakness ? ' <span style="color:var(--wrong);font-size:0.7rem;">⚠ 系统性薄弱</span>' : '';
+          ruleHtml += '<div class="grammar-rule-item">' +
+            '<span class="grammar-rule-name">' + escapeHtml(ra.subRule) + weakIcon + '</span>' +
+            '<div class="grammar-rule-bar"><div class="grammar-rule-bar-fill" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+            '<span class="grammar-rule-score" style="color:' + color + ';">' + pct + '%</span>' +
+            '</div>';
+          if (ra.insight) {
+            ruleHtml += '<div style="font-size:0.75rem;color:var(--muted);padding:0 0 0.4rem 0.5rem;">' + escapeHtml(ra.insight) + '</div>';
+          }
+        });
+      }
+      document.getElementById('grammarRuleList').innerHTML = ruleHtml;
+
+      document.getElementById('grammarDiagnosisText').textContent = data.diagnosis || '暂无诊断';
+
+      var strengthsEl = document.getElementById('grammarStrengthsList');
+      var weaknessesEl = document.getElementById('grammarWeaknessesList');
+      var tipsEl = document.getElementById('grammarTipsList');
+
+      strengthsEl.innerHTML = (data.strengths || []).map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('');
+      weaknessesEl.innerHTML = (data.weaknesses || []).map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('');
+      tipsEl.innerHTML = (data.studyTips || []).map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('');
+
+      document.getElementById('grammarStrengthsSection').style.display = (data.strengths && data.strengths.length) ? 'block' : 'none';
+      document.getElementById('grammarWeaknessesSection').style.display = (data.weaknesses && data.weaknesses.length) ? 'block' : 'none';
+    }
+
+    function renderGrammarReportFallback() {
+      var correct = 0;
+      grammarState.answers.forEach(function (a, i) {
+        if (a.selected === grammarState.questions[i].correctIndex) correct++;
+      });
+      var score = Math.round((correct / grammarState.questions.length) * 100);
+      renderGrammarReport({
+        score: score,
+        totalCorrect: correct,
+        totalQuestions: grammarState.questions.length,
+        diagnosis: '网络问题导致无法获取AI深度分析。基本成绩：' + correct + '/' + grammarState.questions.length + '。',
+        ruleAnalysis: [],
+        strengths: [],
+        weaknesses: [],
+        studyTips: ['建议重新测试以获取完整的AI诊断分析。']
+      });
+    }
+
+    // Grammar event listeners
+    document.getElementById('btnOpenGrammar').addEventListener('click', function () { openGrammarHome(); });
+    document.getElementById('btnGrammarBackHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('btnGrammarQuizBack').addEventListener('click', function () { showScreen('screen-grammar'); });
+    document.getElementById('btnGrammarResultHome').addEventListener('click', function () { showScreen('screen-home'); });
+
+    document.getElementById('grammarTopicGrid').addEventListener('click', function (e) {
+      var card = e.target.closest('.grammar-topic-card');
+      if (!card) return;
+      grammarState.selectedTopic = card.dataset.topic;
+      renderGrammarTopicGrid();
+      document.getElementById('btnStartGrammar').disabled = false;
+    });
+
+    document.getElementById('grammarDiffRow').addEventListener('click', function (e) {
+      var btn = e.target.closest('.grammar-diff-btn');
+      if (!btn) return;
+      grammarState.difficulty = btn.dataset.diff;
+      this.querySelectorAll('.grammar-diff-btn').forEach(function (b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+    });
+
+    document.getElementById('btnStartGrammar').addEventListener('click', function () { startGrammarQuiz(); });
+
+    document.getElementById('grammarOptions').addEventListener('click', function (e) {
+      var btn = e.target.closest('.grammar-opt-btn');
+      if (!btn || btn.disabled) return;
+      selectGrammarOption(parseInt(btn.dataset.idx));
+    });
+
+    document.getElementById('btnGrammarNext').addEventListener('click', function () { grammarNext(); });
+
+    document.getElementById('btnGrammarRetry').addEventListener('click', function () { startGrammarQuiz(); });
+    document.getElementById('btnGrammarNewTopic').addEventListener('click', function () { openGrammarHome(); });
 
     (function init() {
       var sizeEl = document.getElementById('quizSize');
