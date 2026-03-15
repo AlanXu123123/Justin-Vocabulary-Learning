@@ -955,10 +955,11 @@
     <!-- ═══ 造句训练：配置页 ═══ -->
     <div id="screen-sentence-home" class="screen">
       <button type="button" class="btn-back-home" id="btnSentenceBackHome">← 返回主页</button>
+      <div id="sentenceResumeBar" style="display:none;"></div>
       <div class="card">
         <h3 style="margin-bottom:0.25rem;">✍️ 单词造句训练</h3>
         <p class="hint">选择词库和范围，用指定单词造句，AI 严格评分</p>
-        <p class="hint" style="font-size:0.7rem;color:var(--orange);margin-top:0.2rem;">🧠 Gemini 2.5 Pro · 100分制 · 单词使用50% + 语法20% + 句子复杂度20% + 语义10%</p>
+        <p class="hint" style="font-size:0.7rem;color:var(--orange);margin-top:0.2rem;">🧠 Gemini 2.5 Pro · 100分 · 单词使用50 + 语法20 + 复杂度10 + 书面用词10 + 通顺地道10</p>
         <div style="margin-top:0.75rem;">
           <label class="hint">选择单词组</label>
           <select id="sentenceGroupSelect" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
@@ -4039,14 +4040,17 @@
     // ═══════════════════════════════════════════════
     //  单词造句训练模块
     // ═══════════════════════════════════════════════
-    var SENTENCE_SCORE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/scoreSentence';
-    var SENTENCE_REPORT_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/analyzeSentenceReport';
+    var SENTENCE_BATCH_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/scoreSentenceBatch';
+    var SENTENCE_REPORT_BASE = 'https://analyzesentencereport-tbj6ixfqaa-uc.a.run.app';
+    var SENTENCE_PROGRESS_KEY = 'sentence_progress';
+    var SENTENCE_HISTORY_KEY = 'sentence_history';
 
     var sentenceState = {
       words: [],
       currentIndex: 0,
       results: [],
       sentences: [],
+      scored: false,
       timerStart: 0,
       timerInterval: null,
       reportData: null
@@ -4058,6 +4062,53 @@
     }
     function hideSentenceLoading() {
       document.getElementById('sentenceLoading').style.display = 'none';
+    }
+
+    function saveSentenceProgress() {
+      try {
+        var data = {
+          words: sentenceState.words,
+          sentences: sentenceState.sentences,
+          currentIndex: sentenceState.currentIndex,
+          timerStart: sentenceState.timerStart,
+          scored: sentenceState.scored,
+          results: sentenceState.results,
+          reportData: sentenceState.reportData,
+          user: _currentUser || '',
+          savedAt: Date.now()
+        };
+        localStorage.setItem(SENTENCE_PROGRESS_KEY, JSON.stringify(data));
+      } catch (e) { /* ignore */ }
+    }
+
+    function loadSentenceProgress() {
+      try {
+        var raw = localStorage.getItem(SENTENCE_PROGRESS_KEY);
+        if (!raw) return null;
+        var data = JSON.parse(raw);
+        if (Date.now() - data.savedAt > 24 * 3600 * 1000) { localStorage.removeItem(SENTENCE_PROGRESS_KEY); return null; }
+        if (data.user && data.user !== (_currentUser || '')) return null;
+        return data;
+      } catch (e) { return null; }
+    }
+
+    function clearSentenceProgress() {
+      localStorage.removeItem(SENTENCE_PROGRESS_KEY);
+    }
+
+    function saveSentenceHistory(avgScore, wordCount) {
+      try {
+        var history = JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]');
+        history.push({
+          date: new Date().toISOString(),
+          user: _currentUser || '',
+          score: avgScore,
+          wordCount: wordCount,
+          words: sentenceState.words.map(function (w) { return w.word; })
+        });
+        if (history.length > 100) history = history.slice(-100);
+        localStorage.setItem(SENTENCE_HISTORY_KEY, JSON.stringify(history));
+      } catch (e) { /* ignore */ }
     }
 
     function populateSentenceGroupSelect() {
@@ -4072,6 +4123,37 @@
 
     function openSentenceHome() {
       populateSentenceGroupSelect();
+      var saved = loadSentenceProgress();
+      var resumeBar = document.getElementById('sentenceResumeBar');
+      if (saved && saved.words && saved.words.length > 0 && !saved.scored) {
+        var filled = saved.sentences.filter(function (s) { return s && s.trim(); }).length;
+        resumeBar.innerHTML = '<div style="padding:0.6rem;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--r-md);margin-bottom:0.75rem;">'
+          + '<div style="font-size:0.85rem;color:var(--orange);font-weight:600;margin-bottom:0.3rem;">📝 有未完成的造句训练</div>'
+          + '<div style="font-size:0.78rem;color:var(--text-secondary);">' + saved.words.length + ' 个单词，已完成 ' + filled + ' / ' + saved.words.length + '</div>'
+          + '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'
+          + '<button type="button" class="btn" id="btnSentenceResume" style="flex:1;background:var(--orange);">继续做题</button>'
+          + '<button type="button" class="btn btn-secondary" id="btnSentenceDiscard" style="flex:1;">放弃</button>'
+          + '</div></div>';
+        resumeBar.style.display = 'block';
+        document.getElementById('btnSentenceResume').addEventListener('click', function () {
+          sentenceState.words = saved.words;
+          sentenceState.sentences = saved.sentences;
+          sentenceState.currentIndex = saved.currentIndex || 0;
+          sentenceState.timerStart = saved.timerStart || Date.now();
+          sentenceState.results = new Array(saved.words.length).fill(null);
+          sentenceState.scored = false;
+          sentenceState.reportData = null;
+          startSentenceTimer();
+          showScreen('screen-sentence-quiz');
+          renderSentenceQuestion();
+        });
+        document.getElementById('btnSentenceDiscard').addEventListener('click', function () {
+          clearSentenceProgress();
+          resumeBar.style.display = 'none';
+        });
+      } else {
+        resumeBar.style.display = 'none';
+      }
       showScreen('screen-sentence-home');
       renderSentenceProfile();
     }
@@ -4081,28 +4163,39 @@
       var body = document.getElementById('sentenceProfileBody');
       if (!_currentUser) { card.style.display = 'none'; return; }
 
-      fetch(USER_GET_URL + '?username=' + encodeURIComponent(_currentUser), { redirect: 'follow', credentials: 'omit' })
-        .then(function (r) { return r.json(); })
-        .then(function (resp) {
-          if (!resp.ok || !resp.found || !resp.data || !resp.data.sentenceProfile) {
-            card.style.display = 'none';
-            return;
-          }
-          var p = resp.data.sentenceProfile;
-          var html = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem;">';
-          html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent-light);">' + (p.avgScore || 0) + '</div><div class="hint">平均分</div></div>';
-          html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--text);">' + (p.totalTests || 0) + '</div><div class="hint">测试次数</div></div>';
-          html += '</div>';
-          if (p.weakCategories && Object.keys(p.weakCategories).length > 0) {
-            html += '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">薄弱环节：';
-            var labels = { word_misuse: '用词不当', verb_tense: '动词时态', subject_verb: '主谓一致', article: '冠词', preposition: '介词', word_form: '词形', chinglish: '中式英语', complexity: '句子简单', other: '其他' };
-            Object.keys(p.weakCategories).forEach(function (k) { html += '<span style="color:var(--wrong);margin-right:0.4rem;">' + (labels[k] || k) + '(' + p.weakCategories[k].count + ')</span>'; });
-            html += '</div>';
-          }
-          body.innerHTML = html;
-          card.style.display = 'block';
-        })
-        .catch(function () { card.style.display = 'none'; });
+      var history = JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]').filter(function (h) { return h.user === _currentUser; });
+      if (history.length === 0) {
+        fetch(USER_GET_URL + '?username=' + encodeURIComponent(_currentUser), { redirect: 'follow', credentials: 'omit' })
+          .then(function (r) { return r.json(); })
+          .then(function (resp) {
+            if (!resp.ok || !resp.found || !resp.data || !resp.data.sentenceProfile) { card.style.display = 'none'; return; }
+            var p = resp.data.sentenceProfile;
+            body.innerHTML = _buildProfileHTML(p.avgScore || 0, p.totalTests || 0, p.weakCategories);
+            card.style.display = 'block';
+          })
+          .catch(function () { card.style.display = 'none'; });
+        return;
+      }
+      var total = history.length;
+      var avgScore = Math.round(history.reduce(function (s, h) { return s + h.score; }, 0) / total);
+      body.innerHTML = _buildProfileHTML(avgScore, total, null) +
+        '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">最近：' +
+        history.slice(-5).map(function (h) { return '<span style="color:' + _scoreColor(h.score, 100) + ';">' + h.score + '</span>'; }).join(' → ') + '</div>';
+      card.style.display = 'block';
+    }
+
+    function _buildProfileHTML(avg, total, weakCats) {
+      var html = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem;">';
+      html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent-light);">' + avg + '</div><div class="hint">平均分</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--text);">' + total + '</div><div class="hint">测试次数</div></div>';
+      html += '</div>';
+      if (weakCats && Object.keys(weakCats).length > 0) {
+        var labels = { word_misuse: '用词不当', verb_tense: '动词时态', subject_verb: '主谓一致', article: '冠词', preposition: '介词', word_form: '词形', chinglish: '中式英语', complexity: '句子简单', register: '口语化', fluency: '不通顺', other: '其他' };
+        html += '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">薄弱环节：';
+        Object.keys(weakCats).forEach(function (k) { html += '<span style="color:var(--wrong);margin-right:0.4rem;">' + (labels[k] || k) + '(' + weakCats[k].count + ')</span>'; });
+        html += '</div>';
+      }
+      return html;
     }
 
     function getSentenceWords() {
@@ -4118,38 +4211,15 @@
           (cat.words || []).forEach(function (w, i) { words.push({ word: w.word, definition: w.definition, categoryId: cat.id, serial: i + 1 }); });
         }
       }
-      var startEl = document.getElementById('sentenceRangeStart');
-      var endEl = document.getElementById('sentenceRangeEnd');
-      var s = startEl ? parseInt(startEl.value, 10) : NaN;
-      var e = endEl ? parseInt(endEl.value, 10) : NaN;
+      var s = parseInt(document.getElementById('sentenceRangeStart').value, 10);
+      var e = parseInt(document.getElementById('sentenceRangeEnd').value, 10);
       if (!isNaN(s) && !isNaN(e) && s >= 1 && e >= s) {
         words = words.filter(function (w) { return w.serial >= s && w.serial <= e; });
       }
       return words;
     }
 
-    function startSentenceQuiz() {
-      var allWords = getSentenceWords();
-      if (allWords.length === 0) { alert('所选范围内没有单词'); return; }
-
-      var allChecked = document.getElementById('sentenceAll').checked;
-      var size;
-      if (allChecked) {
-        size = allWords.length;
-      } else {
-        size = parseInt(document.getElementById('sentenceSize').value, 10) || 10;
-        size = Math.min(size, allWords.length);
-        size = Math.max(1, size);
-      }
-
-      var shuffled = allWords.sort(function () { return Math.random() - 0.5; });
-      sentenceState.words = shuffled.slice(0, size);
-      sentenceState.currentIndex = 0;
-      sentenceState.results = new Array(size).fill(null);
-      sentenceState.sentences = new Array(size).fill('');
-      sentenceState.reportData = null;
-      sentenceState.timerStart = Date.now();
-
+    function startSentenceTimer() {
       if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval);
       sentenceState.timerInterval = setInterval(function () {
         var elapsed = Math.floor((Date.now() - sentenceState.timerStart) / 1000);
@@ -4158,15 +4228,45 @@
         var el = document.getElementById('sentenceQuizTimer');
         if (el) el.textContent = mm + ':' + ss;
       }, 1000);
+    }
 
+    function startSentenceQuiz() {
+      var allWords = getSentenceWords();
+      if (allWords.length === 0) { alert('所选范围内没有单词'); return; }
+
+      var size;
+      if (document.getElementById('sentenceAll').checked) {
+        size = allWords.length;
+      } else {
+        size = parseInt(document.getElementById('sentenceSize').value, 10) || 10;
+        size = Math.min(Math.max(1, size), allWords.length);
+      }
+
+      var shuffled = allWords.sort(function () { return Math.random() - 0.5; });
+      sentenceState.words = shuffled.slice(0, size);
+      sentenceState.currentIndex = 0;
+      sentenceState.results = new Array(size).fill(null);
+      sentenceState.sentences = new Array(size).fill('');
+      sentenceState.scored = false;
+      sentenceState.reportData = null;
+      sentenceState.timerStart = Date.now();
+
+      startSentenceTimer();
+      saveSentenceProgress();
       showScreen('screen-sentence-quiz');
       renderSentenceQuestion();
+    }
+
+    function _saveCurrSentenceText() {
+      var val = document.getElementById('sentenceInput').value.trim();
+      if (val) sentenceState.sentences[sentenceState.currentIndex] = val;
     }
 
     function renderSentenceQuestion() {
       var idx = sentenceState.currentIndex;
       var total = sentenceState.words.length;
       var w = sentenceState.words[idx];
+      var isScored = sentenceState.scored;
 
       document.getElementById('sentenceProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题';
       document.getElementById('sentenceWord').textContent = w.word;
@@ -4182,13 +4282,26 @@
 
       var input = document.getElementById('sentenceInput');
       input.value = sentenceState.sentences[idx] || '';
-      input.disabled = !!sentenceState.results[idx];
+      input.disabled = isScored;
 
       var submitBtn = document.getElementById('btnSubmitSentence');
-      submitBtn.style.display = sentenceState.results[idx] ? 'none' : 'block';
+      var filled = sentenceState.sentences.filter(function (s) { return s && s.trim(); }).length;
+
+      if (isScored) {
+        submitBtn.style.display = 'none';
+      } else {
+        submitBtn.style.display = 'block';
+        if (filled >= total && idx === total - 1) {
+          submitBtn.textContent = '✅ 全部完成，提交评分（' + total + ' 题）';
+          submitBtn.style.background = 'linear-gradient(135deg,#32d74b,#10b981)';
+        } else {
+          submitBtn.textContent = '保存并下一题 (' + filled + '/' + total + ')';
+          submitBtn.style.background = 'linear-gradient(135deg,#f59e0b,#ef4444)';
+        }
+      }
 
       var scoreArea = document.getElementById('sentenceScoreArea');
-      if (sentenceState.results[idx]) {
+      if (isScored && sentenceState.results[idx]) {
         scoreArea.style.display = 'block';
         scoreArea.innerHTML = buildScoreHTML(sentenceState.results[idx]);
       } else {
@@ -4200,23 +4313,16 @@
       navRow.style.display = 'flex';
       document.getElementById('btnSentencePrev').disabled = idx === 0;
       var nextBtn = document.getElementById('btnSentenceNext');
-      var allDone = sentenceState.results.every(function (r) { return r !== null; });
-      if (idx === total - 1 && allDone) {
+      nextBtn.disabled = false;
+      if (isScored && idx === total - 1) {
         nextBtn.textContent = '查看成绩';
-        nextBtn.className = 'btn';
-        nextBtn.style.flex = '1';
         nextBtn.style.background = 'linear-gradient(135deg,#32d74b,#10b981)';
       } else if (idx === total - 1) {
         nextBtn.textContent = '下一题';
         nextBtn.disabled = true;
-        nextBtn.className = 'btn';
-        nextBtn.style.flex = '1';
         nextBtn.style.background = '';
       } else {
         nextBtn.textContent = '下一题';
-        nextBtn.disabled = false;
-        nextBtn.className = 'btn';
-        nextBtn.style.flex = '1';
         nextBtn.style.background = '';
       }
     }
@@ -4237,8 +4343,9 @@
       var dims = [
         { key: 'wordUsage', label: '单词使用', max: 50 },
         { key: 'grammar', label: '语法正确', max: 20 },
-        { key: 'complexity', label: '句子复杂度', max: 20 },
-        { key: 'semantics', label: '语义合理', max: 10 }
+        { key: 'complexity', label: '句子复杂度', max: 10 },
+        { key: 'register', label: '书面化用词', max: 10 },
+        { key: 'fluency', label: '通顺地道', max: 10 }
       ];
       dims.forEach(function (d) {
         var dim = data.dimensions && data.dimensions[d.key];
@@ -4262,7 +4369,6 @@
           html += '</div>';
         });
       }
-
       if (data.correctedSentence) {
         html += '<div class="sentence-corrected">✅ 修正句：' + escapeHtml(data.correctedSentence) + '</div>';
       }
@@ -4273,45 +4379,60 @@
       return html;
     }
 
-    async function submitSentence() {
-      var idx = sentenceState.currentIndex;
-      var w = sentenceState.words[idx];
-      var sentence = document.getElementById('sentenceInput').value.trim();
-      if (!sentence) { alert('请输入一个句子'); return; }
+    async function submitAllSentences() {
+      _saveCurrSentenceText();
+      var total = sentenceState.words.length;
+      var filled = sentenceState.sentences.filter(function (s) { return s && s.trim(); }).length;
 
-      sentenceState.sentences[idx] = sentence;
+      if (filled < total) {
+        sentenceState.sentences[sentenceState.currentIndex] = document.getElementById('sentenceInput').value.trim();
+        saveSentenceProgress();
+        if (sentenceState.currentIndex < total - 1) {
+          sentenceState.currentIndex++;
+          renderSentenceQuestion();
+        }
+        return;
+      }
 
-      var key = w.word.toLowerCase().trim();
-      var cached = aiCache[key];
+      if (!confirm('全部 ' + total + ' 个句子已填写完毕，提交给 AI 评分？')) return;
 
-      showSentenceLoading('AI 正在评分第 ' + (idx + 1) + ' 题...');
+      var items = sentenceState.words.map(function (w, i) {
+        var key = w.word.toLowerCase().trim();
+        var cached = aiCache[key];
+        return {
+          word: w.word,
+          partOfSpeech: cached && cached.partOfSpeech || '',
+          definition: w.definition || '',
+          definitionEn: cached && cached.definitionEn || '',
+          sentence: sentenceState.sentences[i]
+        };
+      });
+
+      showSentenceLoading('AI 正在批量评分 ' + total + ' 个句子，请稍候...');
       try {
-        var resp = await fetch(SENTENCE_SCORE_BASE, {
+        var resp = await fetch(SENTENCE_BATCH_BASE, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            word: w.word,
-            partOfSpeech: cached && cached.partOfSpeech || '',
-            definition: w.definition || '',
-            definitionEn: cached && cached.definitionEn || '',
-            sentence: sentence,
-            username: _currentUser || ''
-          })
+          body: JSON.stringify({ items: items, username: _currentUser || '' })
         });
         var result = await resp.json();
         hideSentenceLoading();
 
-        if (!result.ok || !result.data) {
+        if (!result.ok || !result.data || !result.data.results) {
           throw new Error(result.error || '评分失败');
         }
 
         var el = document.getElementById('usageSentenceModel');
         if (el && result.model) el.textContent = result.model;
 
-        sentenceState.results[idx] = result.data;
-        sentenceState.results[idx].word = w.word;
-        sentenceState.results[idx].sentence = sentence;
-        renderSentenceQuestion();
+        result.data.results.forEach(function (r, i) {
+          r.word = sentenceState.words[i].word;
+          r.sentence = sentenceState.sentences[i];
+          sentenceState.results[i] = r;
+        });
+        sentenceState.scored = true;
+        saveSentenceProgress();
+        showSentenceResults();
       } catch (err) {
         hideSentenceLoading();
         alert('评分失败：' + err.message);
@@ -4323,6 +4444,8 @@
 
       var scores = sentenceState.results.filter(function (r) { return r; }).map(function (r) { return r.totalScore || 0; });
       var avg = scores.length > 0 ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length) : 0;
+
+      saveSentenceHistory(avg, sentenceState.words.length);
 
       var scoreEl = document.getElementById('sentenceOverallScore');
       scoreEl.textContent = avg;
@@ -4343,6 +4466,7 @@
       });
       document.getElementById('sentenceResultList').innerHTML = listHtml;
 
+      clearSentenceProgress();
       showScreen('screen-sentence-result');
     }
 
@@ -4362,10 +4486,7 @@
         var resp = await fetch(SENTENCE_REPORT_BASE, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            results: resultsForApi,
-            username: _currentUser || ''
-          })
+          body: JSON.stringify({ results: resultsForApi, username: _currentUser || '' })
         });
         var result = await resp.json();
         hideSentenceLoading();
@@ -4426,13 +4547,13 @@
         html += '<div class="sentence-report-section"><h4>📖 单词掌握情况</h4>';
         data.wordMastery.forEach(function (wm) {
           var icon = wm.mastered ? '✅' : '❌';
-          var issueText = wm.issue ? ' — ' + escapeHtml(wm.issue) : '';
+          var issueText = wm.issue ? escapeHtml(wm.issue) : '';
           var c = wm.mastered ? 'var(--correct)' : 'var(--wrong)';
           html += '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;font-size:0.82rem;">';
           html += '<span>' + icon + '</span><span style="font-weight:600;">' + escapeHtml(wm.word) + '</span>';
           if (wm.score !== undefined) html += '<span style="color:' + c + ';margin-left:auto;font-weight:600;">' + wm.score + '分</span>';
           html += '</div>';
-          if (issueText) html += '<div style="font-size:0.75rem;color:var(--muted);margin-left:1.5rem;margin-bottom:0.2rem;">' + issueText.substring(3) + '</div>';
+          if (issueText) html += '<div style="font-size:0.75rem;color:var(--muted);margin-left:1.5rem;margin-bottom:0.2rem;">' + issueText + '</div>';
         });
         html += '</div>';
       }
@@ -4450,13 +4571,20 @@
     document.getElementById('btnOpenSentence').addEventListener('click', openSentenceHome);
     document.getElementById('btnSentenceBackHome').addEventListener('click', function () { showScreen('screen-home'); });
     document.getElementById('btnStartSentence').addEventListener('click', startSentenceQuiz);
-    document.getElementById('btnSubmitSentence').addEventListener('click', submitSentence);
+    document.getElementById('btnSubmitSentence').addEventListener('click', submitAllSentences);
+    document.getElementById('sentenceInput').addEventListener('blur', function () {
+      _saveCurrSentenceText();
+      saveSentenceProgress();
+    });
     document.getElementById('btnSentencePrev').addEventListener('click', function () {
+      _saveCurrSentenceText();
+      saveSentenceProgress();
       if (sentenceState.currentIndex > 0) { sentenceState.currentIndex--; renderSentenceQuestion(); }
     });
     document.getElementById('btnSentenceNext').addEventListener('click', function () {
-      var allDone = sentenceState.results.every(function (r) { return r !== null; });
-      if (sentenceState.currentIndex === sentenceState.words.length - 1 && allDone) {
+      _saveCurrSentenceText();
+      saveSentenceProgress();
+      if (sentenceState.scored && sentenceState.currentIndex === sentenceState.words.length - 1) {
         showSentenceResults();
       } else if (sentenceState.currentIndex < sentenceState.words.length - 1) {
         sentenceState.currentIndex++;
@@ -4464,7 +4592,10 @@
       }
     });
     document.getElementById('btnSentenceQuizBack').addEventListener('click', function () {
-      if (confirm('返回将丢失当前进度，确定吗？')) { if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval); showScreen('screen-sentence-home'); }
+      _saveCurrSentenceText();
+      saveSentenceProgress();
+      if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval);
+      showScreen('screen-sentence-home');
     });
     document.getElementById('btnSentenceResultHome').addEventListener('click', function () { showScreen('screen-home'); });
     document.getElementById('btnSentenceResultHomeBtn').addEventListener('click', function () { showScreen('screen-home'); });
