@@ -710,7 +710,7 @@
       <div style="width:100%;display:flex;gap:0.5rem;margin-top:0.15rem;flex-wrap:wrap;">
         <span style="font-size:0.68rem;">单词AI: <span class="usage-model" id="usageModel">--</span></span>
         <span class="usage-sep">|</span>
-        <span style="font-size:0.68rem;">语法AI: <span class="usage-model" id="usageGrammarModel">--</span></span>
+        <span style="font-size:0.68rem;">语法分析: <span class="usage-model" id="usageGrammarModel">--</span></span>
       </div>
     </div>
 
@@ -822,8 +822,8 @@
       <button type="button" class="btn-back-home" id="btnGrammarBackHome">← 返回主页</button>
       <div class="card">
         <h3 style="margin-bottom:0.25rem;">语法专项训练</h3>
-        <p class="hint">选择语法专项，AI 将根据你的掌握情况出题并诊断分析</p>
-        <p class="hint" style="font-size:0.7rem;color:var(--accent-light);margin-top:0.2rem;">📚 20,000+ 专业题库 + 🤖 Gemini 2.5 Pro 动态出题 · 混合模式</p>
+        <p class="hint">选择语法专项，AI 根据你的掌握情况智能选题并诊断分析</p>
+        <p class="hint" style="font-size:0.7rem;color:var(--accent-light);margin-top:0.2rem;">📚 20,000+ Zanichelli 专业题库 · 每次 20 题 · 🔄 10题弱点复习 + ✨ 10题AI推荐</p>
         <div class="grammar-topic-grid" id="grammarTopicGrid"></div>
         <div class="grammar-difficulty-row" id="grammarDiffRow">
           <button type="button" class="grammar-diff-btn" data-diff="beginner">入门</button>
@@ -3958,7 +3958,7 @@
 
     async function startGrammarQuiz() {
       if (!grammarState.selectedTopic) return;
-      showGrammarLoading('AI 正在根据你的掌握情况出题...');
+      showGrammarLoading('正在从题库智能选题...');
       try {
         var resp = await fetch(GRAMMAR_API_BASE, {
           method: 'POST',
@@ -3990,8 +3990,9 @@
       var total = grammarState.questions.length;
       var q = grammarState.questions[idx];
 
-      document.getElementById('grammarQuizProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题';
-      document.getElementById('grammarQuizTopic').textContent = GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '';
+      var reasonLabel = q.selectionReason === 'weak_review' ? ' 🔄弱点' : ' ✨推荐';
+      document.getElementById('grammarQuizProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题' + reasonLabel;
+      document.getElementById('grammarQuizTopic').textContent = (GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '') + ' · ' + (q.subRule || '');
 
       var barHtml = '';
       for (var i = 0; i < total; i++) {
@@ -4026,9 +4027,13 @@
       var expEl = document.getElementById('grammarExplanation');
       if (answered) {
         var expText = q.explanation || '';
-        var sourceTag = q.source === 'seed_bank' ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-bottom:0.3rem;">📚 专业题库</span><br>' : '<span style="display:inline-block;background:rgba(50,215,75,0.15);color:var(--correct);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-bottom:0.3rem;">🤖 AI 出题</span><br>';
-        if (!expText && q.source === 'seed_bank') {
-          expText = '正确答案是 "' + q.options[q.correctIndex] + '"。此题来自专业语法题库。';
+        var reasonTag = q.selectionReason === 'weak_review'
+          ? '<span style="display:inline-block;background:rgba(255,100,100,0.15);color:#ff6b6b;font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-right:0.3rem;">🔄 弱点复习</span>'
+          : '<span style="display:inline-block;background:rgba(50,215,75,0.15);color:var(--correct);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-right:0.3rem;">✨ AI推荐</span>';
+        var sourceTag = '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;">📚 ' + (q.source || 'zanichelli') + '</span><br>';
+        sourceTag = reasonTag + sourceTag;
+        if (!expText) {
+          expText = '正确答案是 "' + q.options[q.correctIndex] + '"。此题来自 ' + (q.source || 'zanichelli') + ' 专业语法题库。';
         }
         expEl.innerHTML = sourceTag + escapeHtml(expText);
         expEl.classList.add('show');
@@ -4114,12 +4119,12 @@
       ringFg.style.stroke = ringColor;
       setTimeout(function () { ringFg.style.strokeDashoffset = offset; }, 100);
       document.getElementById('grammarScoreNum').textContent = score;
-      var seedC = grammarState.questions.filter(function (q) { return q.source === 'seed_bank'; }).length;
-      var aiC = grammarState.questions.length - seedC;
+      var weakC = grammarState.questions.filter(function (q) { return q.selectionReason === 'weak_review'; }).length;
+      var recC = grammarState.questions.length - weakC;
       document.getElementById('grammarScoreSummary').innerHTML =
         (data.totalCorrect || 0) + ' / ' + (data.totalQuestions || grammarState.questions.length) + ' 正确 · ' +
         (GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '') +
-        '<br><span style="font-size:0.72rem;color:var(--muted);">📚 题库 ' + seedC + ' 题 + 🤖 AI ' + aiC + ' 题</span>';
+        '<br><span style="font-size:0.72rem;color:var(--muted);">🔄 弱点复习 ' + weakC + ' 题 + ✨ AI推荐 ' + recC + ' 题</span>';
 
       var ruleHtml = '';
       if (data.ruleAnalysis && data.ruleAnalysis.length) {
