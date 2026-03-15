@@ -2437,13 +2437,17 @@
       var manualDef = item.definition || '';
       var cached = aiCache[(item.word || '').toLowerCase().trim()];
       var aiDef = cached && cached.definitionEn ? cached.definitionEn : '';
+      var aiPos = cached && cached.partOfSpeech ? cached.partOfSpeech : '';
+      var posHtml = aiPos ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.78rem;font-weight:600;padding:0.1rem 0.45rem;border-radius:4px;margin-bottom:0.35rem;">' + escapeHtml(aiPos) + '</span><br>' : '';
       var showManual = manualDef && manualDef !== '(无释义)';
       if (showManual && aiDef) {
-        defEl.innerHTML = escapeHtml(manualDef) + '<div class="quiz-ai-def">' + escapeHtml(aiDef) + '</div>';
+        defEl.innerHTML = posHtml + escapeHtml(manualDef) + '<div class="quiz-ai-def">' + escapeHtml(aiDef) + '</div>';
       } else if (aiDef) {
-        defEl.innerHTML = '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(aiDef) + '</div>';
+        defEl.innerHTML = posHtml + '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(aiDef) + '</div>';
+      } else if (showManual) {
+        defEl.innerHTML = posHtml + escapeHtml(manualDef);
       } else {
-        defEl.textContent = manualDef || '(无释义)';
+        defEl.innerHTML = posHtml + '(无释义)';
       }
       const input = document.getElementById('answerInput');
       const feedbackEl = document.getElementById('feedback');
