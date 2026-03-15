@@ -2330,6 +2330,7 @@
                         }
                       });
                     }
+                    if (w.partOfSpeech) cached.partOfSpeech = w.partOfSpeech;
                     aiCache[key] = cached;
                   }
                 }
@@ -3009,7 +3010,8 @@
           definitionEn: d.definitionEn || '',
           phonetic: d.phonetic || '',
           synonyms: synonymsStr,
-          relatedWords: relatedStr
+          relatedWords: relatedStr,
+          partOfSpeech: d.partOfSpeech || ''
         };
       });
       fetch(url, {

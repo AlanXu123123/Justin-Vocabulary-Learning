@@ -51,7 +51,7 @@ function doGet(e) {
  * POST  body 格式：
  * 1) 创建新单词组：{ "action": "createSheet", "category": "新组名" }
  * 2) 追加单词：{ "category": "SS10 Unit4", "words": [ { "word": "xxx", "definition": "..." }, ... ] }
- * 3) 写入AI数据：{ "action": "updateAI", "category": "...", "aiData": [ { "word": "...", "definitionEn": "...", "phonetic": "...", "synonyms": "...", "relatedWords": "..." }, ... ] }
+ * 3) 写入AI数据：{ "action": "updateAI", "category": "...", "aiData": [ { "word": "...", "definitionEn": "...", "phonetic": "...", "synonyms": "...", "relatedWords": "...", "partOfSpeech": "..." }, ... ] }
  */
 function doPost(e) {
   try {
@@ -147,11 +147,12 @@ function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
       }
       if (word) {
         var entry = { serial: serial, word: word, definition: definition || '(无释义)' };
-        var ai0 = aiOffset, ai1 = aiOffset + 1, ai2 = aiOffset + 2, ai3 = aiOffset + 3;
+        var ai0 = aiOffset, ai1 = aiOffset + 1, ai2 = aiOffset + 2, ai3 = aiOffset + 3, ai4 = aiOffset + 4;
         if (data[r].length > ai0 && data[r][ai0] != null && String(data[r][ai0]).trim()) entry.definitionEn = String(data[r][ai0]).trim();
         if (data[r].length > ai1 && data[r][ai1] != null && String(data[r][ai1]).trim()) entry.phonetic = String(data[r][ai1]).trim();
         if (data[r].length > ai2 && data[r][ai2] != null && String(data[r][ai2]).trim()) entry.synonyms = String(data[r][ai2]).trim();
         if (data[r].length > ai3 && data[r][ai3] != null && String(data[r][ai3]).trim()) entry.relatedWords = String(data[r][ai3]).trim();
+        if (data[r].length > ai4 && data[r][ai4] != null && String(data[r][ai4]).trim()) entry.partOfSpeech = String(data[r][ai4]).trim();
         words.push(entry);
       }
     }
@@ -240,10 +241,10 @@ function updateAIDataInSheet(spreadsheetId, category, aiData) {
   var aiStartCol = is3Col ? 4 : 3;
 
   if (startRow === 1) {
-    sheet.getRange(1, aiStartCol, 1, 4).setValues([['AI英文解释', '音标', '同义词', '词形变化']]);
+    sheet.getRange(1, aiStartCol, 1, 5).setValues([['AI英文解释', '音标', '同义词', '词形变化', '词性']]);
   }
 
-  var maxCol = Math.max(sheet.getLastColumn(), aiStartCol + 3);
+  var maxCol = Math.max(sheet.getLastColumn(), aiStartCol + 4);
   var allData = sheet.getRange(1, 1, lastRow, maxCol).getValues();
 
   if (!is3Col && allData.length > startRow) {
@@ -265,11 +266,12 @@ function updateAIDataInSheet(spreadsheetId, category, aiData) {
     if (!cellWord) continue;
     var ai = aiMap[cellWord];
     if (!ai) continue;
-    sheet.getRange(r + 1, aiStartCol, 1, 4).setValues([[
+    sheet.getRange(r + 1, aiStartCol, 1, 5).setValues([[
       ai.definitionEn || '',
       ai.phonetic || '',
       ai.synonyms || '',
-      ai.relatedWords || ''
+      ai.relatedWords || '',
+      ai.partOfSpeech || ''
     ]]);
     updatedCount++;
   }
