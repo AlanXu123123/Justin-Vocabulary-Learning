@@ -2761,8 +2761,9 @@
             var isActive = u.username === _currentUser ? ' active' : '';
             var time = u.lastUpdated ? new Date(u.lastUpdated).toLocaleDateString('zh-CN') : '';
             return '<div class="user-list-item' + isActive + '" data-username="' + u.username + '" data-display="' + (u.displayName || u.username) + '">'
-              + '<span class="user-name">' + (u.displayName || u.username) + '</span>'
+              + '<span class="user-name">' + escapeHtml(u.displayName || u.username) + '</span>'
               + '<span class="user-time">' + time + '</span>'
+              + '<button type="button" class="btn-rename-user" data-username="' + u.username + '" data-display="' + escapeHtml(u.displayName || u.username) + '" title="改名" style="background:none;border:none;color:var(--accent-light);cursor:pointer;font-size:0.75rem;padding:0.15rem 0.3rem;margin-left:0.3rem;" onclick="event.stopPropagation()">✏️</button>'
               + '</div>';
           }).join('');
           wrap.innerHTML = html;
@@ -2776,6 +2777,30 @@
       setCurrentUser(username);
       hideUserModal();
       loadUserDataFromCloud(username);
+    }
+
+    function renameUser(username, oldDisplayName) {
+      var newName = prompt('请输入新的显示名称：', oldDisplayName);
+      if (!newName || !newName.trim() || newName.trim() === oldDisplayName) return;
+      var trimmed = newName.trim();
+      fetch(USER_SAVE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, displayName: trimmed }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok) {
+            if (username === _currentUser) {
+              var el = document.getElementById('currentUserDisplay');
+              if (el) el.textContent = trimmed;
+            }
+            loadUserList();
+          } else {
+            alert('改名失败：' + (resp.error || '未知错误'));
+          }
+        })
+        .catch(function (e) { alert('改名失败：' + e.message); });
     }
 
     function createNewUser(displayName) {
@@ -2854,6 +2879,11 @@
     document.getElementById('btnSwitchUser').addEventListener('click', showUserModal);
 
     document.getElementById('userListWrap').addEventListener('click', function (e) {
+      var renameBtn = e.target.closest('.btn-rename-user');
+      if (renameBtn) {
+        renameUser(renameBtn.dataset.username, renameBtn.dataset.display);
+        return;
+      }
       var item = e.target.closest('.user-list-item');
       if (!item) return;
       switchToUser(item.dataset.username, item.dataset.display);
