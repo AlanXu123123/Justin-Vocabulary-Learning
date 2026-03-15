@@ -679,9 +679,10 @@
 
     /* ===== AI Usage Badge ===== */
     .ai-usage-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
-    .user-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.75rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.8rem; color: var(--text-secondary); }
-    .user-bar strong { color: var(--accent-light); }
-    .btn-switch-user { background: none; border: 1px solid var(--glass-border); color: var(--accent-light); padding: 0.2rem 0.6rem; border-radius: var(--r-sm); cursor: pointer; font-size: 0.72rem; transition: background 0.2s; }
+    .user-bar { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 1rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; font-size: 0.95rem; color: var(--text-secondary); }
+    .user-bar .user-bar-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0; text-transform: uppercase; }
+    .user-bar strong { color: var(--accent-light); font-size: 1.05rem; }
+    .btn-switch-user { background: none; border: 1px solid var(--glass-border); color: var(--accent-light); padding: 0.3rem 0.75rem; border-radius: var(--r-sm); cursor: pointer; font-size: 0.8rem; transition: background 0.2s; margin-left: auto; }
     .btn-switch-user:hover { background: rgba(255,255,255,0.08); }
     #modalUser .modal-dialog { text-align: center; }
     .user-list-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; transition: background 0.2s, transform 0.15s; }
@@ -696,6 +697,45 @@
     .ai-usage-bar .usage-sep { color: rgba(255,255,255,0.15); }
     .ai-usage-bar .usage-tokens { color: var(--text-secondary); }
     .ai-usage-bar .usage-calls { color: var(--muted); }
+
+    /* ===== Sentence Module ===== */
+    .sentence-word-card { text-align: center; padding: 1.2rem 1rem; margin-bottom: 1rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-lg); }
+    .sentence-word-card .sw-word { font-size: 1.8rem; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+    .sentence-word-card .sw-phonetic { font-size: 0.9rem; color: rgba(255,255,255,0.45); margin-top: 0.2rem; }
+    .sentence-word-card .sw-pos { display: inline-block; background: rgba(167,139,250,0.15); color: var(--accent-light); font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: 4px; margin-top: 0.3rem; }
+    .sentence-word-card .sw-def { font-size: 0.95rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.5; }
+    .sentence-word-card .sw-def-en { font-size: 0.88rem; color: var(--pink); margin-top: 0.25rem; font-weight: 500; }
+    .sentence-textarea { width: 100%; min-height: 80px; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-md); color: var(--text); font-size: 1rem; font-family: inherit; resize: vertical; transition: border-color 0.2s; }
+    .sentence-textarea:focus { outline: none; border-color: var(--accent); box-shadow: var(--glow); }
+    .sentence-textarea::placeholder { color: var(--muted); }
+    .sentence-score-card { padding: 1rem; margin-top: 1rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-lg); }
+    .sentence-score-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .sentence-total-score { font-size: 2rem; font-weight: 700; }
+    .sentence-dim { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.5rem 0.6rem; background: rgba(255,255,255,0.03); border-radius: var(--r-sm); }
+    .sentence-dim-label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); min-width: 5.5rem; flex-shrink: 0; }
+    .sentence-dim-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .sentence-dim-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s var(--ease); }
+    .sentence-dim-score { font-size: 0.8rem; font-weight: 600; min-width: 3.5rem; text-align: right; }
+    .sentence-dim-comment { font-size: 0.75rem; color: var(--muted); margin-left: 6rem; margin-top: -0.2rem; margin-bottom: 0.4rem; }
+    .sentence-error-item { padding: 0.5rem 0.6rem; margin-bottom: 0.4rem; background: rgba(255,100,100,0.08); border-left: 3px solid var(--wrong); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 0.82rem; }
+    .sentence-error-item .err-original { text-decoration: line-through; color: var(--wrong); }
+    .sentence-error-item .err-corrected { color: var(--correct); font-weight: 600; }
+    .sentence-corrected { padding: 0.6rem; margin-top: 0.6rem; background: rgba(50,215,75,0.08); border: 1px solid rgba(50,215,75,0.2); border-radius: var(--r-sm); font-size: 0.88rem; color: var(--correct); line-height: 1.5; }
+    .sentence-better { padding: 0.6rem; margin-top: 0.4rem; background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); border-radius: var(--r-sm); font-size: 0.85rem; color: var(--accent-light); line-height: 1.5; font-style: italic; }
+    .sentence-result-item { padding: 0.6rem 0.75rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: background 0.2s; }
+    .sentence-result-item:hover { background: rgba(255,255,255,0.08); }
+    .sentence-result-item .sri-num { font-size: 0.75rem; color: var(--muted); min-width: 1.5rem; }
+    .sentence-result-item .sri-word { font-weight: 600; color: var(--text); flex: 1; }
+    .sentence-result-item .sri-score { font-weight: 700; font-size: 1.1rem; min-width: 3rem; text-align: right; }
+    .sentence-result-item .sri-bar { width: 60px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .sentence-result-item .sri-bar-fill { height: 100%; border-radius: 3px; }
+    .sentence-report-section { margin-bottom: 1rem; }
+    .sentence-report-section h4 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .sentence-weakness { padding: 0.5rem 0.6rem; margin-bottom: 0.35rem; background: rgba(255,100,100,0.06); border-radius: var(--r-sm); font-size: 0.82rem; }
+    .sentence-strength { padding: 0.4rem 0.6rem; margin-bottom: 0.25rem; background: rgba(50,215,75,0.06); border-radius: var(--r-sm); font-size: 0.82rem; color: var(--correct); }
+    .sentence-suggestion { padding: 0.4rem 0.6rem; margin-bottom: 0.25rem; background: rgba(167,139,250,0.06); border-radius: var(--r-sm); font-size: 0.82rem; color: var(--accent-light); }
+    .sentence-loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+    .sentence-loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.75rem; }
 
     /* ===== Inline style overrides ===== */
     #homeGroupSelect, #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
@@ -714,11 +754,14 @@
         <span style="font-size:0.68rem;">单词AI: <span class="usage-model" id="usageModel">--</span></span>
         <span class="usage-sep">|</span>
         <span style="font-size:0.68rem;">语法分析: <span class="usage-model" id="usageGrammarModel">--</span></span>
+        <span class="usage-sep">|</span>
+        <span style="font-size:0.68rem;">造句AI: <span class="usage-model" id="usageSentenceModel">--</span></span>
       </div>
     </div>
 
     <div class="user-bar" id="userBar">
-      <span>👤 当前用户：<strong id="currentUserDisplay">未登录</strong></span>
+      <div class="user-bar-avatar" id="userBarAvatar" style="background:#6366f1;">?</div>
+      <span>当前用户：<strong id="currentUserDisplay">未登录</strong></span>
       <button type="button" class="btn-switch-user" id="btnSwitchUser">切换用户</button>
     </div>
 
@@ -751,6 +794,7 @@
         <button type="button" class="btn btn-secondary" id="btnOpenHistory">测验历史</button>
         <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
         <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(118,75,162,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📖 语法专项训练（AI）</button>
+        <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
@@ -906,6 +950,106 @@
           <button type="button" class="btn btn-secondary" id="btnGrammarNewTopic" style="flex:1;">换个专项</button>
         </div>
       </div>
+    </div>
+
+    <!-- ═══ 造句训练：配置页 ═══ -->
+    <div id="screen-sentence-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnSentenceBackHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">✍️ 单词造句训练</h3>
+        <p class="hint">选择词库和范围，用指定单词造句，AI 严格评分</p>
+        <p class="hint" style="font-size:0.7rem;color:var(--orange);margin-top:0.2rem;">🧠 Gemini 2.5 Pro · 100分制 · 单词使用50% + 语法20% + 句子复杂度20% + 语义10%</p>
+        <div style="margin-top:0.75rem;">
+          <label class="hint">选择单词组</label>
+          <select id="sentenceGroupSelect" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
+            <option value="all">全部</option>
+          </select>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+          <label class="hint" style="flex-shrink:0;">序号范围</label>
+          <input type="number" id="sentenceRangeStart" min="1" placeholder="起始" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
+          <span style="color:var(--muted);">—</span>
+          <input type="number" id="sentenceRangeEnd" min="1" placeholder="结束" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
+          <span class="hint" id="sentenceRangeHint" style="font-size:0.78rem;"></span>
+        </div>
+        <div style="margin-top:0.75rem;">
+          <label class="hint">造句题数</label>
+          <input type="number" id="sentenceSize" min="1" max="50" placeholder="输入题数(建议5-15)" value="10" style="margin-top:0.35rem;padding:0.5rem;width:10rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
+        </div>
+        <div style="margin-top:0.5rem;">
+          <label style="display:inline-flex;align-items:center;gap:0.35rem;cursor:pointer;font-size:0.9rem;">
+            <input type="checkbox" id="sentenceAll" /> 考全部单词
+          </label>
+        </div>
+        <button type="button" class="btn" id="btnStartSentence" style="margin-top:1rem;background:linear-gradient(135deg,#f59e0b,#ef4444);width:100%;">开始造句训练</button>
+      </div>
+      <div class="card" id="sentenceProfileCard" style="display:none;">
+        <h4 style="margin-bottom:0.5rem;">📊 我的造句画像</h4>
+        <div id="sentenceProfileBody"></div>
+      </div>
+    </div>
+
+    <!-- ═══ 造句训练：答题界面 ═══ -->
+    <div id="screen-sentence-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnSentenceQuizBack">← 返回选择</button>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="progress" id="sentenceProgress">第 1 / 1 题</span>
+          <span style="font-size:0.75rem;color:var(--muted);" id="sentenceQuizTimer">00:00</span>
+        </div>
+        <div class="sentence-word-card">
+          <div class="sw-word" id="sentenceWord">--</div>
+          <div class="sw-phonetic" id="sentencePhonetic"></div>
+          <div class="sw-pos" id="sentencePos" style="display:none;"></div>
+          <div class="sw-def" id="sentenceDef"></div>
+          <div class="sw-def-en" id="sentenceDefEn"></div>
+        </div>
+        <div style="margin-bottom:0.5rem;">
+          <label class="hint" style="margin-bottom:0.3rem;display:block;">请用上面的单词造一个英文句子：</label>
+          <textarea class="sentence-textarea" id="sentenceInput" placeholder="Type your sentence here..." rows="3"></textarea>
+        </div>
+        <button type="button" class="btn" id="btnSubmitSentence" style="width:100%;background:linear-gradient(135deg,#f59e0b,#ef4444);">提交并评分</button>
+        <div id="sentenceScoreArea" style="display:none;"></div>
+        <div id="sentenceNavRow" style="margin-top:0.75rem;display:none;gap:0.5rem;">
+          <button type="button" class="btn btn-secondary" id="btnSentencePrev" style="flex:1;" disabled>上一题</button>
+          <button type="button" class="btn" id="btnSentenceNext" style="flex:1;">下一题</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 造句训练：成绩总览 ═══ -->
+    <div id="screen-sentence-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnSentenceResultHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;">✍️ 造句训练完成！</h3>
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="font-size:2.5rem;font-weight:700;" id="sentenceOverallScore">--</div>
+          <div class="hint" id="sentenceOverallSub">综合评分</div>
+        </div>
+        <div id="sentenceResultList"></div>
+        <button type="button" class="btn" id="btnSentenceReport" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#667eea,#764ba2);">📊 查看 AI 总结报告</button>
+        <button type="button" class="btn btn-secondary" id="btnSentenceResultHomeBtn" style="width:100%;margin-top:0.5rem;">返回主页</button>
+      </div>
+    </div>
+
+    <!-- ═══ 造句训练：AI 总结报告 ═══ -->
+    <div id="screen-sentence-report" class="screen">
+      <button type="button" class="btn-back-home" id="btnSentenceReportBack">← 返回成绩</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.75rem;">📊 AI 综合诊断报告</h3>
+        <div id="sentenceReportBody">
+          <div style="text-align:center;color:var(--muted);padding:2rem 0;">加载中...</div>
+        </div>
+      </div>
+      <div style="margin-top:0.75rem;">
+        <button type="button" class="btn btn-secondary" id="btnSentenceReportHome" style="width:100%;">返回主页</button>
+      </div>
+    </div>
+
+    <!-- 造句加载蒙层 -->
+    <div id="sentenceLoading" class="sentence-loading-overlay" style="display:none;">
+      <div class="sentence-loading-spinner"></div>
+      <div style="color:var(--text);font-size:0.9rem;" id="sentenceLoadingText">AI 正在评分...</div>
     </div>
 
     <!-- 语法加载蒙层 -->
@@ -2734,11 +2878,23 @@
 
     function getCurrentUser() { return _currentUser; }
 
+    var _avatarColors = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ef4444','#14b8a6','#f97316','#06b6d4'];
+    function _avatarColor(name) {
+      var hash = 0;
+      for (var i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
+      return _avatarColors[Math.abs(hash) % _avatarColors.length];
+    }
     function setCurrentUser(username) {
       _currentUser = username;
       localStorage.setItem(STORAGE_CURRENT_USER, username);
       var el = document.getElementById('currentUserDisplay');
       if (el) el.textContent = username || '未登录';
+      var av = document.getElementById('userBarAvatar');
+      if (av) {
+        var initial = username ? username.charAt(0).toUpperCase() : '?';
+        av.textContent = initial;
+        av.style.background = username ? _avatarColor(username) : '#6366f1';
+      }
     }
 
     function showUserModal() {
@@ -2760,13 +2916,12 @@
             wrap.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;">暂无用户，请创建新用户</div>';
             return;
           }
-          var avatarColors = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ef4444','#14b8a6','#f97316','#06b6d4'];
-          var html = resp.users.map(function (u, idx) {
+          var html = resp.users.map(function (u) {
             var isActive = u.username === _currentUser ? ' active' : '';
             var time = u.lastUpdated ? new Date(u.lastUpdated).toLocaleDateString('zh-CN') : '';
             var displayName = u.displayName || u.username;
             var initial = (displayName.charAt(0) || '?').toUpperCase();
-            var bgColor = avatarColors[idx % avatarColors.length];
+            var bgColor = _avatarColor(u.username);
             return '<div class="user-list-item' + isActive + '" data-username="' + u.username + '" data-display="' + escapeHtml(displayName) + '">'
               + '<div class="user-avatar" style="background:' + bgColor + ';">' + initial + '</div>'
               + '<div class="user-info">'
@@ -2842,6 +2997,13 @@
       updateReviewBadge();
     }
 
+    function _updateBarAvatar(name) {
+      var av = document.getElementById('userBarAvatar');
+      if (av && name) {
+        av.textContent = name.charAt(0).toUpperCase();
+        av.style.background = _avatarColor(name);
+      }
+    }
     function loadUserDataFromCloud(username) {
       var el = document.getElementById('currentUserDisplay');
       if (el) el.textContent = username + ' (同步中...)';
@@ -2854,9 +3016,12 @@
             if (d.wordStats) localStorage.setItem(STORAGE_WORD_STATS, JSON.stringify(d.wordStats));
             if (d.reviewPlan) localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(d.reviewPlan));
             if (d.wrongWords) localStorage.setItem(STORAGE_WRONG, JSON.stringify(d.wrongWords));
-            if (el) el.textContent = d.displayName || username;
+            var dn = d.displayName || username;
+            if (el) el.textContent = dn;
+            _updateBarAvatar(dn);
           } else {
             if (el) el.textContent = username;
+            _updateBarAvatar(username);
           }
           updateReviewBadge();
           rescheduleOverdueWords();
@@ -3868,6 +4033,453 @@
       if (state.flashcardIndex >= state.flashcardWords.length) state.flashcardIndex = 0;
       renderFlashcard();
       if (_ttsAutoSpeak) speakWord(state.flashcardWords[state.flashcardIndex].word);
+    });
+
+
+    // ═══════════════════════════════════════════════
+    //  单词造句训练模块
+    // ═══════════════════════════════════════════════
+    var SENTENCE_SCORE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/scoreSentence';
+    var SENTENCE_REPORT_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/analyzeSentenceReport';
+
+    var sentenceState = {
+      words: [],
+      currentIndex: 0,
+      results: [],
+      sentences: [],
+      timerStart: 0,
+      timerInterval: null,
+      reportData: null
+    };
+
+    function showSentenceLoading(text) {
+      document.getElementById('sentenceLoadingText').textContent = text || 'AI 正在评分...';
+      document.getElementById('sentenceLoading').style.display = 'flex';
+    }
+    function hideSentenceLoading() {
+      document.getElementById('sentenceLoading').style.display = 'none';
+    }
+
+    function populateSentenceGroupSelect() {
+      var sel = document.getElementById('sentenceGroupSelect');
+      if (!sel) return;
+      var homeSelect = document.getElementById('homeGroupSelect');
+      if (homeSelect) {
+        sel.innerHTML = homeSelect.innerHTML;
+        sel.value = homeSelect.value;
+      }
+    }
+
+    function openSentenceHome() {
+      populateSentenceGroupSelect();
+      showScreen('screen-sentence-home');
+      renderSentenceProfile();
+    }
+
+    function renderSentenceProfile() {
+      var card = document.getElementById('sentenceProfileCard');
+      var body = document.getElementById('sentenceProfileBody');
+      if (!_currentUser) { card.style.display = 'none'; return; }
+
+      fetch(USER_GET_URL + '?username=' + encodeURIComponent(_currentUser), { redirect: 'follow', credentials: 'omit' })
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (!resp.ok || !resp.found || !resp.data || !resp.data.sentenceProfile) {
+            card.style.display = 'none';
+            return;
+          }
+          var p = resp.data.sentenceProfile;
+          var html = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem;">';
+          html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent-light);">' + (p.avgScore || 0) + '</div><div class="hint">平均分</div></div>';
+          html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--text);">' + (p.totalTests || 0) + '</div><div class="hint">测试次数</div></div>';
+          html += '</div>';
+          if (p.weakCategories && Object.keys(p.weakCategories).length > 0) {
+            html += '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">薄弱环节：';
+            var labels = { word_misuse: '用词不当', verb_tense: '动词时态', subject_verb: '主谓一致', article: '冠词', preposition: '介词', word_form: '词形', chinglish: '中式英语', complexity: '句子简单', other: '其他' };
+            Object.keys(p.weakCategories).forEach(function (k) { html += '<span style="color:var(--wrong);margin-right:0.4rem;">' + (labels[k] || k) + '(' + p.weakCategories[k].count + ')</span>'; });
+            html += '</div>';
+          }
+          body.innerHTML = html;
+          card.style.display = 'block';
+        })
+        .catch(function () { card.style.display = 'none'; });
+    }
+
+    function getSentenceWords() {
+      var groupVal = document.getElementById('sentenceGroupSelect').value;
+      var words = [];
+      if (groupVal === 'all') {
+        state.categories.forEach(function (c) {
+          (c.words || []).forEach(function (w, i) { words.push({ word: w.word, definition: w.definition, categoryId: c.id, serial: i + 1 }); });
+        });
+      } else {
+        var cat = state.categories.find(function (c) { return c.id === groupVal; });
+        if (cat) {
+          (cat.words || []).forEach(function (w, i) { words.push({ word: w.word, definition: w.definition, categoryId: cat.id, serial: i + 1 }); });
+        }
+      }
+      var startEl = document.getElementById('sentenceRangeStart');
+      var endEl = document.getElementById('sentenceRangeEnd');
+      var s = startEl ? parseInt(startEl.value, 10) : NaN;
+      var e = endEl ? parseInt(endEl.value, 10) : NaN;
+      if (!isNaN(s) && !isNaN(e) && s >= 1 && e >= s) {
+        words = words.filter(function (w) { return w.serial >= s && w.serial <= e; });
+      }
+      return words;
+    }
+
+    function startSentenceQuiz() {
+      var allWords = getSentenceWords();
+      if (allWords.length === 0) { alert('所选范围内没有单词'); return; }
+
+      var allChecked = document.getElementById('sentenceAll').checked;
+      var size;
+      if (allChecked) {
+        size = allWords.length;
+      } else {
+        size = parseInt(document.getElementById('sentenceSize').value, 10) || 10;
+        size = Math.min(size, allWords.length);
+        size = Math.max(1, size);
+      }
+
+      var shuffled = allWords.sort(function () { return Math.random() - 0.5; });
+      sentenceState.words = shuffled.slice(0, size);
+      sentenceState.currentIndex = 0;
+      sentenceState.results = new Array(size).fill(null);
+      sentenceState.sentences = new Array(size).fill('');
+      sentenceState.reportData = null;
+      sentenceState.timerStart = Date.now();
+
+      if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval);
+      sentenceState.timerInterval = setInterval(function () {
+        var elapsed = Math.floor((Date.now() - sentenceState.timerStart) / 1000);
+        var mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        var ss = String(elapsed % 60).padStart(2, '0');
+        var el = document.getElementById('sentenceQuizTimer');
+        if (el) el.textContent = mm + ':' + ss;
+      }, 1000);
+
+      showScreen('screen-sentence-quiz');
+      renderSentenceQuestion();
+    }
+
+    function renderSentenceQuestion() {
+      var idx = sentenceState.currentIndex;
+      var total = sentenceState.words.length;
+      var w = sentenceState.words[idx];
+
+      document.getElementById('sentenceProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题';
+      document.getElementById('sentenceWord').textContent = w.word;
+      document.getElementById('sentenceDef').textContent = w.definition || '';
+
+      var key = w.word.toLowerCase().trim();
+      var cached = aiCache[key];
+      document.getElementById('sentencePhonetic').textContent = cached && cached.phonetic ? cached.phonetic : '';
+      var posEl = document.getElementById('sentencePos');
+      if (cached && cached.partOfSpeech) { posEl.textContent = cached.partOfSpeech; posEl.style.display = 'inline-block'; }
+      else { posEl.style.display = 'none'; }
+      document.getElementById('sentenceDefEn').textContent = cached && cached.definitionEn ? cached.definitionEn : '';
+
+      var input = document.getElementById('sentenceInput');
+      input.value = sentenceState.sentences[idx] || '';
+      input.disabled = !!sentenceState.results[idx];
+
+      var submitBtn = document.getElementById('btnSubmitSentence');
+      submitBtn.style.display = sentenceState.results[idx] ? 'none' : 'block';
+
+      var scoreArea = document.getElementById('sentenceScoreArea');
+      if (sentenceState.results[idx]) {
+        scoreArea.style.display = 'block';
+        scoreArea.innerHTML = buildScoreHTML(sentenceState.results[idx]);
+      } else {
+        scoreArea.style.display = 'none';
+        scoreArea.innerHTML = '';
+      }
+
+      var navRow = document.getElementById('sentenceNavRow');
+      navRow.style.display = 'flex';
+      document.getElementById('btnSentencePrev').disabled = idx === 0;
+      var nextBtn = document.getElementById('btnSentenceNext');
+      var allDone = sentenceState.results.every(function (r) { return r !== null; });
+      if (idx === total - 1 && allDone) {
+        nextBtn.textContent = '查看成绩';
+        nextBtn.className = 'btn';
+        nextBtn.style.flex = '1';
+        nextBtn.style.background = 'linear-gradient(135deg,#32d74b,#10b981)';
+      } else if (idx === total - 1) {
+        nextBtn.textContent = '下一题';
+        nextBtn.disabled = true;
+        nextBtn.className = 'btn';
+        nextBtn.style.flex = '1';
+        nextBtn.style.background = '';
+      } else {
+        nextBtn.textContent = '下一题';
+        nextBtn.disabled = false;
+        nextBtn.className = 'btn';
+        nextBtn.style.flex = '1';
+        nextBtn.style.background = '';
+      }
+    }
+
+    function _scoreColor(score, max) {
+      var pct = max > 0 ? score / max : 0;
+      if (pct >= 0.8) return 'var(--correct)';
+      if (pct >= 0.6) return '#f59e0b';
+      return 'var(--wrong)';
+    }
+
+    function buildScoreHTML(data) {
+      var color = _scoreColor(data.totalScore, 100);
+      var html = '<div class="sentence-score-card">';
+      html += '<div class="sentence-score-header"><span style="font-size:0.85rem;font-weight:600;">AI 评分</span>';
+      html += '<span class="sentence-total-score" style="color:' + color + ';">' + data.totalScore + '<span style="font-size:0.9rem;color:var(--muted);">/100</span></span></div>';
+
+      var dims = [
+        { key: 'wordUsage', label: '单词使用', max: 50 },
+        { key: 'grammar', label: '语法正确', max: 20 },
+        { key: 'complexity', label: '句子复杂度', max: 20 },
+        { key: 'semantics', label: '语义合理', max: 10 }
+      ];
+      dims.forEach(function (d) {
+        var dim = data.dimensions && data.dimensions[d.key];
+        if (!dim) return;
+        var pct = d.max > 0 ? Math.round((dim.score / d.max) * 100) : 0;
+        var c = _scoreColor(dim.score, d.max);
+        html += '<div class="sentence-dim">';
+        html += '<span class="sentence-dim-label">' + d.label + '</span>';
+        html += '<div class="sentence-dim-bar"><div class="sentence-dim-bar-fill" style="width:' + pct + '%;background:' + c + ';"></div></div>';
+        html += '<span class="sentence-dim-score" style="color:' + c + ';">' + dim.score + '/' + d.max + '</span>';
+        html += '</div>';
+        if (dim.comment) html += '<div class="sentence-dim-comment">' + escapeHtml(dim.comment) + '</div>';
+      });
+
+      if (data.errors && data.errors.length > 0) {
+        html += '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600;color:var(--wrong);margin-bottom:0.3rem;">❌ 错误分析</div>';
+        data.errors.forEach(function (e) {
+          html += '<div class="sentence-error-item">';
+          html += '<span class="err-original">' + escapeHtml(e.original || '') + '</span> → <span class="err-corrected">' + escapeHtml(e.corrected || '') + '</span>';
+          if (e.explanation) html += '<div style="color:var(--muted);margin-top:0.15rem;">' + escapeHtml(e.explanation) + '</div>';
+          html += '</div>';
+        });
+      }
+
+      if (data.correctedSentence) {
+        html += '<div class="sentence-corrected">✅ 修正句：' + escapeHtml(data.correctedSentence) + '</div>';
+      }
+      if (data.betterExample) {
+        html += '<div class="sentence-better">💎 高级范例：' + escapeHtml(data.betterExample) + '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    async function submitSentence() {
+      var idx = sentenceState.currentIndex;
+      var w = sentenceState.words[idx];
+      var sentence = document.getElementById('sentenceInput').value.trim();
+      if (!sentence) { alert('请输入一个句子'); return; }
+
+      sentenceState.sentences[idx] = sentence;
+
+      var key = w.word.toLowerCase().trim();
+      var cached = aiCache[key];
+
+      showSentenceLoading('AI 正在评分第 ' + (idx + 1) + ' 题...');
+      try {
+        var resp = await fetch(SENTENCE_SCORE_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            word: w.word,
+            partOfSpeech: cached && cached.partOfSpeech || '',
+            definition: w.definition || '',
+            definitionEn: cached && cached.definitionEn || '',
+            sentence: sentence,
+            username: _currentUser || ''
+          })
+        });
+        var result = await resp.json();
+        hideSentenceLoading();
+
+        if (!result.ok || !result.data) {
+          throw new Error(result.error || '评分失败');
+        }
+
+        var el = document.getElementById('usageSentenceModel');
+        if (el && result.model) el.textContent = result.model;
+
+        sentenceState.results[idx] = result.data;
+        sentenceState.results[idx].word = w.word;
+        sentenceState.results[idx].sentence = sentence;
+        renderSentenceQuestion();
+      } catch (err) {
+        hideSentenceLoading();
+        alert('评分失败：' + err.message);
+      }
+    }
+
+    function showSentenceResults() {
+      if (sentenceState.timerInterval) { clearInterval(sentenceState.timerInterval); sentenceState.timerInterval = null; }
+
+      var scores = sentenceState.results.filter(function (r) { return r; }).map(function (r) { return r.totalScore || 0; });
+      var avg = scores.length > 0 ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length) : 0;
+
+      var scoreEl = document.getElementById('sentenceOverallScore');
+      scoreEl.textContent = avg;
+      scoreEl.style.color = _scoreColor(avg, 100);
+      document.getElementById('sentenceOverallSub').textContent = '综合评分 · ' + sentenceState.words.length + ' 个单词';
+
+      var listHtml = '';
+      sentenceState.results.forEach(function (r, i) {
+        if (!r) return;
+        var c = _scoreColor(r.totalScore, 100);
+        var pct = r.totalScore;
+        listHtml += '<div class="sentence-result-item" data-idx="' + i + '">';
+        listHtml += '<span class="sri-num">' + (i + 1) + '</span>';
+        listHtml += '<span class="sri-word">' + escapeHtml(r.word || sentenceState.words[i].word) + '</span>';
+        listHtml += '<div class="sri-bar"><div class="sri-bar-fill" style="width:' + pct + '%;background:' + c + ';"></div></div>';
+        listHtml += '<span class="sri-score" style="color:' + c + ';">' + r.totalScore + '</span>';
+        listHtml += '</div>';
+      });
+      document.getElementById('sentenceResultList').innerHTML = listHtml;
+
+      showScreen('screen-sentence-result');
+    }
+
+    async function loadSentenceReport() {
+      if (sentenceState.reportData) {
+        renderSentenceReport(sentenceState.reportData);
+        showScreen('screen-sentence-report');
+        return;
+      }
+
+      var resultsForApi = sentenceState.results.filter(function (r) { return r; }).map(function (r) {
+        return { word: r.word, sentence: r.sentence, totalScore: r.totalScore, errors: r.errors || [], dimensions: r.dimensions || {} };
+      });
+
+      showSentenceLoading('AI 正在生成综合诊断报告...');
+      try {
+        var resp = await fetch(SENTENCE_REPORT_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            results: resultsForApi,
+            username: _currentUser || ''
+          })
+        });
+        var result = await resp.json();
+        hideSentenceLoading();
+
+        if (!result.ok || !result.data) throw new Error(result.error || '报告生成失败');
+
+        sentenceState.reportData = result.data;
+        renderSentenceReport(result.data);
+        showScreen('screen-sentence-report');
+      } catch (err) {
+        hideSentenceLoading();
+        alert('报告生成失败：' + err.message);
+      }
+    }
+
+    function renderSentenceReport(data) {
+      var html = '';
+
+      html += '<div style="text-align:center;margin-bottom:1rem;">';
+      html += '<div style="font-size:2rem;font-weight:700;color:' + _scoreColor(data.overallScore, 100) + ';">' + (data.overallScore || 0) + ' <span style="font-size:0.9rem;color:var(--muted);">/ 100</span></div>';
+      if (data.level) html += '<div style="font-size:0.85rem;color:var(--accent-light);margin-top:0.2rem;">CEFR 等级估计：' + escapeHtml(data.level) + '</div>';
+      html += '</div>';
+
+      if (data.complexityAnalysis) {
+        html += '<div class="sentence-report-section">';
+        html += '<h4>📝 句子复杂度分析</h4>';
+        html += '<div style="padding:0.5rem 0.6rem;background:rgba(245,158,11,0.08);border-radius:var(--r-sm);font-size:0.82rem;color:var(--orange);">';
+        html += '整体水平：<strong>' + escapeHtml(data.complexityAnalysis.avgLevel || '--') + '</strong>';
+        if (data.complexityAnalysis.comment) html += '<div style="color:var(--text-secondary);margin-top:0.2rem;">' + escapeHtml(data.complexityAnalysis.comment) + '</div>';
+        html += '</div></div>';
+      }
+
+      if (data.weaknesses && data.weaknesses.length > 0) {
+        html += '<div class="sentence-report-section"><h4>🔴 薄弱环节</h4>';
+        data.weaknesses.forEach(function (w) {
+          var sevColor = w.severity === 'high' ? 'var(--wrong)' : w.severity === 'medium' ? '#f59e0b' : 'var(--muted)';
+          html += '<div class="sentence-weakness">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
+          html += '<span style="font-weight:600;">' + escapeHtml(w.label || w.category) + '</span>';
+          html += '<span style="font-size:0.72rem;color:' + sevColor + ';">' + (w.frequency || 0) + ' 次 · ' + escapeHtml(w.severity || '') + '</span>';
+          html += '</div>';
+          if (w.advice) html += '<div style="color:var(--text-secondary);margin-top:0.2rem;font-size:0.78rem;">' + escapeHtml(w.advice) + '</div>';
+          if (w.examples && w.examples.length > 0) {
+            html += '<div style="color:var(--muted);margin-top:0.15rem;font-size:0.75rem;font-style:italic;">"' + escapeHtml(w.examples[0]) + '"</div>';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      if (data.strengths && data.strengths.length > 0) {
+        html += '<div class="sentence-report-section"><h4>🟢 优势</h4>';
+        data.strengths.forEach(function (s) { html += '<div class="sentence-strength">✅ ' + escapeHtml(s) + '</div>'; });
+        html += '</div>';
+      }
+
+      if (data.wordMastery && data.wordMastery.length > 0) {
+        html += '<div class="sentence-report-section"><h4>📖 单词掌握情况</h4>';
+        data.wordMastery.forEach(function (wm) {
+          var icon = wm.mastered ? '✅' : '❌';
+          var issueText = wm.issue ? ' — ' + escapeHtml(wm.issue) : '';
+          var c = wm.mastered ? 'var(--correct)' : 'var(--wrong)';
+          html += '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;font-size:0.82rem;">';
+          html += '<span>' + icon + '</span><span style="font-weight:600;">' + escapeHtml(wm.word) + '</span>';
+          if (wm.score !== undefined) html += '<span style="color:' + c + ';margin-left:auto;font-weight:600;">' + wm.score + '分</span>';
+          html += '</div>';
+          if (issueText) html += '<div style="font-size:0.75rem;color:var(--muted);margin-left:1.5rem;margin-bottom:0.2rem;">' + issueText.substring(3) + '</div>';
+        });
+        html += '</div>';
+      }
+
+      if (data.suggestions && data.suggestions.length > 0) {
+        html += '<div class="sentence-report-section"><h4>📈 改进建议</h4>';
+        data.suggestions.forEach(function (s) { html += '<div class="sentence-suggestion">💡 ' + escapeHtml(s) + '</div>'; });
+        html += '</div>';
+      }
+
+      document.getElementById('sentenceReportBody').innerHTML = html;
+    }
+
+    // 造句模块事件绑定
+    document.getElementById('btnOpenSentence').addEventListener('click', openSentenceHome);
+    document.getElementById('btnSentenceBackHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('btnStartSentence').addEventListener('click', startSentenceQuiz);
+    document.getElementById('btnSubmitSentence').addEventListener('click', submitSentence);
+    document.getElementById('btnSentencePrev').addEventListener('click', function () {
+      if (sentenceState.currentIndex > 0) { sentenceState.currentIndex--; renderSentenceQuestion(); }
+    });
+    document.getElementById('btnSentenceNext').addEventListener('click', function () {
+      var allDone = sentenceState.results.every(function (r) { return r !== null; });
+      if (sentenceState.currentIndex === sentenceState.words.length - 1 && allDone) {
+        showSentenceResults();
+      } else if (sentenceState.currentIndex < sentenceState.words.length - 1) {
+        sentenceState.currentIndex++;
+        renderSentenceQuestion();
+      }
+    });
+    document.getElementById('btnSentenceQuizBack').addEventListener('click', function () {
+      if (confirm('返回将丢失当前进度，确定吗？')) { if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval); showScreen('screen-sentence-home'); }
+    });
+    document.getElementById('btnSentenceResultHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('btnSentenceResultHomeBtn').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('btnSentenceReport').addEventListener('click', loadSentenceReport);
+    document.getElementById('btnSentenceReportBack').addEventListener('click', function () { showScreen('screen-sentence-result'); });
+    document.getElementById('btnSentenceReportHome').addEventListener('click', function () { showScreen('screen-home'); });
+
+    document.getElementById('sentenceResultList').addEventListener('click', function (e) {
+      var item = e.target.closest('.sentence-result-item');
+      if (!item) return;
+      var idx = parseInt(item.dataset.idx, 10);
+      if (isNaN(idx)) return;
+      sentenceState.currentIndex = idx;
+      showScreen('screen-sentence-quiz');
+      renderSentenceQuestion();
     });
 
 
