@@ -15,7 +15,7 @@
  * 7. 在背单词网页里填这个部署链接：用于「从 Sheet 同步」和「上传当前词库到 Sheet」
  */
 
-var SPREADSHEET_ID = '这里填你的表格ID';  // 例如：1ABC...xyz
+var SPREADSHEET_ID = '9cVe0c4AQ5EbiBmLFLhQzmkV-ef1u405Jee2c5FdjuM';
 
 function doGet(e) {
   var action = e && e.parameter ? String(e.parameter.action || '').trim() : '';
