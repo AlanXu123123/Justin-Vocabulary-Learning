@@ -2435,19 +2435,29 @@
       const item = state.currentQuiz[idx];
       var defEl = document.getElementById('questionDefinition');
       var manualDef = item.definition || '';
-      var cached = aiCache[(item.word || '').toLowerCase().trim()];
+      var wordKey = (item.word || '').toLowerCase().trim();
+      var cached = aiCache[wordKey];
       var aiDef = cached && cached.definitionEn ? cached.definitionEn : '';
       var aiPos = cached && cached.partOfSpeech ? cached.partOfSpeech : '';
-      var posHtml = aiPos ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.78rem;font-weight:600;padding:0.1rem 0.45rem;border-radius:4px;margin-bottom:0.35rem;">' + escapeHtml(aiPos) + '</span><br>' : '';
-      var showManual = manualDef && manualDef !== '(无释义)';
-      if (showManual && aiDef) {
-        defEl.innerHTML = posHtml + escapeHtml(manualDef) + '<div class="quiz-ai-def">' + escapeHtml(aiDef) + '</div>';
-      } else if (aiDef) {
-        defEl.innerHTML = posHtml + '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(aiDef) + '</div>';
-      } else if (showManual) {
-        defEl.innerHTML = posHtml + escapeHtml(manualDef);
-      } else {
-        defEl.innerHTML = posHtml + '(无释义)';
+
+      function buildDefHtml(pos, manual, enDef) {
+        var posTag = pos ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.78rem;font-weight:600;padding:0.1rem 0.45rem;border-radius:4px;margin-bottom:0.35rem;">' + escapeHtml(pos) + '</span><br>' : '';
+        var hasManual = manual && manual !== '(无释义)';
+        if (hasManual && enDef) return posTag + escapeHtml(manual) + '<div class="quiz-ai-def">' + escapeHtml(enDef) + '</div>';
+        if (enDef) return posTag + '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(enDef) + '</div>';
+        if (hasManual) return posTag + escapeHtml(manual);
+        return posTag + '(无释义)';
+      }
+      defEl.innerHTML = buildDefHtml(aiPos, manualDef, aiDef);
+
+      if (!aiPos && wordKey) {
+        var capturedIdx = idx;
+        lookupWordAI(wordKey).then(function (data) {
+          if (state.index !== capturedIdx || !data) return;
+          var pos = data.partOfSpeech || '';
+          var def = data.definitionEn || aiDef;
+          if (pos) defEl.innerHTML = buildDefHtml(pos, manualDef, def);
+        });
       }
       const input = document.getElementById('answerInput');
       const feedbackEl = document.getElementById('feedback');
