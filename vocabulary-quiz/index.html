@@ -2763,7 +2763,7 @@
             return '<div class="user-list-item' + isActive + '" data-username="' + u.username + '" data-display="' + (u.displayName || u.username) + '">'
               + '<span class="user-name">' + escapeHtml(u.displayName || u.username) + '</span>'
               + '<span class="user-time">' + time + '</span>'
-              + '<button type="button" class="btn-rename-user" data-username="' + u.username + '" data-display="' + escapeHtml(u.displayName || u.username) + '" title="改名" style="background:none;border:none;color:var(--accent-light);cursor:pointer;font-size:0.75rem;padding:0.15rem 0.3rem;margin-left:0.3rem;" onclick="event.stopPropagation()">✏️</button>'
+              + '<button type="button" class="btn-rename-user" data-rn-user="' + u.username + '" data-rn-name="' + escapeHtml(u.displayName || u.username) + '" title="改名" style="background:none;border:none;color:var(--accent-light);cursor:pointer;font-size:0.85rem;padding:0.2rem 0.4rem;margin-left:auto;">✏️</button>'
               + '</div>';
           }).join('');
           wrap.innerHTML = html;
@@ -2881,7 +2881,8 @@
     document.getElementById('userListWrap').addEventListener('click', function (e) {
       var renameBtn = e.target.closest('.btn-rename-user');
       if (renameBtn) {
-        renameUser(renameBtn.dataset.username, renameBtn.dataset.display);
+        e.stopPropagation();
+        renameUser(renameBtn.getAttribute('data-rn-user'), renameBtn.getAttribute('data-rn-name'));
         return;
       }
       var item = e.target.closest('.user-list-item');
