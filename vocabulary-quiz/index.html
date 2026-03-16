@@ -983,6 +983,7 @@
           </label>
         </div>
         <button type="button" class="btn" id="btnStartSentence" style="margin-top:1rem;background:linear-gradient(135deg,#f59e0b,#ef4444);width:100%;">开始造句训练</button>
+        <button type="button" class="btn btn-secondary" id="btnSentenceHistory" style="width:100%;margin-top:0.5rem;">📋 测验历史 &amp; 总体分析</button>
       </div>
       <div class="card" id="sentenceProfileCard" style="display:none;">
         <h4 style="margin-bottom:0.5rem;">📊 我的造句画像</h4>
@@ -1044,6 +1045,28 @@
       </div>
       <div style="margin-top:0.75rem;">
         <button type="button" class="btn btn-secondary" id="btnSentenceReportHome" style="width:100%;">返回主页</button>
+      </div>
+    </div>
+
+    <!-- ═══ 造句训练：测验历史 ═══ -->
+    <div id="screen-sentence-history" class="screen">
+      <button type="button" class="btn-back-home" id="btnSentenceHistoryBack">← 返回</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">📋 造句测验历史</h3>
+        <div id="sentenceHistoryOverview" style="margin-bottom:1rem;"></div>
+        <div id="sentenceHistoryList"></div>
+        <div style="margin-top:0.75rem;text-align:center;">
+          <button type="button" class="btn btn-secondary" id="btnClearSentenceHistory" style="font-size:0.75rem;padding:0.3rem 0.8rem;">清空历史</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 造句训练：历史详情 ═══ -->
+    <div id="screen-sentence-history-detail" class="screen">
+      <button type="button" class="btn-back-home" id="btnSentenceDetailBack">← 返回历史</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;" id="sentenceDetailTitle">--</h3>
+        <div id="sentenceDetailBody"></div>
       </div>
     </div>
 
@@ -4099,14 +4122,32 @@
     function saveSentenceHistory(avgScore, wordCount) {
       try {
         var history = JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]');
+        var details = sentenceState.results.map(function (r, i) {
+          if (!r) return null;
+          return {
+            word: r.word || sentenceState.words[i].word,
+            sentence: r.sentence || sentenceState.sentences[i] || '',
+            totalScore: r.totalScore || 0,
+            dims: {
+              wordUsage: r.dimensions && r.dimensions.wordUsage ? r.dimensions.wordUsage.score : 0,
+              grammar: r.dimensions && r.dimensions.grammar ? r.dimensions.grammar.score : 0,
+              complexity: r.dimensions && r.dimensions.complexity ? r.dimensions.complexity.score : 0,
+              register: r.dimensions && r.dimensions.register ? r.dimensions.register.score : 0,
+              fluency: r.dimensions && r.dimensions.fluency ? r.dimensions.fluency.score : 0
+            },
+            errors: (r.errors || []).map(function (e) { return { type: e.type, explanation: e.explanation || '' }; }),
+            corrected: r.correctedSentence || ''
+          };
+        }).filter(Boolean);
         history.push({
           date: new Date().toISOString(),
           user: _currentUser || '',
           score: avgScore,
           wordCount: wordCount,
-          words: sentenceState.words.map(function (w) { return w.word; })
+          words: sentenceState.words.map(function (w) { return w.word; }),
+          details: details
         });
-        if (history.length > 100) history = history.slice(-100);
+        if (history.length > 50) history = history.slice(-50);
         localStorage.setItem(SENTENCE_HISTORY_KEY, JSON.stringify(history));
       } catch (e) { /* ignore */ }
     }
@@ -4567,6 +4608,213 @@
       document.getElementById('sentenceReportBody').innerHTML = html;
     }
 
+    // ── 造句历史分析 ──
+    function getSentenceHistoryForUser() {
+      try {
+        return JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]').filter(function (h) { return h.user === (_currentUser || ''); });
+      } catch (e) { return []; }
+    }
+
+    function openSentenceHistory() {
+      var history = getSentenceHistoryForUser();
+      renderSentenceHistoryOverview(history);
+      renderSentenceHistoryList(history);
+      showScreen('screen-sentence-history');
+    }
+
+    function renderSentenceHistoryOverview(history) {
+      var el = document.getElementById('sentenceHistoryOverview');
+      if (history.length === 0) {
+        el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:1rem 0;">暂无测验记录</div>';
+        return;
+      }
+
+      var scores = history.map(function (h) { return h.score || 0; });
+      var avgScore = Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length);
+      var maxScore = Math.max.apply(null, scores);
+      var recentScores = scores.slice(-10);
+      var firstHalf = recentScores.slice(0, Math.floor(recentScores.length / 2));
+      var secondHalf = recentScores.slice(Math.floor(recentScores.length / 2));
+      var firstAvg = firstHalf.length > 0 ? firstHalf.reduce(function (a, b) { return a + b; }, 0) / firstHalf.length : 0;
+      var secondAvg = secondHalf.length > 0 ? secondHalf.reduce(function (a, b) { return a + b; }, 0) / secondHalf.length : 0;
+      var trend = secondAvg - firstAvg;
+      var trendIcon = trend > 3 ? '📈' : trend < -3 ? '📉' : '➡️';
+      var trendText = trend > 3 ? '进步中 +' + Math.round(trend) : trend < -3 ? '退步 ' + Math.round(trend) : '稳定';
+      var trendColor = trend > 3 ? 'var(--correct)' : trend < -3 ? 'var(--wrong)' : 'var(--muted)';
+
+      var errorStats = {};
+      var dimTotals = { wordUsage: { sum: 0, max: 0 }, grammar: { sum: 0, max: 0 }, complexity: { sum: 0, max: 0 }, register: { sum: 0, max: 0 }, fluency: { sum: 0, max: 0 } };
+      var wordScoreMap = {};
+      var totalWords = 0;
+
+      history.forEach(function (h) {
+        if (!h.details) return;
+        h.details.forEach(function (d) {
+          totalWords++;
+          if (d.dims) {
+            Object.keys(d.dims).forEach(function (k) {
+              if (dimTotals[k]) { dimTotals[k].sum += d.dims[k] || 0; dimTotals[k].max++; }
+            });
+          }
+          (d.errors || []).forEach(function (e) {
+            if (!errorStats[e.type]) errorStats[e.type] = 0;
+            errorStats[e.type]++;
+          });
+          if (!wordScoreMap[d.word]) wordScoreMap[d.word] = [];
+          wordScoreMap[d.word].push(d.totalScore || 0);
+        });
+      });
+
+      var html = '<div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.75rem;">';
+      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.4rem;font-weight:700;color:' + _scoreColor(avgScore, 100) + ';">' + avgScore + '</div><div class="hint">平均分</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.4rem;font-weight:700;color:var(--correct);">' + maxScore + '</div><div class="hint">最高分</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.4rem;font-weight:700;color:var(--text);">' + history.length + '</div><div class="hint">测试次数</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.1rem;font-weight:700;color:' + trendColor + ';">' + trendIcon + '</div><div class="hint" style="color:' + trendColor + ';">' + trendText + '</div></div>';
+      html += '</div>';
+
+      html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem;">分数趋势（最近' + recentScores.length + '次）</div>';
+      html += '<div style="display:flex;align-items:flex-end;gap:2px;height:40px;margin-bottom:0.75rem;">';
+      var barMax = Math.max.apply(null, recentScores.concat([1]));
+      recentScores.forEach(function (s) {
+        var h = Math.max(4, Math.round((s / barMax) * 38));
+        html += '<div style="flex:1;height:' + h + 'px;background:' + _scoreColor(s, 100) + ';border-radius:2px;" title="' + s + '分"></div>';
+      });
+      html += '</div>';
+
+      if (totalWords > 0) {
+        var dimLabels = { wordUsage: '单词使用', grammar: '语法', complexity: '复杂度', register: '书面用词', fluency: '通顺地道' };
+        var dimMaxes = { wordUsage: 50, grammar: 20, complexity: 10, register: 10, fluency: 10 };
+        html += '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📊 各维度平均表现</div>';
+        Object.keys(dimTotals).forEach(function (k) {
+          var t = dimTotals[k];
+          if (t.max === 0) return;
+          var avg = Math.round((t.sum / t.max) * 10) / 10;
+          var maxVal = dimMaxes[k] || 10;
+          var pct = Math.round((avg / maxVal) * 100);
+          var c = _scoreColor(avg, maxVal);
+          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">';
+          html += '<span style="font-size:0.78rem;min-width:4.5rem;color:var(--text-secondary);">' + (dimLabels[k] || k) + '</span>';
+          html += '<div style="flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">';
+          html += '<div style="width:' + pct + '%;height:100%;background:' + c + ';border-radius:3px;"></div></div>';
+          html += '<span style="font-size:0.75rem;color:' + c + ';min-width:3rem;text-align:right;">' + avg + '/' + maxVal + '</span>';
+          html += '</div>';
+        });
+      }
+
+      var errorLabels = { word_misuse: '用词不当', verb_tense: '动词时态', subject_verb: '主谓一致', article: '冠词', preposition: '介词', word_form: '词形变化', chinglish: '中式英语', register: '口语化', fluency: '不通顺', other: '其他' };
+      var sortedErrors = Object.entries(errorStats).sort(function (a, b) { return b[1] - a[1]; });
+      if (sortedErrors.length > 0) {
+        html += '<div style="font-size:0.82rem;font-weight:600;margin-top:0.75rem;margin-bottom:0.4rem;">🔴 高频错误类型</div>';
+        sortedErrors.slice(0, 6).forEach(function (pair) {
+          var label = errorLabels[pair[0]] || pair[0];
+          html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0.5rem;margin-bottom:0.2rem;background:rgba(255,100,100,0.06);border-radius:var(--r-sm);font-size:0.78rem;">';
+          html += '<span style="color:var(--text-secondary);">' + escapeHtml(label) + '</span>';
+          html += '<span style="color:var(--wrong);font-weight:600;">' + pair[1] + ' 次</span>';
+          html += '</div>';
+        });
+      }
+
+      var weakWords = Object.entries(wordScoreMap).filter(function (p) { return p[1].length > 0; }).map(function (p) {
+        var avg = Math.round(p[1].reduce(function (a, b) { return a + b; }, 0) / p[1].length);
+        return { word: p[0], avg: avg, count: p[1].length };
+      }).sort(function (a, b) { return a.avg - b.avg; });
+
+      if (weakWords.length > 0) {
+        html += '<div style="font-size:0.82rem;font-weight:600;margin-top:0.75rem;margin-bottom:0.4rem;">📖 薄弱单词 TOP5</div>';
+        weakWords.slice(0, 5).forEach(function (w) {
+          var c = _scoreColor(w.avg, 100);
+          html += '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.5rem;margin-bottom:0.2rem;background:rgba(255,255,255,0.03);border-radius:var(--r-sm);font-size:0.78rem;">';
+          html += '<span style="font-weight:600;flex:1;">' + escapeHtml(w.word) + '</span>';
+          html += '<span style="color:var(--muted);font-size:0.7rem;">测 ' + w.count + ' 次</span>';
+          html += '<span style="color:' + c + ';font-weight:600;">' + w.avg + ' 分</span>';
+          html += '</div>';
+        });
+      }
+
+      el.innerHTML = html;
+    }
+
+    function renderSentenceHistoryList(history) {
+      var el = document.getElementById('sentenceHistoryList');
+      if (history.length === 0) { el.innerHTML = ''; return; }
+
+      var html = '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">📝 测验记录</div>';
+      var reversed = history.slice().reverse();
+      reversed.forEach(function (h, idx) {
+        var realIdx = history.length - 1 - idx;
+        var d = new Date(h.date);
+        var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        var c = _scoreColor(h.score, 100);
+        html += '<div class="sentence-result-item" data-hist-idx="' + realIdx + '" style="cursor:pointer;">';
+        html += '<span class="sri-num" style="font-size:0.7rem;color:var(--muted);">#' + (realIdx + 1) + '</span>';
+        html += '<div style="flex:1;min-width:0;">';
+        html += '<div style="font-size:0.82rem;font-weight:600;color:var(--text);">' + dateStr + '</div>';
+        html += '<div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + h.wordCount + ' 词 · ' + (h.words || []).slice(0, 5).join(', ') + (h.wordCount > 5 ? '...' : '') + '</div>';
+        html += '</div>';
+        html += '<span class="sri-score" style="color:' + c + ';">' + h.score + '</span>';
+        html += '</div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function openSentenceHistoryDetail(idx) {
+      var history = getSentenceHistoryForUser();
+      var h = history[idx];
+      if (!h) return;
+
+      var d = new Date(h.date);
+      var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('sentenceDetailTitle').textContent = dateStr + ' · ' + h.score + '分';
+
+      var html = '';
+      html += '<div style="text-align:center;margin-bottom:0.75rem;">';
+      html += '<div style="font-size:2.2rem;font-weight:700;color:' + _scoreColor(h.score, 100) + ';">' + h.score + '</div>';
+      html += '<div class="hint">' + h.wordCount + ' 个单词</div></div>';
+
+      if (h.details && h.details.length > 0) {
+        h.details.forEach(function (det, i) {
+          var c = _scoreColor(det.totalScore, 100);
+          html += '<div style="padding:0.6rem;margin-bottom:0.5rem;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:var(--r-md);">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">';
+          html += '<span style="font-weight:700;font-size:0.95rem;">' + escapeHtml(det.word) + '</span>';
+          html += '<span style="font-weight:700;color:' + c + ';">' + det.totalScore + '/100</span></div>';
+          html += '<div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.3rem;font-style:italic;">"' + escapeHtml(det.sentence || '') + '"</div>';
+
+          var dimLabels = { wordUsage: ['单词使用', 50], grammar: ['语法', 20], complexity: ['复杂度', 10], register: ['书面用词', 10], fluency: ['通顺地道', 10] };
+          if (det.dims) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.3rem;">';
+            Object.keys(dimLabels).forEach(function (k) {
+              var val = det.dims[k] !== undefined ? det.dims[k] : '-';
+              var max = dimLabels[k][1];
+              var dc = val !== '-' ? _scoreColor(val, max) : 'var(--muted)';
+              html += '<span style="font-size:0.7rem;padding:0.15rem 0.4rem;background:rgba(255,255,255,0.05);border-radius:3px;color:' + dc + ';">' + dimLabels[k][0] + ' ' + val + '/' + max + '</span>';
+            });
+            html += '</div>';
+          }
+
+          if (det.errors && det.errors.length > 0) {
+            det.errors.forEach(function (err) {
+              var errLabel = { word_misuse: '用词不当', verb_tense: '时态', subject_verb: '主谓', article: '冠词', preposition: '介词', word_form: '词形', chinglish: '中式英语', register: '口语化', other: '其他' };
+              html += '<div style="font-size:0.72rem;color:var(--wrong);margin-bottom:0.1rem;">⚠ ' + (errLabel[err.type] || err.type) + (err.explanation ? '：' + escapeHtml(err.explanation) : '') + '</div>';
+            });
+          }
+          if (det.corrected) {
+            html += '<div style="font-size:0.75rem;color:var(--correct);margin-top:0.2rem;">✅ ' + escapeHtml(det.corrected) + '</div>';
+          }
+          html += '</div>';
+        });
+      } else {
+        html += '<div style="text-align:center;color:var(--muted);padding:1rem;">此测验没有详细记录（旧版数据）</div>';
+      }
+
+      document.getElementById('sentenceDetailBody').innerHTML = html;
+      showScreen('screen-sentence-history-detail');
+    }
+
     // 造句模块事件绑定
     document.getElementById('btnOpenSentence').addEventListener('click', openSentenceHome);
     document.getElementById('btnSentenceBackHome').addEventListener('click', function () { showScreen('screen-home'); });
@@ -4611,6 +4859,21 @@
       sentenceState.currentIndex = idx;
       showScreen('screen-sentence-quiz');
       renderSentenceQuestion();
+    });
+
+    document.getElementById('btnSentenceHistory').addEventListener('click', openSentenceHistory);
+    document.getElementById('btnSentenceHistoryBack').addEventListener('click', function () { showScreen('screen-sentence-home'); });
+    document.getElementById('btnSentenceDetailBack').addEventListener('click', function () { openSentenceHistory(); });
+    document.getElementById('btnClearSentenceHistory').addEventListener('click', function () {
+      if (confirm('确定清空所有造句历史记录吗？')) {
+        localStorage.removeItem(SENTENCE_HISTORY_KEY);
+        openSentenceHistory();
+      }
+    });
+    document.getElementById('sentenceHistoryList').addEventListener('click', function (e) {
+      var item = e.target.closest('.sentence-result-item');
+      if (!item || item.dataset.histIdx === undefined) return;
+      openSentenceHistoryDetail(parseInt(item.dataset.histIdx, 10));
     });
 
 
