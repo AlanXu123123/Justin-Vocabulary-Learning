@@ -878,6 +878,7 @@
           <button type="button" class="grammar-diff-btn" data-diff="advanced">进阶</button>
         </div>
         <button type="button" class="btn" id="btnStartGrammar" style="margin-top:1rem;width:100%;" disabled>开始测试</button>
+        <button type="button" class="btn btn-secondary" id="btnGrammarHistory" style="width:100%;margin-top:0.5rem;">📋 测验历史 &amp; 总体分析</button>
       </div>
       <div class="card" id="grammarProfileCard" style="display:none;">
         <h4 style="margin-bottom:0.5rem;">📊 我的语法画像</h4>
@@ -949,6 +950,28 @@
           <button type="button" class="btn" id="btnGrammarRetry" style="flex:1;">再测一次</button>
           <button type="button" class="btn btn-secondary" id="btnGrammarNewTopic" style="flex:1;">换个专项</button>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ 语法专练：测验历史 ═══ -->
+    <div id="screen-grammar-history" class="screen">
+      <button type="button" class="btn-back-home" id="btnGrammarHistoryBack">← 返回</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">📋 语法测验历史</h3>
+        <div id="grammarHistoryOverview" style="margin-bottom:1rem;"></div>
+        <div id="grammarHistoryList"></div>
+        <div style="margin-top:0.75rem;text-align:center;">
+          <button type="button" class="btn btn-secondary" id="btnClearGrammarHistory" style="font-size:0.75rem;padding:0.3rem 0.8rem;">清空历史</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 语法专练：历史详情 ═══ -->
+    <div id="screen-grammar-history-detail" class="screen">
+      <button type="button" class="btn-back-home" id="btnGrammarDetailBack">← 返回历史</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;" id="grammarDetailTitle">--</h3>
+        <div id="grammarDetailBody"></div>
       </div>
     </div>
 
@@ -4895,6 +4918,8 @@
       modals: { name: '情态动词', icon: '💬', subRules: ['can_could', 'must_have_to', 'should_ought_to', 'may_might'] }
     };
 
+    var GRAMMAR_HISTORY_KEY = 'grammar_history';
+
     var grammarState = {
       selectedTopic: null,
       difficulty: 'intermediate',
@@ -5157,7 +5182,53 @@
       }
     }
 
+    function saveGrammarHistory(data) {
+      try {
+        var history = JSON.parse(localStorage.getItem(GRAMMAR_HISTORY_KEY) || '[]');
+        var correct = 0;
+        var questionDetails = grammarState.questions.map(function (q, i) {
+          var a = grammarState.answers[i];
+          var isCorrect = a && a.selected === q.correctIndex;
+          if (isCorrect) correct++;
+          return {
+            question: q.sentence || q.question || '',
+            subRule: q.subRule || '',
+            selectionReason: q.selectionReason || '',
+            correctAnswer: q.options ? q.options[q.correctIndex] : '',
+            userAnswer: q.options && a ? q.options[a.selected] || '' : '',
+            isCorrect: isCorrect,
+            explanation: q.explanation || ''
+          };
+        });
+        var ruleResults = {};
+        if (data.ruleAnalysis) {
+          data.ruleAnalysis.forEach(function (ra) {
+            ruleResults[ra.subRule] = { mastery: ra.mastery || 0, isWeak: ra.isSystemicWeakness || false, insight: ra.insight || '' };
+          });
+        }
+        history.push({
+          date: new Date().toISOString(),
+          user: _currentUser || '',
+          topic: grammarState.selectedTopic,
+          topicName: GRAMMAR_TOPICS[grammarState.selectedTopic] ? GRAMMAR_TOPICS[grammarState.selectedTopic].name : grammarState.selectedTopic,
+          difficulty: grammarState.difficulty,
+          score: data.score || 0,
+          totalCorrect: correct,
+          totalQuestions: grammarState.questions.length,
+          diagnosis: data.diagnosis || '',
+          strengths: data.strengths || [],
+          weaknesses: data.weaknesses || [],
+          studyTips: data.studyTips || [],
+          ruleResults: ruleResults,
+          details: questionDetails
+        });
+        if (history.length > 50) history = history.slice(-50);
+        localStorage.setItem(GRAMMAR_HISTORY_KEY, JSON.stringify(history));
+      } catch (e) { /* ignore */ }
+    }
+
     function renderGrammarReport(data) {
+      saveGrammarHistory(data);
       var score = data.score || 0;
       var ringFg = document.getElementById('grammarRingFg');
       var circumference = 264;
@@ -5223,6 +5294,233 @@
       });
     }
 
+    // ── 语法历史分析 ──
+    function getGrammarHistoryForUser() {
+      try {
+        return JSON.parse(localStorage.getItem(GRAMMAR_HISTORY_KEY) || '[]').filter(function (h) { return h.user === (_currentUser || ''); });
+      } catch (e) { return []; }
+    }
+
+    function openGrammarHistory() {
+      var history = getGrammarHistoryForUser();
+      renderGrammarHistoryOverview(history);
+      renderGrammarHistoryList(history);
+      showScreen('screen-grammar-history');
+    }
+
+    function renderGrammarHistoryOverview(history) {
+      var el = document.getElementById('grammarHistoryOverview');
+      if (history.length === 0) {
+        el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:1rem 0;">暂无测验记录</div>';
+        return;
+      }
+
+      var scores = history.map(function (h) { return h.score || 0; });
+      var avgScore = Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length);
+      var maxScore = Math.max.apply(null, scores);
+      var totalCorrect = history.reduce(function (s, h) { return s + (h.totalCorrect || 0); }, 0);
+      var totalQs = history.reduce(function (s, h) { return s + (h.totalQuestions || 0); }, 0);
+      var accuracy = totalQs > 0 ? Math.round((totalCorrect / totalQs) * 100) : 0;
+
+      var recentScores = scores.slice(-10);
+      var firstHalf = recentScores.slice(0, Math.floor(recentScores.length / 2));
+      var secondHalf = recentScores.slice(Math.floor(recentScores.length / 2));
+      var firstAvg = firstHalf.length > 0 ? firstHalf.reduce(function (a, b) { return a + b; }, 0) / firstHalf.length : 0;
+      var secondAvg = secondHalf.length > 0 ? secondHalf.reduce(function (a, b) { return a + b; }, 0) / secondHalf.length : 0;
+      var trend = secondAvg - firstAvg;
+      var trendIcon = trend > 3 ? '📈' : trend < -3 ? '📉' : '➡️';
+      var trendText = trend > 3 ? '进步中 +' + Math.round(trend) : trend < -3 ? '退步 ' + Math.round(trend) : '稳定';
+      var trendColor = trend > 3 ? 'var(--correct)' : trend < -3 ? 'var(--wrong)' : 'var(--muted)';
+
+      var html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">';
+      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.3rem;font-weight:700;color:' + _scoreColor(avgScore, 100) + ';">' + avgScore + '</div><div class="hint">平均分</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.3rem;font-weight:700;color:var(--correct);">' + accuracy + '%</div><div class="hint">正确率</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1.3rem;font-weight:700;color:var(--text);">' + history.length + '</div><div class="hint">测试次数</div></div>';
+      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
+      html += '<div style="font-size:1rem;font-weight:700;color:' + trendColor + ';">' + trendIcon + '</div><div class="hint" style="color:' + trendColor + ';">' + trendText + '</div></div>';
+      html += '</div>';
+
+      html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem;">分数趋势（最近' + recentScores.length + '次）</div>';
+      html += '<div style="display:flex;align-items:flex-end;gap:2px;height:40px;margin-bottom:0.75rem;">';
+      var barMax = Math.max.apply(null, recentScores.concat([1]));
+      recentScores.forEach(function (s) {
+        var h = Math.max(4, Math.round((s / barMax) * 38));
+        html += '<div style="flex:1;height:' + h + 'px;background:' + _scoreColor(s, 100) + ';border-radius:2px;" title="' + s + '分"></div>';
+      });
+      html += '</div>';
+
+      var topicStats = {};
+      history.forEach(function (h) {
+        var t = h.topic || 'unknown';
+        if (!topicStats[t]) topicStats[t] = { name: h.topicName || t, scores: [], correct: 0, total: 0 };
+        topicStats[t].scores.push(h.score || 0);
+        topicStats[t].correct += h.totalCorrect || 0;
+        topicStats[t].total += h.totalQuestions || 0;
+      });
+
+      var topicEntries = Object.entries(topicStats).sort(function (a, b) {
+        var avgA = a[1].scores.reduce(function (s, v) { return s + v; }, 0) / a[1].scores.length;
+        var avgB = b[1].scores.reduce(function (s, v) { return s + v; }, 0) / b[1].scores.length;
+        return avgA - avgB;
+      });
+
+      if (topicEntries.length > 0) {
+        html += '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📊 各专项成绩</div>';
+        topicEntries.forEach(function (pair) {
+          var st = pair[1];
+          var avg = Math.round(st.scores.reduce(function (a, b) { return a + b; }, 0) / st.scores.length);
+          var acc = st.total > 0 ? Math.round((st.correct / st.total) * 100) : 0;
+          var c = _scoreColor(avg, 100);
+          var latestTrend = '';
+          if (st.scores.length >= 2) {
+            var diff = st.scores[st.scores.length - 1] - st.scores[st.scores.length - 2];
+            latestTrend = diff > 0 ? ' ↑' + diff : diff < 0 ? ' ↓' + Math.abs(diff) : '';
+          }
+          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">';
+          html += '<span style="font-size:0.78rem;min-width:5rem;color:var(--text-secondary);">' + escapeHtml(st.name) + '</span>';
+          html += '<div style="flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">';
+          html += '<div style="width:' + avg + '%;height:100%;background:' + c + ';border-radius:3px;"></div></div>';
+          html += '<span style="font-size:0.75rem;color:' + c + ';min-width:4.5rem;text-align:right;">' + avg + '分 · ' + acc + '%' + latestTrend + '</span>';
+          html += '</div>';
+        });
+      }
+
+      var subRuleStats = {};
+      history.forEach(function (h) {
+        if (!h.details) return;
+        h.details.forEach(function (d) {
+          var key = d.subRule || 'unknown';
+          if (!subRuleStats[key]) subRuleStats[key] = { total: 0, wrong: 0 };
+          subRuleStats[key].total++;
+          if (!d.isCorrect) subRuleStats[key].wrong++;
+        });
+      });
+
+      var weakRules = Object.entries(subRuleStats).filter(function (p) { return p[1].wrong > 0; })
+        .map(function (p) { return { rule: p[0], wrong: p[1].wrong, total: p[1].total, rate: Math.round((p[1].wrong / p[1].total) * 100) }; })
+        .sort(function (a, b) { return b.wrong - a.wrong; });
+
+      if (weakRules.length > 0) {
+        html += '<div style="font-size:0.82rem;font-weight:600;margin-top:0.75rem;margin-bottom:0.4rem;">🔴 高频错误知识点</div>';
+        weakRules.slice(0, 8).forEach(function (w) {
+          html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0.5rem;margin-bottom:0.2rem;background:rgba(255,100,100,0.06);border-radius:var(--r-sm);font-size:0.78rem;">';
+          html += '<span style="color:var(--text-secondary);">' + escapeHtml(w.rule) + '</span>';
+          html += '<span style="color:var(--wrong);font-weight:600;">' + w.wrong + '/' + w.total + ' 错 (' + w.rate + '%)</span>';
+          html += '</div>';
+        });
+      }
+
+      el.innerHTML = html;
+    }
+
+    function renderGrammarHistoryList(history) {
+      var el = document.getElementById('grammarHistoryList');
+      if (history.length === 0) { el.innerHTML = ''; return; }
+
+      var html = '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">📝 测验记录</div>';
+      var reversed = history.slice().reverse();
+      reversed.forEach(function (h, idx) {
+        var realIdx = history.length - 1 - idx;
+        var d = new Date(h.date);
+        var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        var c = _scoreColor(h.score, 100);
+        var topicIcon = GRAMMAR_TOPICS[h.topic] ? GRAMMAR_TOPICS[h.topic].icon : '📝';
+        html += '<div class="sentence-result-item" data-ghist-idx="' + realIdx + '" style="cursor:pointer;">';
+        html += '<span class="sri-num" style="font-size:0.85rem;">' + topicIcon + '</span>';
+        html += '<div style="flex:1;min-width:0;">';
+        html += '<div style="font-size:0.82rem;font-weight:600;color:var(--text);">' + escapeHtml(h.topicName || h.topic) + '</div>';
+        html += '<div style="font-size:0.72rem;color:var(--muted);">' + dateStr + ' · ' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + ' 正确</div>';
+        html += '</div>';
+        html += '<span class="sri-score" style="color:' + c + ';">' + h.score + '</span>';
+        html += '</div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function openGrammarHistoryDetail(idx) {
+      var history = getGrammarHistoryForUser();
+      var h = history[idx];
+      if (!h) return;
+
+      var d = new Date(h.date);
+      var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('grammarDetailTitle').textContent = (h.topicName || h.topic) + ' · ' + h.score + '分';
+
+      var html = '';
+      html += '<div style="text-align:center;margin-bottom:0.75rem;">';
+      html += '<div style="font-size:2.2rem;font-weight:700;color:' + _scoreColor(h.score, 100) + ';">' + h.score + '</div>';
+      html += '<div class="hint">' + dateStr + ' · ' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + ' 正确 · ' + (h.difficulty || '') + '</div></div>';
+
+      if (h.ruleResults && Object.keys(h.ruleResults).length > 0) {
+        html += '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📋 各规则掌握度</div>';
+        Object.entries(h.ruleResults).forEach(function (pair) {
+          var name = pair[0]; var data = pair[1];
+          var pct = Math.round((data.mastery || 0) * 100);
+          var color = data.mastery >= 0.7 ? 'var(--correct)' : data.mastery >= 0.4 ? '#f59e0b' : 'var(--wrong)';
+          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">';
+          html += '<span style="font-size:0.78rem;min-width:6rem;color:var(--text-secondary);">' + escapeHtml(name) + (data.isWeak ? ' ⚠' : '') + '</span>';
+          html += '<div style="flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">';
+          html += '<div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:3px;"></div></div>';
+          html += '<span style="font-size:0.75rem;color:' + color + ';min-width:2.5rem;text-align:right;">' + pct + '%</span>';
+          html += '</div>';
+          if (data.insight) html += '<div style="font-size:0.72rem;color:var(--muted);margin-left:6.5rem;margin-top:-0.1rem;margin-bottom:0.2rem;">' + escapeHtml(data.insight) + '</div>';
+        });
+      }
+
+      if (h.diagnosis) {
+        html += '<div style="margin-top:0.75rem;padding:0.6rem;background:rgba(167,139,250,0.08);border-radius:var(--r-sm);font-size:0.82rem;color:var(--accent-light);">';
+        html += '🔍 ' + escapeHtml(h.diagnosis) + '</div>';
+      }
+
+      if (h.weaknesses && h.weaknesses.length > 0) {
+        html += '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600;color:var(--wrong);margin-bottom:0.3rem;">⚠️ 需要加强</div>';
+        h.weaknesses.forEach(function (w) { html += '<div style="font-size:0.78rem;color:var(--text-secondary);padding:0.15rem 0;">· ' + escapeHtml(w) + '</div>'; });
+      }
+      if (h.strengths && h.strengths.length > 0) {
+        html += '<div style="margin-top:0.5rem;font-size:0.82rem;font-weight:600;color:var(--correct);margin-bottom:0.3rem;">✅ 掌握良好</div>';
+        h.strengths.forEach(function (s) { html += '<div style="font-size:0.78rem;color:var(--text-secondary);padding:0.15rem 0;">· ' + escapeHtml(s) + '</div>'; });
+      }
+
+      if (h.details && h.details.length > 0) {
+        html += '<div style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📝 逐题回顾</div>';
+        h.details.forEach(function (det, i) {
+          var bgColor = det.isCorrect ? 'rgba(50,215,75,0.06)' : 'rgba(255,100,100,0.06)';
+          var borderColor = det.isCorrect ? 'rgba(50,215,75,0.2)' : 'rgba(255,100,100,0.2)';
+          var icon = det.isCorrect ? '✅' : '❌';
+          html += '<div style="padding:0.5rem;margin-bottom:0.4rem;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:var(--r-sm);">';
+          html += '<div style="display:flex;align-items:center;gap:0.3rem;margin-bottom:0.2rem;">';
+          html += '<span>' + icon + '</span><span style="font-size:0.78rem;font-weight:600;">#' + (i + 1) + '</span>';
+          if (det.subRule) html += '<span style="font-size:0.68rem;color:var(--muted);background:rgba(255,255,255,0.06);padding:0.1rem 0.3rem;border-radius:3px;">' + escapeHtml(det.subRule) + '</span>';
+          if (det.selectionReason) {
+            var reasonTag = det.selectionReason === 'weak_review' ? '🔄弱点' : '✨推荐';
+            html += '<span style="font-size:0.65rem;color:var(--muted);">' + reasonTag + '</span>';
+          }
+          html += '</div>';
+          html += '<div style="font-size:0.82rem;color:var(--text);margin-bottom:0.2rem;">' + escapeHtml(det.question) + '</div>';
+          if (!det.isCorrect) {
+            html += '<div style="font-size:0.75rem;"><span style="color:var(--wrong);text-decoration:line-through;">你的答案：' + escapeHtml(det.userAnswer) + '</span> → <span style="color:var(--correct);font-weight:600;">' + escapeHtml(det.correctAnswer) + '</span></div>';
+          } else {
+            html += '<div style="font-size:0.75rem;color:var(--correct);">答案：' + escapeHtml(det.correctAnswer) + '</div>';
+          }
+          if (det.explanation && !det.isCorrect) {
+            html += '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.15rem;">' + escapeHtml(det.explanation) + '</div>';
+          }
+          html += '</div>';
+        });
+      }
+
+      if (h.studyTips && h.studyTips.length > 0) {
+        html += '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600;margin-bottom:0.3rem;">💡 学习建议</div>';
+        h.studyTips.forEach(function (t) { html += '<div style="font-size:0.78rem;color:var(--accent-light);padding:0.15rem 0;">· ' + escapeHtml(t) + '</div>'; });
+      }
+
+      document.getElementById('grammarDetailBody').innerHTML = html;
+      showScreen('screen-grammar-history-detail');
+    }
+
     // Grammar event listeners
     document.getElementById('btnOpenGrammar').addEventListener('click', function () { openGrammarHome(); });
     document.getElementById('btnGrammarBackHome').addEventListener('click', function () { showScreen('screen-home'); });
@@ -5257,6 +5555,21 @@
 
     document.getElementById('btnGrammarRetry').addEventListener('click', function () { startGrammarQuiz(); });
     document.getElementById('btnGrammarNewTopic').addEventListener('click', function () { openGrammarHome(); });
+
+    document.getElementById('btnGrammarHistory').addEventListener('click', openGrammarHistory);
+    document.getElementById('btnGrammarHistoryBack').addEventListener('click', function () { showScreen('screen-grammar'); });
+    document.getElementById('btnGrammarDetailBack').addEventListener('click', function () { openGrammarHistory(); });
+    document.getElementById('btnClearGrammarHistory').addEventListener('click', function () {
+      if (confirm('确定清空所有语法历史记录吗？')) {
+        localStorage.removeItem(GRAMMAR_HISTORY_KEY);
+        openGrammarHistory();
+      }
+    });
+    document.getElementById('grammarHistoryList').addEventListener('click', function (e) {
+      var item = e.target.closest('.sentence-result-item');
+      if (!item || item.dataset.ghistIdx === undefined) return;
+      openGrammarHistoryDetail(parseInt(item.dataset.ghistIdx, 10));
+    });
 
     (function init() {
       var sizeEl = document.getElementById('quizSize');
