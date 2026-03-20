@@ -679,63 +679,20 @@
 
     /* ===== AI Usage Badge ===== */
     .ai-usage-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.72rem; color: var(--muted); flex-wrap: wrap; }
-    .user-bar { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 1rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; font-size: 0.95rem; color: var(--text-secondary); }
-    .user-bar .user-bar-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0; text-transform: uppercase; }
-    .user-bar strong { color: var(--accent-light); font-size: 1.05rem; }
-    .btn-switch-user { background: none; border: 1px solid var(--glass-border); color: var(--accent-light); padding: 0.3rem 0.75rem; border-radius: var(--r-sm); cursor: pointer; font-size: 0.8rem; transition: background 0.2s; margin-left: auto; }
+    .user-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.75rem; margin-bottom: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-md); font-size: 0.8rem; color: var(--text-secondary); }
+    .user-bar strong { color: var(--accent-light); }
+    .btn-switch-user { background: none; border: 1px solid var(--glass-border); color: var(--accent-light); padding: 0.2rem 0.6rem; border-radius: var(--r-sm); cursor: pointer; font-size: 0.72rem; transition: background 0.2s; }
     .btn-switch-user:hover { background: rgba(255,255,255,0.08); }
     #modalUser .modal-dialog { text-align: center; }
-    .user-list-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; transition: background 0.2s, transform 0.15s; }
-    .user-list-item:hover { background: rgba(99,102,241,0.15); transform: translateY(-1px); }
-    .user-list-item:active { transform: scale(0.98); }
+    .user-list-item { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.8rem; margin-bottom: 0.4rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-sm); cursor: pointer; transition: background 0.2s; }
+    .user-list-item:hover { background: rgba(99,102,241,0.15); }
     .user-list-item.active { background: rgba(99,102,241,0.25); border-color: var(--accent); }
-    .user-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: #fff; flex-shrink: 0; text-transform: uppercase; }
-    .user-info { flex: 1; min-width: 0; }
-    .user-list-item .user-name { font-weight: 600; color: var(--text-primary); font-size: 1rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .user-list-item .user-time { font-size: 0.7rem; color: var(--muted); display: block; margin-top: 0.1rem; }
+    .user-list-item .user-name { font-weight: 600; color: var(--text-primary); }
+    .user-list-item .user-time { font-size: 0.7rem; color: var(--muted); }
     .ai-usage-bar .usage-model { color: var(--accent-light); font-weight: 600; }
     .ai-usage-bar .usage-sep { color: rgba(255,255,255,0.15); }
     .ai-usage-bar .usage-tokens { color: var(--text-secondary); }
     .ai-usage-bar .usage-calls { color: var(--muted); }
-
-    /* ===== Sentence Module ===== */
-    .sentence-word-card { text-align: center; padding: 1.2rem 1rem; margin-bottom: 1rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-lg); }
-    .sentence-word-card .sw-word { font-size: 1.8rem; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
-    .sentence-word-card .sw-phonetic { font-size: 0.9rem; color: rgba(255,255,255,0.45); margin-top: 0.2rem; }
-    .sentence-word-card .sw-pos { display: inline-block; background: rgba(167,139,250,0.15); color: var(--accent-light); font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: 4px; margin-top: 0.3rem; }
-    .sentence-word-card .sw-def { font-size: 0.95rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.5; }
-    .sentence-word-card .sw-def-en { font-size: 0.88rem; color: var(--pink); margin-top: 0.25rem; font-weight: 500; }
-    .sentence-textarea { width: 100%; min-height: 80px; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-md); color: var(--text); font-size: 1rem; font-family: inherit; resize: vertical; transition: border-color 0.2s; }
-    .sentence-textarea:focus { outline: none; border-color: var(--accent); box-shadow: var(--glow); }
-    .sentence-textarea::placeholder { color: var(--muted); }
-    .sentence-score-card { padding: 1rem; margin-top: 1rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-lg); }
-    .sentence-score-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-    .sentence-total-score { font-size: 2rem; font-weight: 700; }
-    .sentence-dim { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.5rem 0.6rem; background: rgba(255,255,255,0.03); border-radius: var(--r-sm); }
-    .sentence-dim-label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); min-width: 5.5rem; flex-shrink: 0; }
-    .sentence-dim-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .sentence-dim-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s var(--ease); }
-    .sentence-dim-score { font-size: 0.8rem; font-weight: 600; min-width: 3.5rem; text-align: right; }
-    .sentence-dim-comment { font-size: 0.75rem; color: var(--muted); margin-left: 6rem; margin-top: -0.2rem; margin-bottom: 0.4rem; }
-    .sentence-error-item { padding: 0.5rem 0.6rem; margin-bottom: 0.4rem; background: rgba(255,100,100,0.08); border-left: 3px solid var(--wrong); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 0.82rem; }
-    .sentence-error-item .err-original { text-decoration: line-through; color: var(--wrong); }
-    .sentence-error-item .err-corrected { color: var(--correct); font-weight: 600; }
-    .sentence-corrected { padding: 0.6rem; margin-top: 0.6rem; background: rgba(50,215,75,0.08); border: 1px solid rgba(50,215,75,0.2); border-radius: var(--r-sm); font-size: 0.88rem; color: var(--correct); line-height: 1.5; }
-    .sentence-better { padding: 0.6rem; margin-top: 0.4rem; background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); border-radius: var(--r-sm); font-size: 0.85rem; color: var(--accent-light); line-height: 1.5; font-style: italic; }
-    .sentence-result-item { padding: 0.6rem 0.75rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: var(--r-md); display: flex; align-items: center; gap: 0.6rem; cursor: pointer; transition: background 0.2s; }
-    .sentence-result-item:hover { background: rgba(255,255,255,0.08); }
-    .sentence-result-item .sri-num { font-size: 0.75rem; color: var(--muted); min-width: 1.5rem; }
-    .sentence-result-item .sri-word { font-weight: 600; color: var(--text); flex: 1; }
-    .sentence-result-item .sri-score { font-weight: 700; font-size: 1.1rem; min-width: 3rem; text-align: right; }
-    .sentence-result-item .sri-bar { width: 60px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .sentence-result-item .sri-bar-fill { height: 100%; border-radius: 3px; }
-    .sentence-report-section { margin-bottom: 1rem; }
-    .sentence-report-section h4 { font-size: 0.9rem; margin-bottom: 0.5rem; }
-    .sentence-weakness { padding: 0.5rem 0.6rem; margin-bottom: 0.35rem; background: rgba(255,100,100,0.06); border-radius: var(--r-sm); font-size: 0.82rem; }
-    .sentence-strength { padding: 0.4rem 0.6rem; margin-bottom: 0.25rem; background: rgba(50,215,75,0.06); border-radius: var(--r-sm); font-size: 0.82rem; color: var(--correct); }
-    .sentence-suggestion { padding: 0.4rem 0.6rem; margin-bottom: 0.25rem; background: rgba(167,139,250,0.06); border-radius: var(--r-sm); font-size: 0.82rem; color: var(--accent-light); }
-    .sentence-loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-    .sentence-loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.75rem; }
 
     /* ===== Inline style overrides ===== */
     #homeGroupSelect, #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
@@ -753,23 +710,19 @@
       <div style="width:100%;display:flex;gap:0.5rem;margin-top:0.15rem;flex-wrap:wrap;">
         <span style="font-size:0.68rem;">单词AI: <span class="usage-model" id="usageModel">--</span></span>
         <span class="usage-sep">|</span>
-        <span style="font-size:0.68rem;">语法分析: <span class="usage-model" id="usageGrammarModel">--</span></span>
-        <span class="usage-sep">|</span>
-        <span style="font-size:0.68rem;">造句AI: <span class="usage-model" id="usageSentenceModel">--</span></span>
+        <span style="font-size:0.68rem;">语法AI: <span class="usage-model" id="usageGrammarModel">--</span></span>
       </div>
     </div>
 
     <div class="user-bar" id="userBar">
-      <div class="user-bar-avatar" id="userBarAvatar" style="background:#6366f1;">?</div>
-      <span>当前用户：<strong id="currentUserDisplay">未登录</strong></span>
-      <span id="syncStatus" style="font-size:0.75rem;margin-left:8px;"></span>
+      <span>👤 当前用户：<strong id="currentUserDisplay">未登录</strong></span>
       <button type="button" class="btn-switch-user" id="btnSwitchUser">切换用户</button>
     </div>
 
     <!-- 用户选择弹窗 -->
     <div id="modalUser" class="modal-overlay">
-      <div class="modal-dialog" style="max-width:420px;">
-        <h3 style="margin-bottom:0.8rem;">选择用户</h3>
+      <div class="modal-dialog" style="max-width:380px;">
+        <h3>选择用户</h3>
         <div id="userListWrap" style="margin-bottom:1rem;"></div>
         <div style="border-top:1px solid var(--glass-border);padding-top:0.75rem;">
           <label class="hint" style="display:block;margin-bottom:0.3rem;">新用户？输入用户名：</label>
@@ -795,7 +748,6 @@
         <button type="button" class="btn btn-secondary" id="btnOpenHistory">测验历史</button>
         <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
         <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(118,75,162,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📖 语法专项训练（AI）</button>
-        <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
@@ -870,8 +822,8 @@
       <button type="button" class="btn-back-home" id="btnGrammarBackHome">← 返回主页</button>
       <div class="card">
         <h3 style="margin-bottom:0.25rem;">语法专项训练</h3>
-        <p class="hint">选择语法专项，AI 根据你的掌握情况智能选题并诊断分析</p>
-        <p class="hint" style="font-size:0.7rem;color:var(--accent-light);margin-top:0.2rem;">📚 20,000+ Zanichelli 专业题库 · 每次 20 题 · 🔄 10题弱点复习 + ✨ 10题AI推荐</p>
+        <p class="hint">选择语法专项，AI 将根据你的掌握情况出题并诊断分析</p>
+        <p class="hint" style="font-size:0.7rem;color:var(--accent-light);margin-top:0.2rem;">📚 20,000+ 专业题库 + 🤖 Gemini 2.5 Pro 动态出题 · 混合模式</p>
         <div class="grammar-topic-grid" id="grammarTopicGrid"></div>
         <div class="grammar-difficulty-row" id="grammarDiffRow">
           <button type="button" class="grammar-diff-btn" data-diff="beginner">入门</button>
@@ -879,7 +831,6 @@
           <button type="button" class="grammar-diff-btn" data-diff="advanced">进阶</button>
         </div>
         <button type="button" class="btn" id="btnStartGrammar" style="margin-top:1rem;width:100%;" disabled>开始测试</button>
-        <button type="button" class="btn btn-secondary" id="btnGrammarHistory" style="width:100%;margin-top:0.5rem;">📋 测验历史 &amp; 总体分析</button>
       </div>
       <div class="card" id="grammarProfileCard" style="display:none;">
         <h4 style="margin-bottom:0.5rem;">📊 我的语法画像</h4>
@@ -952,152 +903,6 @@
           <button type="button" class="btn btn-secondary" id="btnGrammarNewTopic" style="flex:1;">换个专项</button>
         </div>
       </div>
-    </div>
-
-    <!-- ═══ 语法专练：测验历史 ═══ -->
-    <div id="screen-grammar-history" class="screen">
-      <button type="button" class="btn-back-home" id="btnGrammarHistoryBack">← 返回</button>
-      <div class="card">
-        <h3 style="margin-bottom:0.75rem;">📋 语法测验历史</h3>
-        <div id="grammarHistoryOverview" style="margin-bottom:1rem;"></div>
-        <div id="grammarHistoryList"></div>
-        <div style="margin-top:0.75rem;text-align:center;">
-          <button type="button" class="btn btn-secondary" id="btnClearGrammarHistory" style="font-size:0.75rem;padding:0.3rem 0.8rem;">清空历史</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ 语法专练：历史详情 ═══ -->
-    <div id="screen-grammar-history-detail" class="screen">
-      <button type="button" class="btn-back-home" id="btnGrammarDetailBack">← 返回历史</button>
-      <div class="card">
-        <h3 style="text-align:center;margin-bottom:0.5rem;" id="grammarDetailTitle">--</h3>
-        <div id="grammarDetailBody"></div>
-      </div>
-    </div>
-
-    <!-- ═══ 造句训练：配置页 ═══ -->
-    <div id="screen-sentence-home" class="screen">
-      <button type="button" class="btn-back-home" id="btnSentenceBackHome">← 返回主页</button>
-      <div id="sentenceResumeBar" style="display:none;"></div>
-      <div class="card">
-        <h3 style="margin-bottom:0.25rem;">✍️ 单词造句训练</h3>
-        <p class="hint">选择词库和范围，用指定单词造句，AI 严格评分</p>
-        <p class="hint" style="font-size:0.7rem;color:var(--orange);margin-top:0.2rem;">🧠 Gemini 2.5 Pro · 100分 · 单词使用50 + 语法20 + 复杂度10 + 书面用词10 + 通顺地道10</p>
-        <div style="margin-top:0.75rem;">
-          <label class="hint">选择单词组</label>
-          <select id="sentenceGroupSelect" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
-            <option value="all">全部</option>
-          </select>
-        </div>
-        <div style="margin-top:0.5rem;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
-          <label class="hint" style="flex-shrink:0;">序号范围</label>
-          <input type="number" id="sentenceRangeStart" min="1" placeholder="起始" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
-          <span style="color:var(--muted);">—</span>
-          <input type="number" id="sentenceRangeEnd" min="1" placeholder="结束" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
-          <span class="hint" id="sentenceRangeHint" style="font-size:0.78rem;"></span>
-        </div>
-        <div style="margin-top:0.75rem;">
-          <label class="hint">造句题数</label>
-          <input type="number" id="sentenceSize" min="1" max="50" placeholder="输入题数(建议5-15)" value="10" style="margin-top:0.35rem;padding:0.5rem;width:10rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
-        </div>
-        <div style="margin-top:0.5rem;">
-          <label style="display:inline-flex;align-items:center;gap:0.35rem;cursor:pointer;font-size:0.9rem;">
-            <input type="checkbox" id="sentenceAll" /> 考全部单词
-          </label>
-        </div>
-        <button type="button" class="btn" id="btnStartSentence" style="margin-top:1rem;background:linear-gradient(135deg,#f59e0b,#ef4444);width:100%;">开始造句训练</button>
-        <button type="button" class="btn btn-secondary" id="btnSentenceHistory" style="width:100%;margin-top:0.5rem;">📋 测验历史 &amp; 总体分析</button>
-      </div>
-      <div class="card" id="sentenceProfileCard" style="display:none;">
-        <h4 style="margin-bottom:0.5rem;">📊 我的造句画像</h4>
-        <div id="sentenceProfileBody"></div>
-      </div>
-    </div>
-
-    <!-- ═══ 造句训练：答题界面 ═══ -->
-    <div id="screen-sentence-quiz" class="screen">
-      <button type="button" class="btn-back-home" id="btnSentenceQuizBack">← 返回选择</button>
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-          <span class="progress" id="sentenceProgress">第 1 / 1 题</span>
-          <span style="font-size:0.75rem;color:var(--muted);" id="sentenceQuizTimer">00:00</span>
-        </div>
-        <div class="sentence-word-card">
-          <div class="sw-word" id="sentenceWord">--</div>
-          <div class="sw-phonetic" id="sentencePhonetic"></div>
-          <div class="sw-pos" id="sentencePos" style="display:none;"></div>
-          <div class="sw-def" id="sentenceDef"></div>
-          <div class="sw-def-en" id="sentenceDefEn"></div>
-        </div>
-        <div style="margin-bottom:0.5rem;">
-          <label class="hint" style="margin-bottom:0.3rem;display:block;">请用上面的单词造一个英文句子：</label>
-          <textarea class="sentence-textarea" id="sentenceInput" placeholder="Type your sentence here..." rows="3"></textarea>
-        </div>
-        <button type="button" class="btn" id="btnSubmitSentence" style="width:100%;background:linear-gradient(135deg,#f59e0b,#ef4444);">提交并评分</button>
-        <div id="sentenceScoreArea" style="display:none;"></div>
-        <div id="sentenceNavRow" style="margin-top:0.75rem;display:none;gap:0.5rem;">
-          <button type="button" class="btn btn-secondary" id="btnSentencePrev" style="flex:1;" disabled>上一题</button>
-          <button type="button" class="btn" id="btnSentenceNext" style="flex:1;">下一题</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ 造句训练：成绩总览 ═══ -->
-    <div id="screen-sentence-result" class="screen">
-      <button type="button" class="btn-back-home" id="btnSentenceResultHome">← 返回主页</button>
-      <div class="card">
-        <h3 style="text-align:center;margin-bottom:0.5rem;">✍️ 造句训练完成！</h3>
-        <div style="text-align:center;margin-bottom:1rem;">
-          <div style="font-size:2.5rem;font-weight:700;" id="sentenceOverallScore">--</div>
-          <div class="hint" id="sentenceOverallSub">综合评分</div>
-        </div>
-        <div id="sentenceResultList"></div>
-        <button type="button" class="btn" id="btnSentenceReport" style="width:100%;margin-top:1rem;background:linear-gradient(135deg,#667eea,#764ba2);">📊 查看 AI 总结报告</button>
-        <button type="button" class="btn btn-secondary" id="btnSentenceResultHomeBtn" style="width:100%;margin-top:0.5rem;">返回主页</button>
-      </div>
-    </div>
-
-    <!-- ═══ 造句训练：AI 总结报告 ═══ -->
-    <div id="screen-sentence-report" class="screen">
-      <button type="button" class="btn-back-home" id="btnSentenceReportBack">← 返回成绩</button>
-      <div class="card">
-        <h3 style="text-align:center;margin-bottom:0.75rem;">📊 AI 综合诊断报告</h3>
-        <div id="sentenceReportBody">
-          <div style="text-align:center;color:var(--muted);padding:2rem 0;">加载中...</div>
-        </div>
-      </div>
-      <div style="margin-top:0.75rem;">
-        <button type="button" class="btn btn-secondary" id="btnSentenceReportHome" style="width:100%;">返回主页</button>
-      </div>
-    </div>
-
-    <!-- ═══ 造句训练：测验历史 ═══ -->
-    <div id="screen-sentence-history" class="screen">
-      <button type="button" class="btn-back-home" id="btnSentenceHistoryBack">← 返回</button>
-      <div class="card">
-        <h3 style="margin-bottom:0.75rem;">📋 造句测验历史</h3>
-        <div id="sentenceHistoryOverview" style="margin-bottom:1rem;"></div>
-        <div id="sentenceHistoryList"></div>
-        <div style="margin-top:0.75rem;text-align:center;">
-          <button type="button" class="btn btn-secondary" id="btnClearSentenceHistory" style="font-size:0.75rem;padding:0.3rem 0.8rem;">清空历史</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ 造句训练：历史详情 ═══ -->
-    <div id="screen-sentence-history-detail" class="screen">
-      <button type="button" class="btn-back-home" id="btnSentenceDetailBack">← 返回历史</button>
-      <div class="card">
-        <h3 style="text-align:center;margin-bottom:0.5rem;" id="sentenceDetailTitle">--</h3>
-        <div id="sentenceDetailBody"></div>
-      </div>
-    </div>
-
-    <!-- 造句加载蒙层 -->
-    <div id="sentenceLoading" class="sentence-loading-overlay" style="display:none;">
-      <div class="sentence-loading-spinner"></div>
-      <div style="color:var(--text);font-size:0.9rem;" id="sentenceLoadingText">AI 正在评分...</div>
     </div>
 
     <!-- 语法加载蒙层 -->
@@ -1614,7 +1419,7 @@
     }
     function saveQuizHistoryToStorage(history) {
       try { localStorage.setItem(STORAGE_QUIZ_HISTORY, JSON.stringify(history.slice(0, MAX_HISTORY))); } catch (_) {}
-      syncUserDataToCloud(true);
+      syncUserDataToCloud();
     }
 
     function getReviewPlanFromStorage() {
@@ -2525,7 +2330,6 @@
                         }
                       });
                     }
-                    if (w.partOfSpeech) cached.partOfSpeech = w.partOfSpeech;
                     aiCache[key] = cached;
                   }
                 }
@@ -2631,29 +2435,15 @@
       const item = state.currentQuiz[idx];
       var defEl = document.getElementById('questionDefinition');
       var manualDef = item.definition || '';
-      var wordKey = (item.word || '').toLowerCase().trim();
-      var cached = aiCache[wordKey];
+      var cached = aiCache[(item.word || '').toLowerCase().trim()];
       var aiDef = cached && cached.definitionEn ? cached.definitionEn : '';
-      var aiPos = cached && cached.partOfSpeech ? cached.partOfSpeech : '';
-
-      function buildDefHtml(pos, manual, enDef) {
-        var posTag = pos ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.78rem;font-weight:600;padding:0.1rem 0.45rem;border-radius:4px;margin-bottom:0.35rem;">' + escapeHtml(pos) + '</span><br>' : '';
-        var hasManual = manual && manual !== '(无释义)';
-        if (hasManual && enDef) return posTag + escapeHtml(manual) + '<div class="quiz-ai-def">' + escapeHtml(enDef) + '</div>';
-        if (enDef) return posTag + '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(enDef) + '</div>';
-        if (hasManual) return posTag + escapeHtml(manual);
-        return posTag + '(无释义)';
-      }
-      defEl.innerHTML = buildDefHtml(aiPos, manualDef, aiDef);
-
-      if (!aiPos && wordKey) {
-        var capturedIdx = idx;
-        lookupWordAI(wordKey).then(function (data) {
-          if (state.index !== capturedIdx || !data) return;
-          var pos = data.partOfSpeech || '';
-          var def = data.definitionEn || aiDef;
-          if (pos) defEl.innerHTML = buildDefHtml(pos, manualDef, def);
-        });
+      var showManual = manualDef && manualDef !== '(无释义)';
+      if (showManual && aiDef) {
+        defEl.innerHTML = escapeHtml(manualDef) + '<div class="quiz-ai-def">' + escapeHtml(aiDef) + '</div>';
+      } else if (aiDef) {
+        defEl.innerHTML = '<div class="quiz-ai-def" style="margin-top:0;">' + escapeHtml(aiDef) + '</div>';
+      } else {
+        defEl.textContent = manualDef || '(无释义)';
       }
       const input = document.getElementById('answerInput');
       const feedbackEl = document.getElementById('feedback');
@@ -2926,23 +2716,11 @@
 
     function getCurrentUser() { return _currentUser; }
 
-    var _avatarColors = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ef4444','#14b8a6','#f97316','#06b6d4'];
-    function _avatarColor(name) {
-      var hash = 0;
-      for (var i = 0; i < name.length; i++) hash = ((hash << 5) - hash) + name.charCodeAt(i);
-      return _avatarColors[Math.abs(hash) % _avatarColors.length];
-    }
     function setCurrentUser(username) {
       _currentUser = username;
       localStorage.setItem(STORAGE_CURRENT_USER, username);
       var el = document.getElementById('currentUserDisplay');
       if (el) el.textContent = username || '未登录';
-      var av = document.getElementById('userBarAvatar');
-      if (av) {
-        var initial = username ? username.charAt(0).toUpperCase() : '?';
-        av.textContent = initial;
-        av.style.background = username ? _avatarColor(username) : '#6366f1';
-      }
     }
 
     function showUserModal() {
@@ -2967,16 +2745,9 @@
           var html = resp.users.map(function (u) {
             var isActive = u.username === _currentUser ? ' active' : '';
             var time = u.lastUpdated ? new Date(u.lastUpdated).toLocaleDateString('zh-CN') : '';
-            var displayName = u.displayName || u.username;
-            var initial = (displayName.charAt(0) || '?').toUpperCase();
-            var bgColor = _avatarColor(u.username);
-            return '<div class="user-list-item' + isActive + '" data-username="' + u.username + '" data-display="' + escapeHtml(displayName) + '">'
-              + '<div class="user-avatar" style="background:' + bgColor + ';">' + initial + '</div>'
-              + '<div class="user-info">'
-              + '<span class="user-name">' + escapeHtml(displayName) + '</span>'
-              + '<span class="user-time">' + (time ? '最近活跃 ' + time : '') + '</span>'
-              + '</div>'
-              + '<button type="button" class="btn-rename-user" data-rn-user="' + u.username + '" data-rn-name="' + escapeHtml(displayName) + '" title="改名" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0.3rem;">✏️</button>'
+            return '<div class="user-list-item' + isActive + '" data-username="' + u.username + '" data-display="' + (u.displayName || u.username) + '">'
+              + '<span class="user-name">' + (u.displayName || u.username) + '</span>'
+              + '<span class="user-time">' + time + '</span>'
               + '</div>';
           }).join('');
           wrap.innerHTML = html;
@@ -2992,47 +2763,15 @@
       loadUserDataFromCloud(username);
     }
 
-    function renameUser(username, oldDisplayName) {
-      var newName = prompt('请输入新的显示名称：', oldDisplayName);
-      if (!newName || !newName.trim() || newName.trim() === oldDisplayName) return;
-      var trimmed = newName.trim();
-      fetch(USER_SAVE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, displayName: trimmed }),
-      })
-        .then(function (r) { return r.json(); })
-        .then(function (resp) {
-          if (resp.ok) {
-            if (username === _currentUser) {
-              var el = document.getElementById('currentUserDisplay');
-              if (el) el.textContent = trimmed;
-            }
-            loadUserList();
-          } else {
-            alert('改名失败：' + (resp.error || '未知错误'));
-          }
-        })
-        .catch(function (e) { alert('改名失败：' + e.message); });
-    }
-
     function createNewUser(displayName) {
       if (!displayName) return;
       var username = displayName.trim().toLowerCase().replace(/\s+/g, '_');
       if (!username) return;
 
-      var existingHistory = getQuizHistoryFromStorage();
-      var existingStats = getWordStatsFromStorage();
-      var existingPlan = getReviewPlanFromStorage();
-      var existingWrong = getWrongFromStorage();
-      var hasExistingData = existingHistory.length > 0 || Object.keys(existingStats).length > 0;
-
-      if (!hasExistingData) {
-        localStorage.setItem(STORAGE_WRONG, '[]');
-        localStorage.setItem(STORAGE_WORD_STATS, '{}');
-        localStorage.setItem(STORAGE_QUIZ_HISTORY, '[]');
-        localStorage.setItem(STORAGE_REVIEW_PLAN, '{}');
-      }
+      localStorage.setItem(STORAGE_WRONG, '[]');
+      localStorage.setItem(STORAGE_WORD_STATS, '{}');
+      localStorage.setItem(STORAGE_QUIZ_HISTORY, '[]');
+      localStorage.setItem(STORAGE_REVIEW_PLAN, '{}');
 
       setCurrentUser(username);
       hideUserModal();
@@ -3043,23 +2782,16 @@
         body: JSON.stringify({
           username: username,
           displayName: displayName.trim(),
-          quizHistory: hasExistingData ? existingHistory : [],
-          wordStats: hasExistingData ? existingStats : {},
-          reviewPlan: hasExistingData ? existingPlan : {},
-          wrongWords: hasExistingData ? existingWrong : [],
+          quizHistory: [],
+          wordStats: {},
+          reviewPlan: {},
+          wrongWords: [],
         }),
       }).catch(function (e) { console.warn('createUser save failed:', e); });
 
       updateReviewBadge();
     }
 
-    function _updateBarAvatar(name) {
-      var av = document.getElementById('userBarAvatar');
-      if (av && name) {
-        av.textContent = name.charAt(0).toUpperCase();
-        av.style.background = _avatarColor(name);
-      }
-    }
     function loadUserDataFromCloud(username) {
       var el = document.getElementById('currentUserDisplay');
       if (el) el.textContent = username + ' (同步中...)';
@@ -3072,30 +2804,22 @@
             if (d.wordStats) localStorage.setItem(STORAGE_WORD_STATS, JSON.stringify(d.wordStats));
             if (d.reviewPlan) localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(d.reviewPlan));
             if (d.wrongWords) localStorage.setItem(STORAGE_WRONG, JSON.stringify(d.wrongWords));
-            var dn = d.displayName || username;
-            if (el) el.textContent = dn;
-            _updateBarAvatar(dn);
+            if (el) el.textContent = d.displayName || username;
           } else {
             if (el) el.textContent = username;
-            _updateBarAvatar(username);
-            syncUserDataToCloud();
           }
           updateReviewBadge();
           rescheduleOverdueWords();
-          try { renderStatsOverview(); } catch (_) {}
-          try { renderHighFreqWordList(); } catch (_) {}
         })
         .catch(function () {
           if (el) el.textContent = username;
         });
     }
 
-    var _syncPending = false;
-    function syncUserDataToCloud(immediate) {
+    function syncUserDataToCloud() {
       if (!_currentUser) return;
-      var doSync = function () {
-        _syncPending = true;
-        _updateSyncIndicator('syncing');
+      if (_syncTimer) clearTimeout(_syncTimer);
+      _syncTimer = setTimeout(function () {
         var payload = {
           username: _currentUser,
           quizHistory: getQuizHistoryFromStorage(),
@@ -3103,61 +2827,18 @@
           reviewPlan: getReviewPlanFromStorage(),
           wrongWords: getWrongFromStorage(),
         };
-        var body = JSON.stringify(payload);
-        var attempt = function (retries) {
-          fetch(USER_SAVE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: body,
-          }).then(function (r) {
-            if (r.ok) { _syncPending = false; _updateSyncIndicator('ok'); }
-            else if (retries > 0) { setTimeout(function () { attempt(retries - 1); }, 3000); }
-            else { _syncPending = false; _updateSyncIndicator('fail'); }
-          }).catch(function () {
-            if (retries > 0) { setTimeout(function () { attempt(retries - 1); }, 3000); }
-            else { _syncPending = false; _updateSyncIndicator('fail'); }
-          });
-        };
-        attempt(2);
-      };
-      if (immediate) {
-        if (_syncTimer) clearTimeout(_syncTimer);
-        doSync();
-      } else {
-        if (_syncTimer) clearTimeout(_syncTimer);
-        _syncTimer = setTimeout(doSync, 2000);
-      }
+        fetch(USER_SAVE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(function (e) { console.warn('syncUserData failed:', e); });
+      }, 2000);
     }
-    function _updateSyncIndicator(status) {
-      var el = document.getElementById('syncStatus');
-      if (!el) return;
-      if (status === 'syncing') { el.textContent = '⟳ 同步中…'; el.style.color = '#facc15'; }
-      else if (status === 'ok') { el.textContent = '✓ 已同步'; el.style.color = '#4ade80'; setTimeout(function(){ if(el.textContent==='✓ 已同步') el.textContent=''; }, 3000); }
-      else if (status === 'fail') { el.textContent = '✗ 同步失败'; el.style.color = '#f87171'; }
-      else { el.textContent = ''; }
-    }
-    window.addEventListener('beforeunload', function () {
-      if (!_currentUser) return;
-      var payload = JSON.stringify({
-        username: _currentUser,
-        quizHistory: getQuizHistoryFromStorage(),
-        wordStats: getWordStatsFromStorage(),
-        reviewPlan: getReviewPlanFromStorage(),
-        wrongWords: getWrongFromStorage(),
-      });
-      try { navigator.sendBeacon(USER_SAVE_URL, new Blob([payload], { type: 'application/json' })); } catch (_) {}
-    });
 
     // ─── 事件绑定 ───
     document.getElementById('btnSwitchUser').addEventListener('click', showUserModal);
 
     document.getElementById('userListWrap').addEventListener('click', function (e) {
-      var renameBtn = e.target.closest('.btn-rename-user');
-      if (renameBtn) {
-        e.stopPropagation();
-        renameUser(renameBtn.getAttribute('data-rn-user'), renameBtn.getAttribute('data-rn-name'));
-        return;
-      }
       var item = e.target.closest('.user-list-item');
       if (!item) return;
       switchToUser(item.dataset.username, item.dataset.display);
@@ -3314,8 +2995,7 @@
           definitionEn: d.definitionEn || '',
           phonetic: d.phonetic || '',
           synonyms: synonymsStr,
-          relatedWords: relatedStr,
-          partOfSpeech: d.partOfSpeech || ''
+          relatedWords: relatedStr
         };
       });
       fetch(url, {
@@ -4135,823 +3815,6 @@
 
 
     // ═══════════════════════════════════════════════
-    //  单词造句训练模块
-    // ═══════════════════════════════════════════════
-    var SENTENCE_BATCH_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/scoreSentenceBatch';
-    var SENTENCE_REPORT_BASE = 'https://analyzesentencereport-tbj6ixfqaa-uc.a.run.app';
-    var SENTENCE_PROGRESS_KEY = 'sentence_progress';
-    var SENTENCE_HISTORY_KEY = 'sentence_history';
-
-    var sentenceState = {
-      words: [],
-      currentIndex: 0,
-      results: [],
-      sentences: [],
-      scored: false,
-      timerStart: 0,
-      timerInterval: null,
-      reportData: null
-    };
-
-    function showSentenceLoading(text) {
-      document.getElementById('sentenceLoadingText').textContent = text || 'AI 正在评分...';
-      document.getElementById('sentenceLoading').style.display = 'flex';
-    }
-    function hideSentenceLoading() {
-      document.getElementById('sentenceLoading').style.display = 'none';
-    }
-
-    function saveSentenceProgress() {
-      try {
-        var data = {
-          words: sentenceState.words,
-          sentences: sentenceState.sentences,
-          currentIndex: sentenceState.currentIndex,
-          timerStart: sentenceState.timerStart,
-          scored: sentenceState.scored,
-          results: sentenceState.results,
-          reportData: sentenceState.reportData,
-          user: _currentUser || '',
-          savedAt: Date.now()
-        };
-        localStorage.setItem(SENTENCE_PROGRESS_KEY, JSON.stringify(data));
-      } catch (e) { /* ignore */ }
-    }
-
-    function loadSentenceProgress() {
-      try {
-        var raw = localStorage.getItem(SENTENCE_PROGRESS_KEY);
-        if (!raw) return null;
-        var data = JSON.parse(raw);
-        if (Date.now() - data.savedAt > 24 * 3600 * 1000) { localStorage.removeItem(SENTENCE_PROGRESS_KEY); return null; }
-        if (data.user && data.user !== (_currentUser || '')) return null;
-        return data;
-      } catch (e) { return null; }
-    }
-
-    function clearSentenceProgress() {
-      localStorage.removeItem(SENTENCE_PROGRESS_KEY);
-    }
-
-    function saveSentenceHistory(avgScore, wordCount) {
-      try {
-        var history = JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]');
-        var details = sentenceState.results.map(function (r, i) {
-          if (!r) return null;
-          return {
-            word: r.word || sentenceState.words[i].word,
-            sentence: r.sentence || sentenceState.sentences[i] || '',
-            totalScore: r.totalScore || 0,
-            dims: {
-              wordUsage: r.dimensions && r.dimensions.wordUsage ? r.dimensions.wordUsage.score : 0,
-              grammar: r.dimensions && r.dimensions.grammar ? r.dimensions.grammar.score : 0,
-              complexity: r.dimensions && r.dimensions.complexity ? r.dimensions.complexity.score : 0,
-              register: r.dimensions && r.dimensions.register ? r.dimensions.register.score : 0,
-              fluency: r.dimensions && r.dimensions.fluency ? r.dimensions.fluency.score : 0
-            },
-            errors: (r.errors || []).map(function (e) { return { type: e.type, explanation: e.explanation || '' }; }),
-            corrected: r.correctedSentence || ''
-          };
-        }).filter(Boolean);
-        history.push({
-          date: new Date().toISOString(),
-          user: _currentUser || '',
-          score: avgScore,
-          wordCount: wordCount,
-          words: sentenceState.words.map(function (w) { return w.word; }),
-          details: details
-        });
-        if (history.length > 50) history = history.slice(-50);
-        localStorage.setItem(SENTENCE_HISTORY_KEY, JSON.stringify(history));
-      } catch (e) { /* ignore */ }
-    }
-
-    function populateSentenceGroupSelect() {
-      var sel = document.getElementById('sentenceGroupSelect');
-      if (!sel) return;
-      var homeSelect = document.getElementById('homeGroupSelect');
-      if (homeSelect) {
-        sel.innerHTML = homeSelect.innerHTML;
-        sel.value = homeSelect.value;
-      }
-    }
-
-    function openSentenceHome() {
-      populateSentenceGroupSelect();
-      var saved = loadSentenceProgress();
-      var resumeBar = document.getElementById('sentenceResumeBar');
-      if (saved && saved.words && saved.words.length > 0 && !saved.scored) {
-        var filled = saved.sentences.filter(function (s) { return s && s.trim(); }).length;
-        resumeBar.innerHTML = '<div style="padding:0.6rem;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--r-md);margin-bottom:0.75rem;">'
-          + '<div style="font-size:0.85rem;color:var(--orange);font-weight:600;margin-bottom:0.3rem;">📝 有未完成的造句训练</div>'
-          + '<div style="font-size:0.78rem;color:var(--text-secondary);">' + saved.words.length + ' 个单词，已完成 ' + filled + ' / ' + saved.words.length + '</div>'
-          + '<div style="display:flex;gap:0.5rem;margin-top:0.5rem;">'
-          + '<button type="button" class="btn" id="btnSentenceResume" style="flex:1;background:var(--orange);">继续做题</button>'
-          + '<button type="button" class="btn btn-secondary" id="btnSentenceDiscard" style="flex:1;">放弃</button>'
-          + '</div></div>';
-        resumeBar.style.display = 'block';
-        document.getElementById('btnSentenceResume').addEventListener('click', function () {
-          sentenceState.words = saved.words;
-          sentenceState.sentences = saved.sentences;
-          sentenceState.currentIndex = saved.currentIndex || 0;
-          sentenceState.timerStart = saved.timerStart || Date.now();
-          sentenceState.results = new Array(saved.words.length).fill(null);
-          sentenceState.scored = false;
-          sentenceState.reportData = null;
-          startSentenceTimer();
-          showScreen('screen-sentence-quiz');
-          renderSentenceQuestion();
-        });
-        document.getElementById('btnSentenceDiscard').addEventListener('click', function () {
-          clearSentenceProgress();
-          resumeBar.style.display = 'none';
-        });
-      } else {
-        resumeBar.style.display = 'none';
-      }
-      showScreen('screen-sentence-home');
-      renderSentenceProfile();
-    }
-
-    function renderSentenceProfile() {
-      var card = document.getElementById('sentenceProfileCard');
-      var body = document.getElementById('sentenceProfileBody');
-      if (!_currentUser) { card.style.display = 'none'; return; }
-
-      var history = JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]').filter(function (h) { return h.user === _currentUser; });
-      if (history.length === 0) {
-        fetch(USER_GET_URL + '?username=' + encodeURIComponent(_currentUser), { redirect: 'follow', credentials: 'omit' })
-          .then(function (r) { return r.json(); })
-          .then(function (resp) {
-            if (!resp.ok || !resp.found || !resp.data || !resp.data.sentenceProfile) { card.style.display = 'none'; return; }
-            var p = resp.data.sentenceProfile;
-            body.innerHTML = _buildProfileHTML(p.avgScore || 0, p.totalTests || 0, p.weakCategories);
-            card.style.display = 'block';
-          })
-          .catch(function () { card.style.display = 'none'; });
-        return;
-      }
-      var total = history.length;
-      var avgScore = Math.round(history.reduce(function (s, h) { return s + h.score; }, 0) / total);
-      body.innerHTML = _buildProfileHTML(avgScore, total, null) +
-        '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted);">最近：' +
-        history.slice(-5).map(function (h) { return '<span style="color:' + _scoreColor(h.score, 100) + ';">' + h.score + '</span>'; }).join(' → ') + '</div>';
-      card.style.display = 'block';
-    }
-
-    function _buildProfileHTML(avg, total, weakCats) {
-      var html = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.5rem;">';
-      html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent-light);">' + avg + '</div><div class="hint">平均分</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:80px;"><div style="font-size:1.5rem;font-weight:700;color:var(--text);">' + total + '</div><div class="hint">测试次数</div></div>';
-      html += '</div>';
-      if (weakCats && Object.keys(weakCats).length > 0) {
-        var labels = { word_misuse: '用词不当', verb_tense: '动词时态', subject_verb: '主谓一致', article: '冠词', preposition: '介词', word_form: '词形', chinglish: '中式英语', complexity: '句子简单', register: '口语化', fluency: '不通顺', other: '其他' };
-        html += '<div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">薄弱环节：';
-        Object.keys(weakCats).forEach(function (k) { html += '<span style="color:var(--wrong);margin-right:0.4rem;">' + (labels[k] || k) + '(' + weakCats[k].count + ')</span>'; });
-        html += '</div>';
-      }
-      return html;
-    }
-
-    function getSentenceWords() {
-      var groupVal = document.getElementById('sentenceGroupSelect').value;
-      var words = [];
-      if (groupVal === 'all') {
-        state.categories.forEach(function (c) {
-          (c.words || []).forEach(function (w, i) { words.push({ word: w.word, definition: w.definition, categoryId: c.id, serial: i + 1 }); });
-        });
-      } else {
-        var cat = state.categories.find(function (c) { return c.id === groupVal; });
-        if (cat) {
-          (cat.words || []).forEach(function (w, i) { words.push({ word: w.word, definition: w.definition, categoryId: cat.id, serial: i + 1 }); });
-        }
-      }
-      var s = parseInt(document.getElementById('sentenceRangeStart').value, 10);
-      var e = parseInt(document.getElementById('sentenceRangeEnd').value, 10);
-      if (!isNaN(s) && !isNaN(e) && s >= 1 && e >= s) {
-        words = words.filter(function (w) { return w.serial >= s && w.serial <= e; });
-      }
-      return words;
-    }
-
-    function startSentenceTimer() {
-      if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval);
-      sentenceState.timerInterval = setInterval(function () {
-        var elapsed = Math.floor((Date.now() - sentenceState.timerStart) / 1000);
-        var mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
-        var ss = String(elapsed % 60).padStart(2, '0');
-        var el = document.getElementById('sentenceQuizTimer');
-        if (el) el.textContent = mm + ':' + ss;
-      }, 1000);
-    }
-
-    function startSentenceQuiz() {
-      var allWords = getSentenceWords();
-      if (allWords.length === 0) { alert('所选范围内没有单词'); return; }
-
-      var size;
-      if (document.getElementById('sentenceAll').checked) {
-        size = allWords.length;
-      } else {
-        size = parseInt(document.getElementById('sentenceSize').value, 10) || 10;
-        size = Math.min(Math.max(1, size), allWords.length);
-      }
-
-      var shuffled = allWords.sort(function () { return Math.random() - 0.5; });
-      sentenceState.words = shuffled.slice(0, size);
-      sentenceState.currentIndex = 0;
-      sentenceState.results = new Array(size).fill(null);
-      sentenceState.sentences = new Array(size).fill('');
-      sentenceState.scored = false;
-      sentenceState.reportData = null;
-      sentenceState.timerStart = Date.now();
-
-      startSentenceTimer();
-      saveSentenceProgress();
-      showScreen('screen-sentence-quiz');
-      renderSentenceQuestion();
-    }
-
-    function _saveCurrSentenceText() {
-      var val = document.getElementById('sentenceInput').value.trim();
-      if (val) sentenceState.sentences[sentenceState.currentIndex] = val;
-    }
-
-    function renderSentenceQuestion() {
-      var idx = sentenceState.currentIndex;
-      var total = sentenceState.words.length;
-      var w = sentenceState.words[idx];
-      var isScored = sentenceState.scored;
-
-      document.getElementById('sentenceProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题';
-      document.getElementById('sentenceWord').textContent = w.word;
-      document.getElementById('sentenceDef').textContent = w.definition || '';
-
-      var key = w.word.toLowerCase().trim();
-      var cached = aiCache[key];
-      document.getElementById('sentencePhonetic').textContent = cached && cached.phonetic ? cached.phonetic : '';
-      var posEl = document.getElementById('sentencePos');
-      if (cached && cached.partOfSpeech) { posEl.textContent = cached.partOfSpeech; posEl.style.display = 'inline-block'; }
-      else { posEl.style.display = 'none'; }
-      document.getElementById('sentenceDefEn').textContent = cached && cached.definitionEn ? cached.definitionEn : '';
-
-      var input = document.getElementById('sentenceInput');
-      input.value = sentenceState.sentences[idx] || '';
-      input.disabled = isScored;
-
-      var submitBtn = document.getElementById('btnSubmitSentence');
-      var filled = sentenceState.sentences.filter(function (s) { return s && s.trim(); }).length;
-
-      if (isScored) {
-        submitBtn.style.display = 'none';
-      } else {
-        submitBtn.style.display = 'block';
-        if (filled >= total && idx === total - 1) {
-          submitBtn.textContent = '✅ 全部完成，提交评分（' + total + ' 题）';
-          submitBtn.style.background = 'linear-gradient(135deg,#32d74b,#10b981)';
-        } else {
-          submitBtn.textContent = '保存并下一题 (' + filled + '/' + total + ')';
-          submitBtn.style.background = 'linear-gradient(135deg,#f59e0b,#ef4444)';
-        }
-      }
-
-      var scoreArea = document.getElementById('sentenceScoreArea');
-      if (isScored && sentenceState.results[idx]) {
-        scoreArea.style.display = 'block';
-        scoreArea.innerHTML = buildScoreHTML(sentenceState.results[idx]);
-      } else {
-        scoreArea.style.display = 'none';
-        scoreArea.innerHTML = '';
-      }
-
-      var navRow = document.getElementById('sentenceNavRow');
-      navRow.style.display = 'flex';
-      document.getElementById('btnSentencePrev').disabled = idx === 0;
-      var nextBtn = document.getElementById('btnSentenceNext');
-      nextBtn.disabled = false;
-      if (isScored && idx === total - 1) {
-        nextBtn.textContent = '查看成绩';
-        nextBtn.style.background = 'linear-gradient(135deg,#32d74b,#10b981)';
-      } else if (idx === total - 1) {
-        nextBtn.textContent = '下一题';
-        nextBtn.disabled = true;
-        nextBtn.style.background = '';
-      } else {
-        nextBtn.textContent = '下一题';
-        nextBtn.style.background = '';
-      }
-    }
-
-    function _scoreColor(score, max) {
-      var pct = max > 0 ? score / max : 0;
-      if (pct >= 0.8) return 'var(--correct)';
-      if (pct >= 0.6) return '#f59e0b';
-      return 'var(--wrong)';
-    }
-
-    function buildScoreHTML(data) {
-      var color = _scoreColor(data.totalScore, 100);
-      var html = '<div class="sentence-score-card">';
-      html += '<div class="sentence-score-header"><span style="font-size:0.85rem;font-weight:600;">AI 评分</span>';
-      html += '<span class="sentence-total-score" style="color:' + color + ';">' + data.totalScore + '<span style="font-size:0.9rem;color:var(--muted);">/100</span></span></div>';
-
-      var dims = [
-        { key: 'wordUsage', label: '单词使用', max: 50 },
-        { key: 'grammar', label: '语法正确', max: 20 },
-        { key: 'complexity', label: '句子复杂度', max: 10 },
-        { key: 'register', label: '书面化用词', max: 10 },
-        { key: 'fluency', label: '通顺地道', max: 10 }
-      ];
-      dims.forEach(function (d) {
-        var dim = data.dimensions && data.dimensions[d.key];
-        if (!dim) return;
-        var pct = d.max > 0 ? Math.round((dim.score / d.max) * 100) : 0;
-        var c = _scoreColor(dim.score, d.max);
-        html += '<div class="sentence-dim">';
-        html += '<span class="sentence-dim-label">' + d.label + '</span>';
-        html += '<div class="sentence-dim-bar"><div class="sentence-dim-bar-fill" style="width:' + pct + '%;background:' + c + ';"></div></div>';
-        html += '<span class="sentence-dim-score" style="color:' + c + ';">' + dim.score + '/' + d.max + '</span>';
-        html += '</div>';
-        if (dim.comment) html += '<div class="sentence-dim-comment">' + escapeHtml(dim.comment) + '</div>';
-      });
-
-      if (data.errors && data.errors.length > 0) {
-        html += '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600;color:var(--wrong);margin-bottom:0.3rem;">❌ 错误分析</div>';
-        data.errors.forEach(function (e) {
-          html += '<div class="sentence-error-item">';
-          html += '<span class="err-original">' + escapeHtml(e.original || '') + '</span> → <span class="err-corrected">' + escapeHtml(e.corrected || '') + '</span>';
-          if (e.explanation) html += '<div style="color:var(--muted);margin-top:0.15rem;">' + escapeHtml(e.explanation) + '</div>';
-          html += '</div>';
-        });
-      }
-      if (data.correctedSentence) {
-        html += '<div class="sentence-corrected">✅ 修正句：' + escapeHtml(data.correctedSentence) + '</div>';
-      }
-      if (data.betterExample) {
-        html += '<div class="sentence-better">💎 高级范例：' + escapeHtml(data.betterExample) + '</div>';
-      }
-      html += '</div>';
-      return html;
-    }
-
-    async function submitAllSentences() {
-      _saveCurrSentenceText();
-      var total = sentenceState.words.length;
-      var filled = sentenceState.sentences.filter(function (s) { return s && s.trim(); }).length;
-
-      if (filled < total) {
-        sentenceState.sentences[sentenceState.currentIndex] = document.getElementById('sentenceInput').value.trim();
-        saveSentenceProgress();
-        if (sentenceState.currentIndex < total - 1) {
-          sentenceState.currentIndex++;
-          renderSentenceQuestion();
-        }
-        return;
-      }
-
-      if (!confirm('全部 ' + total + ' 个句子已填写完毕，提交给 AI 评分？')) return;
-
-      var items = sentenceState.words.map(function (w, i) {
-        var key = w.word.toLowerCase().trim();
-        var cached = aiCache[key];
-        return {
-          word: w.word,
-          partOfSpeech: cached && cached.partOfSpeech || '',
-          definition: w.definition || '',
-          definitionEn: cached && cached.definitionEn || '',
-          sentence: sentenceState.sentences[i]
-        };
-      });
-
-      showSentenceLoading('AI 正在批量评分 ' + total + ' 个句子，请稍候...');
-      try {
-        var resp = await fetch(SENTENCE_BATCH_BASE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: items, username: _currentUser || '' })
-        });
-        var result = await resp.json();
-        hideSentenceLoading();
-
-        if (!result.ok || !result.data || !result.data.results) {
-          throw new Error(result.error || '评分失败');
-        }
-
-        var el = document.getElementById('usageSentenceModel');
-        if (el && result.model) el.textContent = result.model;
-
-        result.data.results.forEach(function (r, i) {
-          r.word = sentenceState.words[i].word;
-          r.sentence = sentenceState.sentences[i];
-          sentenceState.results[i] = r;
-        });
-        sentenceState.scored = true;
-        saveSentenceProgress();
-        showSentenceResults();
-      } catch (err) {
-        hideSentenceLoading();
-        alert('评分失败：' + err.message);
-      }
-    }
-
-    function showSentenceResults() {
-      if (sentenceState.timerInterval) { clearInterval(sentenceState.timerInterval); sentenceState.timerInterval = null; }
-
-      var scores = sentenceState.results.filter(function (r) { return r; }).map(function (r) { return r.totalScore || 0; });
-      var avg = scores.length > 0 ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length) : 0;
-
-      saveSentenceHistory(avg, sentenceState.words.length);
-
-      var scoreEl = document.getElementById('sentenceOverallScore');
-      scoreEl.textContent = avg;
-      scoreEl.style.color = _scoreColor(avg, 100);
-      document.getElementById('sentenceOverallSub').textContent = '综合评分 · ' + sentenceState.words.length + ' 个单词';
-
-      var listHtml = '';
-      sentenceState.results.forEach(function (r, i) {
-        if (!r) return;
-        var c = _scoreColor(r.totalScore, 100);
-        var pct = r.totalScore;
-        listHtml += '<div class="sentence-result-item" data-idx="' + i + '">';
-        listHtml += '<span class="sri-num">' + (i + 1) + '</span>';
-        listHtml += '<span class="sri-word">' + escapeHtml(r.word || sentenceState.words[i].word) + '</span>';
-        listHtml += '<div class="sri-bar"><div class="sri-bar-fill" style="width:' + pct + '%;background:' + c + ';"></div></div>';
-        listHtml += '<span class="sri-score" style="color:' + c + ';">' + r.totalScore + '</span>';
-        listHtml += '</div>';
-      });
-      document.getElementById('sentenceResultList').innerHTML = listHtml;
-
-      clearSentenceProgress();
-      showScreen('screen-sentence-result');
-    }
-
-    async function loadSentenceReport() {
-      if (sentenceState.reportData) {
-        renderSentenceReport(sentenceState.reportData);
-        showScreen('screen-sentence-report');
-        return;
-      }
-
-      var resultsForApi = sentenceState.results.filter(function (r) { return r; }).map(function (r) {
-        return { word: r.word, sentence: r.sentence, totalScore: r.totalScore, errors: r.errors || [], dimensions: r.dimensions || {} };
-      });
-
-      showSentenceLoading('AI 正在生成综合诊断报告...');
-      try {
-        var resp = await fetch(SENTENCE_REPORT_BASE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ results: resultsForApi, username: _currentUser || '' })
-        });
-        var result = await resp.json();
-        hideSentenceLoading();
-
-        if (!result.ok || !result.data) throw new Error(result.error || '报告生成失败');
-
-        sentenceState.reportData = result.data;
-        renderSentenceReport(result.data);
-        showScreen('screen-sentence-report');
-      } catch (err) {
-        hideSentenceLoading();
-        alert('报告生成失败：' + err.message);
-      }
-    }
-
-    function renderSentenceReport(data) {
-      var html = '';
-
-      html += '<div style="text-align:center;margin-bottom:1rem;">';
-      html += '<div style="font-size:2rem;font-weight:700;color:' + _scoreColor(data.overallScore, 100) + ';">' + (data.overallScore || 0) + ' <span style="font-size:0.9rem;color:var(--muted);">/ 100</span></div>';
-      if (data.level) html += '<div style="font-size:0.85rem;color:var(--accent-light);margin-top:0.2rem;">CEFR 等级估计：' + escapeHtml(data.level) + '</div>';
-      html += '</div>';
-
-      if (data.complexityAnalysis) {
-        html += '<div class="sentence-report-section">';
-        html += '<h4>📝 句子复杂度分析</h4>';
-        html += '<div style="padding:0.5rem 0.6rem;background:rgba(245,158,11,0.08);border-radius:var(--r-sm);font-size:0.82rem;color:var(--orange);">';
-        html += '整体水平：<strong>' + escapeHtml(data.complexityAnalysis.avgLevel || '--') + '</strong>';
-        if (data.complexityAnalysis.comment) html += '<div style="color:var(--text-secondary);margin-top:0.2rem;">' + escapeHtml(data.complexityAnalysis.comment) + '</div>';
-        html += '</div></div>';
-      }
-
-      if (data.weaknesses && data.weaknesses.length > 0) {
-        html += '<div class="sentence-report-section"><h4>🔴 薄弱环节</h4>';
-        data.weaknesses.forEach(function (w) {
-          var sevColor = w.severity === 'high' ? 'var(--wrong)' : w.severity === 'medium' ? '#f59e0b' : 'var(--muted)';
-          html += '<div class="sentence-weakness">';
-          html += '<div style="display:flex;justify-content:space-between;align-items:center;">';
-          html += '<span style="font-weight:600;">' + escapeHtml(w.label || w.category) + '</span>';
-          html += '<span style="font-size:0.72rem;color:' + sevColor + ';">' + (w.frequency || 0) + ' 次 · ' + escapeHtml(w.severity || '') + '</span>';
-          html += '</div>';
-          if (w.advice) html += '<div style="color:var(--text-secondary);margin-top:0.2rem;font-size:0.78rem;">' + escapeHtml(w.advice) + '</div>';
-          if (w.examples && w.examples.length > 0) {
-            html += '<div style="color:var(--muted);margin-top:0.15rem;font-size:0.75rem;font-style:italic;">"' + escapeHtml(w.examples[0]) + '"</div>';
-          }
-          html += '</div>';
-        });
-        html += '</div>';
-      }
-
-      if (data.strengths && data.strengths.length > 0) {
-        html += '<div class="sentence-report-section"><h4>🟢 优势</h4>';
-        data.strengths.forEach(function (s) { html += '<div class="sentence-strength">✅ ' + escapeHtml(s) + '</div>'; });
-        html += '</div>';
-      }
-
-      if (data.wordMastery && data.wordMastery.length > 0) {
-        html += '<div class="sentence-report-section"><h4>📖 单词掌握情况</h4>';
-        data.wordMastery.forEach(function (wm) {
-          var icon = wm.mastered ? '✅' : '❌';
-          var issueText = wm.issue ? escapeHtml(wm.issue) : '';
-          var c = wm.mastered ? 'var(--correct)' : 'var(--wrong)';
-          html += '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;font-size:0.82rem;">';
-          html += '<span>' + icon + '</span><span style="font-weight:600;">' + escapeHtml(wm.word) + '</span>';
-          if (wm.score !== undefined) html += '<span style="color:' + c + ';margin-left:auto;font-weight:600;">' + wm.score + '分</span>';
-          html += '</div>';
-          if (issueText) html += '<div style="font-size:0.75rem;color:var(--muted);margin-left:1.5rem;margin-bottom:0.2rem;">' + issueText + '</div>';
-        });
-        html += '</div>';
-      }
-
-      if (data.suggestions && data.suggestions.length > 0) {
-        html += '<div class="sentence-report-section"><h4>📈 改进建议</h4>';
-        data.suggestions.forEach(function (s) { html += '<div class="sentence-suggestion">💡 ' + escapeHtml(s) + '</div>'; });
-        html += '</div>';
-      }
-
-      document.getElementById('sentenceReportBody').innerHTML = html;
-    }
-
-    // ── 造句历史分析 ──
-    function getSentenceHistoryForUser() {
-      try {
-        return JSON.parse(localStorage.getItem(SENTENCE_HISTORY_KEY) || '[]').filter(function (h) { return h.user === (_currentUser || ''); });
-      } catch (e) { return []; }
-    }
-
-    function openSentenceHistory() {
-      var history = getSentenceHistoryForUser();
-      renderSentenceHistoryOverview(history);
-      renderSentenceHistoryList(history);
-      showScreen('screen-sentence-history');
-    }
-
-    function renderSentenceHistoryOverview(history) {
-      var el = document.getElementById('sentenceHistoryOverview');
-      if (history.length === 0) {
-        el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:1rem 0;">暂无测验记录</div>';
-        return;
-      }
-
-      var scores = history.map(function (h) { return h.score || 0; });
-      var avgScore = Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length);
-      var maxScore = Math.max.apply(null, scores);
-      var recentScores = scores.slice(-10);
-      var firstHalf = recentScores.slice(0, Math.floor(recentScores.length / 2));
-      var secondHalf = recentScores.slice(Math.floor(recentScores.length / 2));
-      var firstAvg = firstHalf.length > 0 ? firstHalf.reduce(function (a, b) { return a + b; }, 0) / firstHalf.length : 0;
-      var secondAvg = secondHalf.length > 0 ? secondHalf.reduce(function (a, b) { return a + b; }, 0) / secondHalf.length : 0;
-      var trend = secondAvg - firstAvg;
-      var trendIcon = trend > 3 ? '📈' : trend < -3 ? '📉' : '➡️';
-      var trendText = trend > 3 ? '进步中 +' + Math.round(trend) : trend < -3 ? '退步 ' + Math.round(trend) : '稳定';
-      var trendColor = trend > 3 ? 'var(--correct)' : trend < -3 ? 'var(--wrong)' : 'var(--muted)';
-
-      var errorStats = {};
-      var dimTotals = { wordUsage: { sum: 0, max: 0 }, grammar: { sum: 0, max: 0 }, complexity: { sum: 0, max: 0 }, register: { sum: 0, max: 0 }, fluency: { sum: 0, max: 0 } };
-      var wordScoreMap = {};
-      var totalWords = 0;
-
-      history.forEach(function (h) {
-        if (!h.details) return;
-        h.details.forEach(function (d) {
-          totalWords++;
-          if (d.dims) {
-            Object.keys(d.dims).forEach(function (k) {
-              if (dimTotals[k]) { dimTotals[k].sum += d.dims[k] || 0; dimTotals[k].max++; }
-            });
-          }
-          (d.errors || []).forEach(function (e) {
-            if (!errorStats[e.type]) errorStats[e.type] = 0;
-            errorStats[e.type]++;
-          });
-          if (!wordScoreMap[d.word]) wordScoreMap[d.word] = [];
-          wordScoreMap[d.word].push(d.totalScore || 0);
-        });
-      });
-
-      var html = '<div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.75rem;">';
-      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.4rem;font-weight:700;color:' + _scoreColor(avgScore, 100) + ';">' + avgScore + '</div><div class="hint">平均分</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.4rem;font-weight:700;color:var(--correct);">' + maxScore + '</div><div class="hint">最高分</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.4rem;font-weight:700;color:var(--text);">' + history.length + '</div><div class="hint">测试次数</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:70px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.1rem;font-weight:700;color:' + trendColor + ';">' + trendIcon + '</div><div class="hint" style="color:' + trendColor + ';">' + trendText + '</div></div>';
-      html += '</div>';
-
-      html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem;">分数趋势（最近' + recentScores.length + '次）</div>';
-      html += '<div style="display:flex;align-items:flex-end;gap:2px;height:40px;margin-bottom:0.75rem;">';
-      var barMax = Math.max.apply(null, recentScores.concat([1]));
-      recentScores.forEach(function (s) {
-        var h = Math.max(4, Math.round((s / barMax) * 38));
-        html += '<div style="flex:1;height:' + h + 'px;background:' + _scoreColor(s, 100) + ';border-radius:2px;" title="' + s + '分"></div>';
-      });
-      html += '</div>';
-
-      if (totalWords > 0) {
-        var dimLabels = { wordUsage: '单词使用', grammar: '语法', complexity: '复杂度', register: '书面用词', fluency: '通顺地道' };
-        var dimMaxes = { wordUsage: 50, grammar: 20, complexity: 10, register: 10, fluency: 10 };
-        html += '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📊 各维度平均表现</div>';
-        Object.keys(dimTotals).forEach(function (k) {
-          var t = dimTotals[k];
-          if (t.max === 0) return;
-          var avg = Math.round((t.sum / t.max) * 10) / 10;
-          var maxVal = dimMaxes[k] || 10;
-          var pct = Math.round((avg / maxVal) * 100);
-          var c = _scoreColor(avg, maxVal);
-          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">';
-          html += '<span style="font-size:0.78rem;min-width:4.5rem;color:var(--text-secondary);">' + (dimLabels[k] || k) + '</span>';
-          html += '<div style="flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">';
-          html += '<div style="width:' + pct + '%;height:100%;background:' + c + ';border-radius:3px;"></div></div>';
-          html += '<span style="font-size:0.75rem;color:' + c + ';min-width:3rem;text-align:right;">' + avg + '/' + maxVal + '</span>';
-          html += '</div>';
-        });
-      }
-
-      var errorLabels = { word_misuse: '用词不当', verb_tense: '动词时态', subject_verb: '主谓一致', article: '冠词', preposition: '介词', word_form: '词形变化', chinglish: '中式英语', register: '口语化', fluency: '不通顺', other: '其他' };
-      var sortedErrors = Object.entries(errorStats).sort(function (a, b) { return b[1] - a[1]; });
-      if (sortedErrors.length > 0) {
-        html += '<div style="font-size:0.82rem;font-weight:600;margin-top:0.75rem;margin-bottom:0.4rem;">🔴 高频错误类型</div>';
-        sortedErrors.slice(0, 6).forEach(function (pair) {
-          var label = errorLabels[pair[0]] || pair[0];
-          html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0.5rem;margin-bottom:0.2rem;background:rgba(255,100,100,0.06);border-radius:var(--r-sm);font-size:0.78rem;">';
-          html += '<span style="color:var(--text-secondary);">' + escapeHtml(label) + '</span>';
-          html += '<span style="color:var(--wrong);font-weight:600;">' + pair[1] + ' 次</span>';
-          html += '</div>';
-        });
-      }
-
-      var weakWords = Object.entries(wordScoreMap).filter(function (p) { return p[1].length > 0; }).map(function (p) {
-        var avg = Math.round(p[1].reduce(function (a, b) { return a + b; }, 0) / p[1].length);
-        return { word: p[0], avg: avg, count: p[1].length };
-      }).sort(function (a, b) { return a.avg - b.avg; });
-
-      if (weakWords.length > 0) {
-        html += '<div style="font-size:0.82rem;font-weight:600;margin-top:0.75rem;margin-bottom:0.4rem;">📖 薄弱单词 TOP5</div>';
-        weakWords.slice(0, 5).forEach(function (w) {
-          var c = _scoreColor(w.avg, 100);
-          html += '<div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.5rem;margin-bottom:0.2rem;background:rgba(255,255,255,0.03);border-radius:var(--r-sm);font-size:0.78rem;">';
-          html += '<span style="font-weight:600;flex:1;">' + escapeHtml(w.word) + '</span>';
-          html += '<span style="color:var(--muted);font-size:0.7rem;">测 ' + w.count + ' 次</span>';
-          html += '<span style="color:' + c + ';font-weight:600;">' + w.avg + ' 分</span>';
-          html += '</div>';
-        });
-      }
-
-      el.innerHTML = html;
-    }
-
-    function renderSentenceHistoryList(history) {
-      var el = document.getElementById('sentenceHistoryList');
-      if (history.length === 0) { el.innerHTML = ''; return; }
-
-      var html = '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">📝 测验记录</div>';
-      var reversed = history.slice().reverse();
-      reversed.forEach(function (h, idx) {
-        var realIdx = history.length - 1 - idx;
-        var d = new Date(h.date);
-        var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-        var c = _scoreColor(h.score, 100);
-        html += '<div class="sentence-result-item" data-hist-idx="' + realIdx + '" style="cursor:pointer;">';
-        html += '<span class="sri-num" style="font-size:0.7rem;color:var(--muted);">#' + (realIdx + 1) + '</span>';
-        html += '<div style="flex:1;min-width:0;">';
-        html += '<div style="font-size:0.82rem;font-weight:600;color:var(--text);">' + dateStr + '</div>';
-        html += '<div style="font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + h.wordCount + ' 词 · ' + (h.words || []).slice(0, 5).join(', ') + (h.wordCount > 5 ? '...' : '') + '</div>';
-        html += '</div>';
-        html += '<span class="sri-score" style="color:' + c + ';">' + h.score + '</span>';
-        html += '</div>';
-      });
-      el.innerHTML = html;
-    }
-
-    function openSentenceHistoryDetail(idx) {
-      var history = getSentenceHistoryForUser();
-      var h = history[idx];
-      if (!h) return;
-
-      var d = new Date(h.date);
-      var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('sentenceDetailTitle').textContent = dateStr + ' · ' + h.score + '分';
-
-      var html = '';
-      html += '<div style="text-align:center;margin-bottom:0.75rem;">';
-      html += '<div style="font-size:2.2rem;font-weight:700;color:' + _scoreColor(h.score, 100) + ';">' + h.score + '</div>';
-      html += '<div class="hint">' + h.wordCount + ' 个单词</div></div>';
-
-      if (h.details && h.details.length > 0) {
-        h.details.forEach(function (det, i) {
-          var c = _scoreColor(det.totalScore, 100);
-          html += '<div style="padding:0.6rem;margin-bottom:0.5rem;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:var(--r-md);">';
-          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;">';
-          html += '<span style="font-weight:700;font-size:0.95rem;">' + escapeHtml(det.word) + '</span>';
-          html += '<span style="font-weight:700;color:' + c + ';">' + det.totalScore + '/100</span></div>';
-          html += '<div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.3rem;font-style:italic;">"' + escapeHtml(det.sentence || '') + '"</div>';
-
-          var dimLabels = { wordUsage: ['单词使用', 50], grammar: ['语法', 20], complexity: ['复杂度', 10], register: ['书面用词', 10], fluency: ['通顺地道', 10] };
-          if (det.dims) {
-            html += '<div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.3rem;">';
-            Object.keys(dimLabels).forEach(function (k) {
-              var val = det.dims[k] !== undefined ? det.dims[k] : '-';
-              var max = dimLabels[k][1];
-              var dc = val !== '-' ? _scoreColor(val, max) : 'var(--muted)';
-              html += '<span style="font-size:0.7rem;padding:0.15rem 0.4rem;background:rgba(255,255,255,0.05);border-radius:3px;color:' + dc + ';">' + dimLabels[k][0] + ' ' + val + '/' + max + '</span>';
-            });
-            html += '</div>';
-          }
-
-          if (det.errors && det.errors.length > 0) {
-            det.errors.forEach(function (err) {
-              var errLabel = { word_misuse: '用词不当', verb_tense: '时态', subject_verb: '主谓', article: '冠词', preposition: '介词', word_form: '词形', chinglish: '中式英语', register: '口语化', other: '其他' };
-              html += '<div style="font-size:0.72rem;color:var(--wrong);margin-bottom:0.1rem;">⚠ ' + (errLabel[err.type] || err.type) + (err.explanation ? '：' + escapeHtml(err.explanation) : '') + '</div>';
-            });
-          }
-          if (det.corrected) {
-            html += '<div style="font-size:0.75rem;color:var(--correct);margin-top:0.2rem;">✅ ' + escapeHtml(det.corrected) + '</div>';
-          }
-          html += '</div>';
-        });
-      } else {
-        html += '<div style="text-align:center;color:var(--muted);padding:1rem;">此测验没有详细记录（旧版数据）</div>';
-      }
-
-      document.getElementById('sentenceDetailBody').innerHTML = html;
-      showScreen('screen-sentence-history-detail');
-    }
-
-    // 造句模块事件绑定
-    document.getElementById('btnOpenSentence').addEventListener('click', openSentenceHome);
-    document.getElementById('btnSentenceBackHome').addEventListener('click', function () { showScreen('screen-home'); });
-    document.getElementById('btnStartSentence').addEventListener('click', startSentenceQuiz);
-    document.getElementById('btnSubmitSentence').addEventListener('click', submitAllSentences);
-    document.getElementById('sentenceInput').addEventListener('blur', function () {
-      _saveCurrSentenceText();
-      saveSentenceProgress();
-    });
-    document.getElementById('btnSentencePrev').addEventListener('click', function () {
-      _saveCurrSentenceText();
-      saveSentenceProgress();
-      if (sentenceState.currentIndex > 0) { sentenceState.currentIndex--; renderSentenceQuestion(); }
-    });
-    document.getElementById('btnSentenceNext').addEventListener('click', function () {
-      _saveCurrSentenceText();
-      saveSentenceProgress();
-      if (sentenceState.scored && sentenceState.currentIndex === sentenceState.words.length - 1) {
-        showSentenceResults();
-      } else if (sentenceState.currentIndex < sentenceState.words.length - 1) {
-        sentenceState.currentIndex++;
-        renderSentenceQuestion();
-      }
-    });
-    document.getElementById('btnSentenceQuizBack').addEventListener('click', function () {
-      _saveCurrSentenceText();
-      saveSentenceProgress();
-      if (sentenceState.timerInterval) clearInterval(sentenceState.timerInterval);
-      showScreen('screen-sentence-home');
-    });
-    document.getElementById('btnSentenceResultHome').addEventListener('click', function () { showScreen('screen-home'); });
-    document.getElementById('btnSentenceResultHomeBtn').addEventListener('click', function () { showScreen('screen-home'); });
-    document.getElementById('btnSentenceReport').addEventListener('click', loadSentenceReport);
-    document.getElementById('btnSentenceReportBack').addEventListener('click', function () { showScreen('screen-sentence-result'); });
-    document.getElementById('btnSentenceReportHome').addEventListener('click', function () { showScreen('screen-home'); });
-
-    document.getElementById('sentenceResultList').addEventListener('click', function (e) {
-      var item = e.target.closest('.sentence-result-item');
-      if (!item) return;
-      var idx = parseInt(item.dataset.idx, 10);
-      if (isNaN(idx)) return;
-      sentenceState.currentIndex = idx;
-      showScreen('screen-sentence-quiz');
-      renderSentenceQuestion();
-    });
-
-    document.getElementById('btnSentenceHistory').addEventListener('click', openSentenceHistory);
-    document.getElementById('btnSentenceHistoryBack').addEventListener('click', function () { showScreen('screen-sentence-home'); });
-    document.getElementById('btnSentenceDetailBack').addEventListener('click', function () { openSentenceHistory(); });
-    document.getElementById('btnClearSentenceHistory').addEventListener('click', function () {
-      if (confirm('确定清空所有造句历史记录吗？')) {
-        localStorage.removeItem(SENTENCE_HISTORY_KEY);
-        openSentenceHistory();
-      }
-    });
-    document.getElementById('sentenceHistoryList').addEventListener('click', function (e) {
-      var item = e.target.closest('.sentence-result-item');
-      if (!item || item.dataset.histIdx === undefined) return;
-      openSentenceHistoryDetail(parseInt(item.dataset.histIdx, 10));
-    });
-
-
-    // ═══════════════════════════════════════════════
     //  语法专练模块
     // ═══════════════════════════════════════════════
     var GRAMMAR_API_BASE = 'https://generategrammarquiz-tbj6ixfqaa-uc.a.run.app';
@@ -4968,8 +3831,6 @@
       clauses: { name: '从句', icon: '🔗', subRules: ['relative_clause', 'conditional_clause', 'adverbial_clause', 'noun_clause'] },
       modals: { name: '情态动词', icon: '💬', subRules: ['can_could', 'must_have_to', 'should_ought_to', 'may_might'] }
     };
-
-    var GRAMMAR_HISTORY_KEY = 'grammar_history';
 
     var grammarState = {
       selectedTopic: null,
@@ -5081,7 +3942,7 @@
 
     async function startGrammarQuiz() {
       if (!grammarState.selectedTopic) return;
-      showGrammarLoading('正在从题库智能选题...');
+      showGrammarLoading('AI 正在根据你的掌握情况出题...');
       try {
         var resp = await fetch(GRAMMAR_API_BASE, {
           method: 'POST',
@@ -5113,9 +3974,8 @@
       var total = grammarState.questions.length;
       var q = grammarState.questions[idx];
 
-      var reasonLabel = q.selectionReason === 'weak_review' ? ' 🔄弱点' : ' ✨推荐';
-      document.getElementById('grammarQuizProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题' + reasonLabel;
-      document.getElementById('grammarQuizTopic').textContent = (GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '') + ' · ' + (q.subRule || '');
+      document.getElementById('grammarQuizProgress').textContent = '第 ' + (idx + 1) + ' / ' + total + ' 题';
+      document.getElementById('grammarQuizTopic').textContent = GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '';
 
       var barHtml = '';
       for (var i = 0; i < total; i++) {
@@ -5150,13 +4010,9 @@
       var expEl = document.getElementById('grammarExplanation');
       if (answered) {
         var expText = q.explanation || '';
-        var reasonTag = q.selectionReason === 'weak_review'
-          ? '<span style="display:inline-block;background:rgba(255,100,100,0.15);color:#ff6b6b;font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-right:0.3rem;">🔄 弱点复习</span>'
-          : '<span style="display:inline-block;background:rgba(50,215,75,0.15);color:var(--correct);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-right:0.3rem;">✨ AI推荐</span>';
-        var sourceTag = '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;">📚 ' + (q.source || 'zanichelli') + '</span><br>';
-        sourceTag = reasonTag + sourceTag;
-        if (!expText) {
-          expText = '正确答案是 "' + q.options[q.correctIndex] + '"。此题来自 ' + (q.source || 'zanichelli') + ' 专业语法题库。';
+        var sourceTag = q.source === 'seed_bank' ? '<span style="display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-light);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-bottom:0.3rem;">📚 专业题库</span><br>' : '<span style="display:inline-block;background:rgba(50,215,75,0.15);color:var(--correct);font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:3px;margin-bottom:0.3rem;">🤖 AI 出题</span><br>';
+        if (!expText && q.source === 'seed_bank') {
+          expText = '正确答案是 "' + q.options[q.correctIndex] + '"。此题来自专业语法题库。';
         }
         expEl.innerHTML = sourceTag + escapeHtml(expText);
         expEl.classList.add('show');
@@ -5233,53 +4089,7 @@
       }
     }
 
-    function saveGrammarHistory(data) {
-      try {
-        var history = JSON.parse(localStorage.getItem(GRAMMAR_HISTORY_KEY) || '[]');
-        var correct = 0;
-        var questionDetails = grammarState.questions.map(function (q, i) {
-          var a = grammarState.answers[i];
-          var isCorrect = a && a.selected === q.correctIndex;
-          if (isCorrect) correct++;
-          return {
-            question: q.sentence || q.question || '',
-            subRule: q.subRule || '',
-            selectionReason: q.selectionReason || '',
-            correctAnswer: q.options ? q.options[q.correctIndex] : '',
-            userAnswer: q.options && a ? q.options[a.selected] || '' : '',
-            isCorrect: isCorrect,
-            explanation: q.explanation || ''
-          };
-        });
-        var ruleResults = {};
-        if (data.ruleAnalysis) {
-          data.ruleAnalysis.forEach(function (ra) {
-            ruleResults[ra.subRule] = { mastery: ra.mastery || 0, isWeak: ra.isSystemicWeakness || false, insight: ra.insight || '' };
-          });
-        }
-        history.push({
-          date: new Date().toISOString(),
-          user: _currentUser || '',
-          topic: grammarState.selectedTopic,
-          topicName: GRAMMAR_TOPICS[grammarState.selectedTopic] ? GRAMMAR_TOPICS[grammarState.selectedTopic].name : grammarState.selectedTopic,
-          difficulty: grammarState.difficulty,
-          score: data.score || 0,
-          totalCorrect: correct,
-          totalQuestions: grammarState.questions.length,
-          diagnosis: data.diagnosis || '',
-          strengths: data.strengths || [],
-          weaknesses: data.weaknesses || [],
-          studyTips: data.studyTips || [],
-          ruleResults: ruleResults,
-          details: questionDetails
-        });
-        if (history.length > 50) history = history.slice(-50);
-        localStorage.setItem(GRAMMAR_HISTORY_KEY, JSON.stringify(history));
-      } catch (e) { /* ignore */ }
-    }
-
     function renderGrammarReport(data) {
-      saveGrammarHistory(data);
       var score = data.score || 0;
       var ringFg = document.getElementById('grammarRingFg');
       var circumference = 264;
@@ -5288,12 +4098,12 @@
       ringFg.style.stroke = ringColor;
       setTimeout(function () { ringFg.style.strokeDashoffset = offset; }, 100);
       document.getElementById('grammarScoreNum').textContent = score;
-      var weakC = grammarState.questions.filter(function (q) { return q.selectionReason === 'weak_review'; }).length;
-      var recC = grammarState.questions.length - weakC;
+      var seedC = grammarState.questions.filter(function (q) { return q.source === 'seed_bank'; }).length;
+      var aiC = grammarState.questions.length - seedC;
       document.getElementById('grammarScoreSummary').innerHTML =
         (data.totalCorrect || 0) + ' / ' + (data.totalQuestions || grammarState.questions.length) + ' 正确 · ' +
         (GRAMMAR_TOPICS[grammarState.selectedTopic]?.name || '') +
-        '<br><span style="font-size:0.72rem;color:var(--muted);">🔄 弱点复习 ' + weakC + ' 题 + ✨ AI推荐 ' + recC + ' 题</span>';
+        '<br><span style="font-size:0.72rem;color:var(--muted);">📚 题库 ' + seedC + ' 题 + 🤖 AI ' + aiC + ' 题</span>';
 
       var ruleHtml = '';
       if (data.ruleAnalysis && data.ruleAnalysis.length) {
@@ -5345,233 +4155,6 @@
       });
     }
 
-    // ── 语法历史分析 ──
-    function getGrammarHistoryForUser() {
-      try {
-        return JSON.parse(localStorage.getItem(GRAMMAR_HISTORY_KEY) || '[]').filter(function (h) { return h.user === (_currentUser || ''); });
-      } catch (e) { return []; }
-    }
-
-    function openGrammarHistory() {
-      var history = getGrammarHistoryForUser();
-      renderGrammarHistoryOverview(history);
-      renderGrammarHistoryList(history);
-      showScreen('screen-grammar-history');
-    }
-
-    function renderGrammarHistoryOverview(history) {
-      var el = document.getElementById('grammarHistoryOverview');
-      if (history.length === 0) {
-        el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:1rem 0;">暂无测验记录</div>';
-        return;
-      }
-
-      var scores = history.map(function (h) { return h.score || 0; });
-      var avgScore = Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length);
-      var maxScore = Math.max.apply(null, scores);
-      var totalCorrect = history.reduce(function (s, h) { return s + (h.totalCorrect || 0); }, 0);
-      var totalQs = history.reduce(function (s, h) { return s + (h.totalQuestions || 0); }, 0);
-      var accuracy = totalQs > 0 ? Math.round((totalCorrect / totalQs) * 100) : 0;
-
-      var recentScores = scores.slice(-10);
-      var firstHalf = recentScores.slice(0, Math.floor(recentScores.length / 2));
-      var secondHalf = recentScores.slice(Math.floor(recentScores.length / 2));
-      var firstAvg = firstHalf.length > 0 ? firstHalf.reduce(function (a, b) { return a + b; }, 0) / firstHalf.length : 0;
-      var secondAvg = secondHalf.length > 0 ? secondHalf.reduce(function (a, b) { return a + b; }, 0) / secondHalf.length : 0;
-      var trend = secondAvg - firstAvg;
-      var trendIcon = trend > 3 ? '📈' : trend < -3 ? '📉' : '➡️';
-      var trendText = trend > 3 ? '进步中 +' + Math.round(trend) : trend < -3 ? '退步 ' + Math.round(trend) : '稳定';
-      var trendColor = trend > 3 ? 'var(--correct)' : trend < -3 ? 'var(--wrong)' : 'var(--muted)';
-
-      var html = '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">';
-      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.3rem;font-weight:700;color:' + _scoreColor(avgScore, 100) + ';">' + avgScore + '</div><div class="hint">平均分</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.3rem;font-weight:700;color:var(--correct);">' + accuracy + '%</div><div class="hint">正确率</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1.3rem;font-weight:700;color:var(--text);">' + history.length + '</div><div class="hint">测试次数</div></div>';
-      html += '<div style="text-align:center;flex:1;min-width:65px;padding:0.5rem;background:rgba(255,255,255,0.04);border-radius:var(--r-md);">';
-      html += '<div style="font-size:1rem;font-weight:700;color:' + trendColor + ';">' + trendIcon + '</div><div class="hint" style="color:' + trendColor + ';">' + trendText + '</div></div>';
-      html += '</div>';
-
-      html += '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem;">分数趋势（最近' + recentScores.length + '次）</div>';
-      html += '<div style="display:flex;align-items:flex-end;gap:2px;height:40px;margin-bottom:0.75rem;">';
-      var barMax = Math.max.apply(null, recentScores.concat([1]));
-      recentScores.forEach(function (s) {
-        var h = Math.max(4, Math.round((s / barMax) * 38));
-        html += '<div style="flex:1;height:' + h + 'px;background:' + _scoreColor(s, 100) + ';border-radius:2px;" title="' + s + '分"></div>';
-      });
-      html += '</div>';
-
-      var topicStats = {};
-      history.forEach(function (h) {
-        var t = h.topic || 'unknown';
-        if (!topicStats[t]) topicStats[t] = { name: h.topicName || t, scores: [], correct: 0, total: 0 };
-        topicStats[t].scores.push(h.score || 0);
-        topicStats[t].correct += h.totalCorrect || 0;
-        topicStats[t].total += h.totalQuestions || 0;
-      });
-
-      var topicEntries = Object.entries(topicStats).sort(function (a, b) {
-        var avgA = a[1].scores.reduce(function (s, v) { return s + v; }, 0) / a[1].scores.length;
-        var avgB = b[1].scores.reduce(function (s, v) { return s + v; }, 0) / b[1].scores.length;
-        return avgA - avgB;
-      });
-
-      if (topicEntries.length > 0) {
-        html += '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📊 各专项成绩</div>';
-        topicEntries.forEach(function (pair) {
-          var st = pair[1];
-          var avg = Math.round(st.scores.reduce(function (a, b) { return a + b; }, 0) / st.scores.length);
-          var acc = st.total > 0 ? Math.round((st.correct / st.total) * 100) : 0;
-          var c = _scoreColor(avg, 100);
-          var latestTrend = '';
-          if (st.scores.length >= 2) {
-            var diff = st.scores[st.scores.length - 1] - st.scores[st.scores.length - 2];
-            latestTrend = diff > 0 ? ' ↑' + diff : diff < 0 ? ' ↓' + Math.abs(diff) : '';
-          }
-          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">';
-          html += '<span style="font-size:0.78rem;min-width:5rem;color:var(--text-secondary);">' + escapeHtml(st.name) + '</span>';
-          html += '<div style="flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">';
-          html += '<div style="width:' + avg + '%;height:100%;background:' + c + ';border-radius:3px;"></div></div>';
-          html += '<span style="font-size:0.75rem;color:' + c + ';min-width:4.5rem;text-align:right;">' + avg + '分 · ' + acc + '%' + latestTrend + '</span>';
-          html += '</div>';
-        });
-      }
-
-      var subRuleStats = {};
-      history.forEach(function (h) {
-        if (!h.details) return;
-        h.details.forEach(function (d) {
-          var key = d.subRule || 'unknown';
-          if (!subRuleStats[key]) subRuleStats[key] = { total: 0, wrong: 0 };
-          subRuleStats[key].total++;
-          if (!d.isCorrect) subRuleStats[key].wrong++;
-        });
-      });
-
-      var weakRules = Object.entries(subRuleStats).filter(function (p) { return p[1].wrong > 0; })
-        .map(function (p) { return { rule: p[0], wrong: p[1].wrong, total: p[1].total, rate: Math.round((p[1].wrong / p[1].total) * 100) }; })
-        .sort(function (a, b) { return b.wrong - a.wrong; });
-
-      if (weakRules.length > 0) {
-        html += '<div style="font-size:0.82rem;font-weight:600;margin-top:0.75rem;margin-bottom:0.4rem;">🔴 高频错误知识点</div>';
-        weakRules.slice(0, 8).forEach(function (w) {
-          html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0.5rem;margin-bottom:0.2rem;background:rgba(255,100,100,0.06);border-radius:var(--r-sm);font-size:0.78rem;">';
-          html += '<span style="color:var(--text-secondary);">' + escapeHtml(w.rule) + '</span>';
-          html += '<span style="color:var(--wrong);font-weight:600;">' + w.wrong + '/' + w.total + ' 错 (' + w.rate + '%)</span>';
-          html += '</div>';
-        });
-      }
-
-      el.innerHTML = html;
-    }
-
-    function renderGrammarHistoryList(history) {
-      var el = document.getElementById('grammarHistoryList');
-      if (history.length === 0) { el.innerHTML = ''; return; }
-
-      var html = '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.5rem;">📝 测验记录</div>';
-      var reversed = history.slice().reverse();
-      reversed.forEach(function (h, idx) {
-        var realIdx = history.length - 1 - idx;
-        var d = new Date(h.date);
-        var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-        var c = _scoreColor(h.score, 100);
-        var topicIcon = GRAMMAR_TOPICS[h.topic] ? GRAMMAR_TOPICS[h.topic].icon : '📝';
-        html += '<div class="sentence-result-item" data-ghist-idx="' + realIdx + '" style="cursor:pointer;">';
-        html += '<span class="sri-num" style="font-size:0.85rem;">' + topicIcon + '</span>';
-        html += '<div style="flex:1;min-width:0;">';
-        html += '<div style="font-size:0.82rem;font-weight:600;color:var(--text);">' + escapeHtml(h.topicName || h.topic) + '</div>';
-        html += '<div style="font-size:0.72rem;color:var(--muted);">' + dateStr + ' · ' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + ' 正确</div>';
-        html += '</div>';
-        html += '<span class="sri-score" style="color:' + c + ';">' + h.score + '</span>';
-        html += '</div>';
-      });
-      el.innerHTML = html;
-    }
-
-    function openGrammarHistoryDetail(idx) {
-      var history = getGrammarHistoryForUser();
-      var h = history[idx];
-      if (!h) return;
-
-      var d = new Date(h.date);
-      var dateStr = d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('grammarDetailTitle').textContent = (h.topicName || h.topic) + ' · ' + h.score + '分';
-
-      var html = '';
-      html += '<div style="text-align:center;margin-bottom:0.75rem;">';
-      html += '<div style="font-size:2.2rem;font-weight:700;color:' + _scoreColor(h.score, 100) + ';">' + h.score + '</div>';
-      html += '<div class="hint">' + dateStr + ' · ' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + ' 正确 · ' + (h.difficulty || '') + '</div></div>';
-
-      if (h.ruleResults && Object.keys(h.ruleResults).length > 0) {
-        html += '<div style="font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📋 各规则掌握度</div>';
-        Object.entries(h.ruleResults).forEach(function (pair) {
-          var name = pair[0]; var data = pair[1];
-          var pct = Math.round((data.mastery || 0) * 100);
-          var color = data.mastery >= 0.7 ? 'var(--correct)' : data.mastery >= 0.4 ? '#f59e0b' : 'var(--wrong)';
-          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">';
-          html += '<span style="font-size:0.78rem;min-width:6rem;color:var(--text-secondary);">' + escapeHtml(name) + (data.isWeak ? ' ⚠' : '') + '</span>';
-          html += '<div style="flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">';
-          html += '<div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:3px;"></div></div>';
-          html += '<span style="font-size:0.75rem;color:' + color + ';min-width:2.5rem;text-align:right;">' + pct + '%</span>';
-          html += '</div>';
-          if (data.insight) html += '<div style="font-size:0.72rem;color:var(--muted);margin-left:6.5rem;margin-top:-0.1rem;margin-bottom:0.2rem;">' + escapeHtml(data.insight) + '</div>';
-        });
-      }
-
-      if (h.diagnosis) {
-        html += '<div style="margin-top:0.75rem;padding:0.6rem;background:rgba(167,139,250,0.08);border-radius:var(--r-sm);font-size:0.82rem;color:var(--accent-light);">';
-        html += '🔍 ' + escapeHtml(h.diagnosis) + '</div>';
-      }
-
-      if (h.weaknesses && h.weaknesses.length > 0) {
-        html += '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600;color:var(--wrong);margin-bottom:0.3rem;">⚠️ 需要加强</div>';
-        h.weaknesses.forEach(function (w) { html += '<div style="font-size:0.78rem;color:var(--text-secondary);padding:0.15rem 0;">· ' + escapeHtml(w) + '</div>'; });
-      }
-      if (h.strengths && h.strengths.length > 0) {
-        html += '<div style="margin-top:0.5rem;font-size:0.82rem;font-weight:600;color:var(--correct);margin-bottom:0.3rem;">✅ 掌握良好</div>';
-        h.strengths.forEach(function (s) { html += '<div style="font-size:0.78rem;color:var(--text-secondary);padding:0.15rem 0;">· ' + escapeHtml(s) + '</div>'; });
-      }
-
-      if (h.details && h.details.length > 0) {
-        html += '<div style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">📝 逐题回顾</div>';
-        h.details.forEach(function (det, i) {
-          var bgColor = det.isCorrect ? 'rgba(50,215,75,0.06)' : 'rgba(255,100,100,0.06)';
-          var borderColor = det.isCorrect ? 'rgba(50,215,75,0.2)' : 'rgba(255,100,100,0.2)';
-          var icon = det.isCorrect ? '✅' : '❌';
-          html += '<div style="padding:0.5rem;margin-bottom:0.4rem;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:var(--r-sm);">';
-          html += '<div style="display:flex;align-items:center;gap:0.3rem;margin-bottom:0.2rem;">';
-          html += '<span>' + icon + '</span><span style="font-size:0.78rem;font-weight:600;">#' + (i + 1) + '</span>';
-          if (det.subRule) html += '<span style="font-size:0.68rem;color:var(--muted);background:rgba(255,255,255,0.06);padding:0.1rem 0.3rem;border-radius:3px;">' + escapeHtml(det.subRule) + '</span>';
-          if (det.selectionReason) {
-            var reasonTag = det.selectionReason === 'weak_review' ? '🔄弱点' : '✨推荐';
-            html += '<span style="font-size:0.65rem;color:var(--muted);">' + reasonTag + '</span>';
-          }
-          html += '</div>';
-          html += '<div style="font-size:0.82rem;color:var(--text);margin-bottom:0.2rem;">' + escapeHtml(det.question) + '</div>';
-          if (!det.isCorrect) {
-            html += '<div style="font-size:0.75rem;"><span style="color:var(--wrong);text-decoration:line-through;">你的答案：' + escapeHtml(det.userAnswer) + '</span> → <span style="color:var(--correct);font-weight:600;">' + escapeHtml(det.correctAnswer) + '</span></div>';
-          } else {
-            html += '<div style="font-size:0.75rem;color:var(--correct);">答案：' + escapeHtml(det.correctAnswer) + '</div>';
-          }
-          if (det.explanation && !det.isCorrect) {
-            html += '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.15rem;">' + escapeHtml(det.explanation) + '</div>';
-          }
-          html += '</div>';
-        });
-      }
-
-      if (h.studyTips && h.studyTips.length > 0) {
-        html += '<div style="margin-top:0.6rem;font-size:0.82rem;font-weight:600;margin-bottom:0.3rem;">💡 学习建议</div>';
-        h.studyTips.forEach(function (t) { html += '<div style="font-size:0.78rem;color:var(--accent-light);padding:0.15rem 0;">· ' + escapeHtml(t) + '</div>'; });
-      }
-
-      document.getElementById('grammarDetailBody').innerHTML = html;
-      showScreen('screen-grammar-history-detail');
-    }
-
     // Grammar event listeners
     document.getElementById('btnOpenGrammar').addEventListener('click', function () { openGrammarHome(); });
     document.getElementById('btnGrammarBackHome').addEventListener('click', function () { showScreen('screen-home'); });
@@ -5606,21 +4189,6 @@
 
     document.getElementById('btnGrammarRetry').addEventListener('click', function () { startGrammarQuiz(); });
     document.getElementById('btnGrammarNewTopic').addEventListener('click', function () { openGrammarHome(); });
-
-    document.getElementById('btnGrammarHistory').addEventListener('click', openGrammarHistory);
-    document.getElementById('btnGrammarHistoryBack').addEventListener('click', function () { showScreen('screen-grammar'); });
-    document.getElementById('btnGrammarDetailBack').addEventListener('click', function () { openGrammarHistory(); });
-    document.getElementById('btnClearGrammarHistory').addEventListener('click', function () {
-      if (confirm('确定清空所有语法历史记录吗？')) {
-        localStorage.removeItem(GRAMMAR_HISTORY_KEY);
-        openGrammarHistory();
-      }
-    });
-    document.getElementById('grammarHistoryList').addEventListener('click', function (e) {
-      var item = e.target.closest('.sentence-result-item');
-      if (!item || item.dataset.ghistIdx === undefined) return;
-      openGrammarHistoryDetail(parseInt(item.dataset.ghistIdx, 10));
-    });
 
     (function init() {
       var sizeEl = document.getElementById('quizSize');
@@ -5671,7 +4239,7 @@
       rescheduleOverdueWords();
       updateReviewBadge();
 
-      tryLoadFromSheet(true).then(function (ok) {
+      tryLoadFromSheet().then(function (ok) {
         if (ok) {
           fillVocabGroupSelect();
           initFlashcardWords();
