@@ -3063,7 +3063,21 @@
     function loadUserDataFromCloud(username) {
       var el = document.getElementById('currentUserDisplay');
       if (el) el.textContent = username + ' (同步中...)';
-      fetch(USER_GET_URL + '?username=' + encodeURIComponent(username), { redirect: 'follow', credentials: 'omit' })
+      _updateSyncIndicator('syncing');
+      var localPayload = {
+        username: username,
+        quizHistory: getQuizHistoryFromStorage(),
+        wordStats: getWordStatsFromStorage(),
+        reviewPlan: getReviewPlanFromStorage(),
+        wrongWords: getWrongFromStorage(),
+      };
+      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0;
+      var uploadFirst = hasLocalData
+        ? fetch(USER_SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(localPayload) }).then(function (r) { return r.json(); }).catch(function () { return { ok: false }; })
+        : Promise.resolve({ ok: true });
+      uploadFirst.then(function () {
+        return fetch(USER_GET_URL + '?username=' + encodeURIComponent(username), { redirect: 'follow', credentials: 'omit' });
+      })
         .then(function (r) { return r.json(); })
         .then(function (resp) {
           if (resp.ok && resp.found && resp.data) {
@@ -3075,10 +3089,12 @@
             var dn = d.displayName || username;
             if (el) el.textContent = dn;
             _updateBarAvatar(dn);
+            _updateSyncIndicator('ok');
           } else {
             if (el) el.textContent = username;
             _updateBarAvatar(username);
-            syncUserDataToCloud();
+            if (hasLocalData) _updateSyncIndicator('ok');
+            else _updateSyncIndicator('');
           }
           updateReviewBadge();
           rescheduleOverdueWords();
@@ -3087,6 +3103,7 @@
         })
         .catch(function () {
           if (el) el.textContent = username;
+          _updateSyncIndicator('fail');
         });
     }
 
