@@ -2584,6 +2584,9 @@
       setSourceLabel('加载中…');
       var attempt = function (retries) {
         return loadWordBankFromUrl(url).then(function (ok) {
+          // #region agent log
+          fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:tryLoadFromSheet:result',message:'loadWordBankFromUrl resolved',data:{ok:!!ok,retries:retries},timestamp:Date.now(),hypothesisId:'B3'})}).catch(function(){});
+          // #endregion
           if (ok) { _lastSheetLoadTime = Date.now(); return true; }
           if (retries > 0) {
             console.warn('[vocab] load failed, retrying... (' + retries + ' left)');
@@ -2592,6 +2595,9 @@
           setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
           return false;
         }).catch(function (err) {
+          // #region agent log
+          fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:tryLoadFromSheet:CATCH',message:'fetch FAILED',data:{error:String(err),errorMsg:err&&err.message,retries:retries},timestamp:Date.now(),hypothesisId:'B2'})}).catch(function(){});
+          // #endregion
           console.error('[vocab] fetch error:', err);
           if (retries > 0) {
             return new Promise(function (resolve) { setTimeout(resolve, 1500); }).then(function () { return attempt(retries - 1); });
