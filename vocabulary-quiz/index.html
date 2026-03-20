@@ -2475,10 +2475,6 @@
     function fillHomeGroupSelect() {
       var sel = document.getElementById('homeGroupSelect');
       if (!sel) return;
-      // #region agent log
-      var _dbgCats = (state.categories || []).map(function(c){return c.name;});
-      fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:fillHomeGroupSelect',message:'filling dropdown',data:{catCount:_dbgCats.length,catNames:_dbgCats},timestamp:Date.now(),hypothesisId:'D'})}).catch(function(){});
-      // #endregion
       sel.innerHTML = '<option value="all">全部</option>';
       (state.categories || []).forEach(function (c) {
         var opt = document.createElement('option');
@@ -2495,23 +2491,13 @@
     }
 
     function loadWordBankFromUrl(url) {
-      // #region agent log
-      fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:loadWordBankFromUrl',message:'fetching sheet URL',data:{url:url},timestamp:Date.now(),hypothesisId:'B'})}).catch(function(){});
-      // #endregion
       return fetch(url, { redirect: 'follow', credentials: 'omit' })
         .then(function (r) {
-          // #region agent log
-          fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:loadWordBankFromUrl:response',message:'fetch response',data:{status:r.status,ok:r.ok,redirected:r.redirected},timestamp:Date.now(),hypothesisId:'B'})}).catch(function(){});
-          // #endregion
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.text();
         })
         .then(function (txt) {
           try { var data = JSON.parse(txt); } catch (e) { console.error('JSON parse fail:', txt.substring(0, 200)); return false; }
-          // #region agent log
-          var catNames = data && data.categories ? data.categories.map(function(c){return c.name;}) : [];
-          fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:loadWordBankFromUrl:parsed',message:'parsed categories',data:{catCount:catNames.length,catNames:catNames,hasProposition:catNames.indexOf('Proposition')>=0},timestamp:Date.now(),hypothesisId:'C'})}).catch(function(){});
-          // #endregion
           return data;
         })
         .then(function (data) {
@@ -2571,22 +2557,13 @@
     var _lastSheetLoadTime = 0;
     function tryLoadFromSheet(force) {
       var now = Date.now();
-      // #region agent log
-      fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:tryLoadFromSheet',message:'tryLoadFromSheet called',data:{force:force,lastLoadTime:_lastSheetLoadTime,catLen:state.categories.length,timeDiff:now-_lastSheetLoadTime},timestamp:Date.now()})}).catch(function(){});
-      // #endregion
       if (!force && _lastSheetLoadTime && (now - _lastSheetLoadTime < 30000) && state.categories.length > 0) {
-        // #region agent log
-        fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:tryLoadFromSheet:SKIPPED',message:'SKIPPED due to throttle',data:{force:force},timestamp:Date.now(),hypothesisId:'A'})}).catch(function(){});
-        // #endregion
         return Promise.resolve(true);
       }
       var url = getVocabUrl();
       setSourceLabel('加载中…');
       var attempt = function (retries) {
         return loadWordBankFromUrl(url).then(function (ok) {
-          // #region agent log
-          fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:tryLoadFromSheet:result',message:'loadWordBankFromUrl resolved',data:{ok:!!ok,retries:retries},timestamp:Date.now(),hypothesisId:'B3'})}).catch(function(){});
-          // #endregion
           if (ok) { _lastSheetLoadTime = Date.now(); return true; }
           if (retries > 0) {
             console.warn('[vocab] load failed, retrying... (' + retries + ' left)');
@@ -2595,9 +2572,6 @@
           setSourceLabel(isDefaultSource() ? '默认词库（加载失败）' : '自定义（加载失败）');
           return false;
         }).catch(function (err) {
-          // #region agent log
-          fetch('http://127.0.0.1:7441/ingest/13a8542e-5510-4b70-9e0b-aea4820148db',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'26d6fb'},body:JSON.stringify({sessionId:'26d6fb',location:'index.html:tryLoadFromSheet:CATCH',message:'fetch FAILED',data:{error:String(err),errorMsg:err&&err.message,retries:retries},timestamp:Date.now(),hypothesisId:'B2'})}).catch(function(){});
-          // #endregion
           console.error('[vocab] fetch error:', err);
           if (retries > 0) {
             return new Promise(function (resolve) { setTimeout(resolve, 1500); }).then(function () { return attempt(retries - 1); });
@@ -3046,10 +3020,18 @@
       var username = displayName.trim().toLowerCase().replace(/\s+/g, '_');
       if (!username) return;
 
-      localStorage.setItem(STORAGE_WRONG, '[]');
-      localStorage.setItem(STORAGE_WORD_STATS, '{}');
-      localStorage.setItem(STORAGE_QUIZ_HISTORY, '[]');
-      localStorage.setItem(STORAGE_REVIEW_PLAN, '{}');
+      var existingHistory = getQuizHistoryFromStorage();
+      var existingStats = getWordStatsFromStorage();
+      var existingPlan = getReviewPlanFromStorage();
+      var existingWrong = getWrongFromStorage();
+      var hasExistingData = existingHistory.length > 0 || Object.keys(existingStats).length > 0;
+
+      if (!hasExistingData) {
+        localStorage.setItem(STORAGE_WRONG, '[]');
+        localStorage.setItem(STORAGE_WORD_STATS, '{}');
+        localStorage.setItem(STORAGE_QUIZ_HISTORY, '[]');
+        localStorage.setItem(STORAGE_REVIEW_PLAN, '{}');
+      }
 
       setCurrentUser(username);
       hideUserModal();
@@ -3060,10 +3042,10 @@
         body: JSON.stringify({
           username: username,
           displayName: displayName.trim(),
-          quizHistory: [],
-          wordStats: {},
-          reviewPlan: {},
-          wrongWords: [],
+          quizHistory: hasExistingData ? existingHistory : [],
+          wordStats: hasExistingData ? existingStats : {},
+          reviewPlan: hasExistingData ? existingPlan : {},
+          wrongWords: hasExistingData ? existingWrong : [],
         }),
       }).catch(function (e) { console.warn('createUser save failed:', e); });
 
@@ -3095,9 +3077,12 @@
           } else {
             if (el) el.textContent = username;
             _updateBarAvatar(username);
+            syncUserDataToCloud();
           }
           updateReviewBadge();
           rescheduleOverdueWords();
+          try { renderStatsOverview(); } catch (_) {}
+          try { renderHighFreqWordList(); } catch (_) {}
         })
         .catch(function () {
           if (el) el.textContent = username;
