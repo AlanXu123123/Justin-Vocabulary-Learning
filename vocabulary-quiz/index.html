@@ -2778,13 +2778,6 @@
         feedbackEl.className = 'feedback wrong';
         feedbackEl.innerHTML = '<span class="icon">✗</span> 错误，正确答案：' + item.word;
         Audio.wrong();
-
-        var alreadyQueued = state.currentQuiz.slice(state.index + 1).some(function (w) { return w.word === item.word; });
-        var queuedCount = state.currentQuiz.length - (state.index + 1);
-        if (!alreadyQueued && queuedCount < state.currentQuiz.length + 10) {
-          state.currentQuiz.push({ word: item.word, definition: item.definition, categoryId: item.categoryId });
-          state.quizAnswers.push({ answered: false, userAnswer: '', correct: false });
-        }
       }
 
       showQuizAIExtra(item.word, state.index);
