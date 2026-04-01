@@ -586,6 +586,24 @@
     /* ===== Flashcard ===== */
     .flashcard-section { margin-bottom: 1rem; }
     .flashcard-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
+    /* Learn page */
+    .learn-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; }
+    .learn-timer { font-size:1.1rem; font-weight:700; color:#60a5fa; font-variant-numeric:tabular-nums; background:rgba(96,165,250,0.12); padding:0.25rem 0.75rem; border-radius:8px; }
+    .learn-dashboard { display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; margin-bottom:0.75rem; }
+    .learn-dash-item { text-align:center; background:var(--glass); backdrop-filter:blur(8px); border:1px solid var(--glass-border); border-radius:10px; padding:0.5rem 0.25rem; }
+    .learn-dash-value { display:block; font-size:1.1rem; font-weight:700; color:var(--text); }
+    .learn-dash-label { display:block; font-size:0.7rem; color:var(--muted); margin-top:0.15rem; }
+    /* Stats tabs */
+    .stats-tabs { display:flex; gap:0; margin-bottom:1rem; border-bottom:2px solid var(--glass-border); }
+    .stats-tab { flex:1; text-align:center; padding:0.5rem 0.75rem; font-size:0.85rem; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+    .stats-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+    .stats-tab-content { display:none; }
+    .stats-tab-content.active { display:block; }
+    .learn-history-item { display:flex; justify-content:space-between; align-items:center; padding:0.55rem 0.65rem; border-bottom:1px solid rgba(255,255,255,0.06); font-size:0.82rem; }
+    .learn-history-item:last-child { border-bottom:none; }
+    .learn-history-date { color:var(--muted); font-size:0.75rem; }
+    .learn-history-group { color:#a78bfa; font-weight:600; }
+    .learn-history-stat { color:var(--text); }
     .flashcard-group-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem; }
     .flashcard-group-row label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
     .flashcard-group-row select { flex: 1; padding: 0.45rem 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: var(--r-sm); color: var(--text); font-size: 0.9rem; }
@@ -796,6 +814,7 @@
         <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
         <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(118,75,162,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📖 语法专项训练（AI）</button>
         <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
+        <button type="button" class="btn" id="btnOpenFlashcardLearn" style="background:linear-gradient(135deg,#06b6d4 0%,#3b82f6 50%,#8b5cf6 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(59,130,246,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📚 单词学习</button>
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
@@ -828,7 +847,34 @@
         </div>
         <button type="button" class="btn" id="btnStart" style="margin-top: 1rem;">开始测验</button>
       </div>
-      <!-- 单词卡 -->
+      <div class="card">
+        <button type="button" class="btn btn-secondary" id="btnOpenVocab">打开词库</button>
+        <span class="hint" style="margin-left:0.5rem;">当前：<span id="currentGroupLabel">默认</span>，共 <strong id="wordListCount">0</strong> 个单词</span>
+      </div>
+    </div>
+
+    <!-- ═══ 单词学习二级页面 ═══ -->
+    <div id="screen-flashcard-learn" class="screen">
+      <div class="learn-top-bar">
+        <button type="button" class="btn-back-home" id="btnLearnBackHome">← 返回主页</button>
+        <div class="learn-timer" id="learnTimer">00:00</div>
+      </div>
+      <div class="learn-dashboard">
+        <div class="learn-dash-item"><span class="learn-dash-value" id="learnViewedCount">0</span><span class="learn-dash-label">已学</span></div>
+        <div class="learn-dash-item"><span class="learn-dash-value" id="learnTotalCount">0</span><span class="learn-dash-label">总数</span></div>
+        <div class="learn-dash-item"><span class="learn-dash-value" id="learnAvgTime">0s</span><span class="learn-dash-label">平均/卡</span></div>
+        <div class="learn-dash-item"><span class="learn-dash-value" id="learnGroupLabel">--</span><span class="learn-dash-label">词组</span></div>
+      </div>
+      <div class="card" style="padding:0.6rem 0.8rem;">
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <select id="learnGroupSelect" style="flex:1;min-width:120px;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;">
+            <option value="all">全部</option>
+          </select>
+          <input type="number" id="learnRangeStart" min="1" placeholder="起始" style="width:4.5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
+          <span style="color:var(--muted);">—</span>
+          <input type="number" id="learnRangeEnd" min="1" placeholder="结束" style="width:4.5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
+        </div>
+      </div>
       <div class="card flashcard-section" id="flashcardSection">
         <h3>单词卡 <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">← 左滑不认识 · 右滑认识 →</span></h3>
         <div class="flashcard-counter" id="flashcardCounter">- / -</div>
@@ -858,10 +904,6 @@
         <div class="flashcard-settings">
           <label><input type="checkbox" id="chkAutoSpeak" /> 自动朗读</label>
         </div>
-      </div>
-      <div class="card">
-        <button type="button" class="btn btn-secondary" id="btnOpenVocab">打开词库</button>
-        <span class="hint" style="margin-left:0.5rem;">当前：<span id="currentGroupLabel">默认</span>，共 <strong id="wordListCount">0</strong> 个单词</span>
       </div>
     </div>
 
@@ -1217,24 +1259,49 @@
     <!-- 学习统计面板 -->
     <div id="modalStats" class="modal-overlay">
       <div class="modal-dialog-lg">
-        <h3>学习统计 &amp; 高频错词</h3>
-        <div class="stat-cards" id="statCards">
-          <div class="stat-card"><div class="stat-value" id="statTotalQuizzes">0</div><div class="stat-label">总测验次数</div></div>
-          <div class="stat-card"><div class="stat-value" id="statTotalWrongWords">0</div><div class="stat-label">累计错词数</div></div>
-          <div class="stat-card"><div class="stat-value" id="statAvgAccuracy">-</div><div class="stat-label">平均正确率</div></div>
-          <div class="stat-card"><div class="stat-value" id="statDueReview">0</div><div class="stat-label">待复习数</div></div>
+        <h3>学习统计</h3>
+        <div class="stats-tabs">
+          <div class="stats-tab active" data-stats-tab="quiz">测验统计</div>
+          <div class="stats-tab" data-stats-tab="learn">单词学习</div>
         </div>
-        <div class="filter-row">
-          <select id="statsFilterGroup"><option value="all">全部分组</option></select>
+        <!-- Tab 1: 测验统计 -->
+        <div class="stats-tab-content active" id="statsTabQuiz">
+          <div class="stat-cards" id="statCards">
+            <div class="stat-card"><div class="stat-value" id="statTotalQuizzes">0</div><div class="stat-label">总测验次数</div></div>
+            <div class="stat-card"><div class="stat-value" id="statTotalWrongWords">0</div><div class="stat-label">累计错词数</div></div>
+            <div class="stat-card"><div class="stat-value" id="statAvgAccuracy">-</div><div class="stat-label">平均正确率</div></div>
+            <div class="stat-card"><div class="stat-value" id="statDueReview">0</div><div class="stat-label">待复习数</div></div>
+          </div>
+          <div class="filter-row">
+            <select id="statsFilterGroup"><option value="all">全部分组</option></select>
+          </div>
+          <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">高频错词排行</h4>
+          <div class="word-list-wrap" id="highFreqList" style="max-height:320px;">
+            <div class="empty-state">暂无错词记录</div>
+          </div>
+          <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button type="button" class="btn" id="btnHighFreqQuiz" disabled>测试高频错词</button>
+            <button type="button" class="btn btn-secondary" id="btnOpenReviewFromPanel">查看复习计划</button>
+            <button type="button" class="btn btn-danger" id="btnClearStats">清空统计</button>
+          </div>
         </div>
-        <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">高频错词排行</h4>
-        <div class="word-list-wrap" id="highFreqList" style="max-height:320px;">
-          <div class="empty-state">暂无错词记录</div>
+        <!-- Tab 2: 单词学习 -->
+        <div class="stats-tab-content" id="statsTabLearn">
+          <div class="stat-cards" id="learnStatCards">
+            <div class="stat-card"><div class="stat-value" id="statLearnSessions">0</div><div class="stat-label">总学习次数</div></div>
+            <div class="stat-card"><div class="stat-value" id="statLearnDuration">0m</div><div class="stat-label">总学习时长</div></div>
+            <div class="stat-card"><div class="stat-value" id="statLearnWords">0</div><div class="stat-label">总学习单词</div></div>
+            <div class="stat-card"><div class="stat-value" id="statLearnAvgCard">0s</div><div class="stat-label">平均每卡</div></div>
+          </div>
+          <div class="filter-row">
+            <select id="learnStatsFilterGroup"><option value="all">全部分组</option></select>
+          </div>
+          <h4 style="font-size:0.95rem;margin-bottom:0.5rem;">最近学习记录</h4>
+          <div class="word-list-wrap" id="learnHistoryList" style="max-height:320px;">
+            <div class="empty-state">暂无学习记录</div>
+          </div>
         </div>
         <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <button type="button" class="btn" id="btnHighFreqQuiz" disabled>测试高频错词</button>
-          <button type="button" class="btn btn-secondary" id="btnOpenReviewFromPanel">查看复习计划</button>
-          <button type="button" class="btn btn-danger" id="btnClearStats">清空统计</button>
           <button type="button" class="btn btn-secondary" id="modalStatsClose">关闭</button>
         </div>
       </div>
@@ -1286,6 +1353,8 @@
     const STORAGE_CATEGORIES_CACHE = 'vocab_quiz_categories_cache';
     const STORAGE_QUIZ_HISTORY = 'vocab_quiz_history';
     const STORAGE_REVIEW_PLAN = 'vocab_quiz_review_plan';
+    const LEARN_SESSIONS_KEY = 'learnSessions';
+    const MAX_LEARN_SESSIONS = 50;
     const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // legacy, kept for migration
     const MAX_HISTORY = 50;
 
@@ -1581,6 +1650,13 @@
     function saveWrongToStorage(items) {
       try { localStorage.setItem(STORAGE_WRONG, JSON.stringify(items)); } catch (_) {}
       syncUserDataToCloud();
+    }
+
+    function getLearnSessionsFromStorage() {
+      try { return JSON.parse(localStorage.getItem(LEARN_SESSIONS_KEY)) || []; } catch (_) { return []; }
+    }
+    function saveLearnSessionsToStorage(sessions) {
+      try { localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(sessions.slice(0, MAX_LEARN_SESSIONS))); } catch (_) {}
     }
 
     function getQuizSize() {
@@ -3063,6 +3139,7 @@
         wordStats: getWordStatsFromStorage(),
         reviewPlan: getReviewPlanFromStorage(),
         wrongWords: getWrongFromStorage(),
+        learnSessions: getLearnSessionsFromStorage(),
       };
       var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0;
       var uploadFirst = hasLocalData
@@ -3079,6 +3156,7 @@
             if (d.wordStats) localStorage.setItem(STORAGE_WORD_STATS, JSON.stringify(d.wordStats));
             if (d.reviewPlan) localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(d.reviewPlan));
             if (d.wrongWords) localStorage.setItem(STORAGE_WRONG, JSON.stringify(d.wrongWords));
+            if (d.learnSessions) localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(d.learnSessions));
             var dn = d.displayName || username;
             if (el) el.textContent = dn;
             _updateBarAvatar(dn);
@@ -3112,6 +3190,7 @@
           wordStats: getWordStatsFromStorage(),
           reviewPlan: getReviewPlanFromStorage(),
           wrongWords: getWrongFromStorage(),
+          learnSessions: getLearnSessionsFromStorage(),
         };
         var body = JSON.stringify(payload);
         var attempt = function (retries) {
@@ -3147,6 +3226,7 @@
       else { el.textContent = ''; }
     }
     window.addEventListener('beforeunload', function () {
+      if (_learnSession) endLearnSession();
       if (!_currentUser) return;
       var payload = JSON.stringify({
         username: _currentUser,
@@ -3154,6 +3234,7 @@
         wordStats: getWordStatsFromStorage(),
         reviewPlan: getReviewPlanFromStorage(),
         wrongWords: getWrongFromStorage(),
+        learnSessions: getLearnSessionsFromStorage(),
       });
       try { navigator.sendBeacon(USER_SAVE_URL, new Blob([payload], { type: 'application/json' })); } catch (_) {}
     });
@@ -4063,6 +4144,7 @@
         if (item) {
           var grade = _swipe.dx > 0 ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN;
           recordWordResult(item.word, item.definition, item.categoryId || state.currentCategoryId || 'unknown', grade >= FSRS_GRADE.HARD, grade);
+          learnLogCurrentCard(_swipe.dx > 0 ? 'right' : 'left');
         }
         var dir = _swipe.dx > 0 ? 'swipe-away-right' : 'swipe-away-left';
         _flashcardInner.classList.add(dir);
@@ -4072,6 +4154,7 @@
           state.flashcardIndex++;
           if (state.flashcardIndex >= state.flashcardWords.length) state.flashcardIndex = 0;
           renderFlashcard();
+          learnStartCardTimer();
           if (_ttsAutoSpeak && state.flashcardWords.length > 0) {
             speakWord(state.flashcardWords[state.flashcardIndex].word);
           }
@@ -4129,19 +4212,268 @@
     // ─── 闪卡前后按钮 ───
     document.getElementById('btnFlashcardPrev').addEventListener('click', function () {
       if (state.flashcardWords.length === 0) return;
+      learnLogCurrentCard();
       state.flashcardIndex--;
       if (state.flashcardIndex < 0) state.flashcardIndex = state.flashcardWords.length - 1;
       renderFlashcard();
+      learnStartCardTimer();
       if (_ttsAutoSpeak) speakWord(state.flashcardWords[state.flashcardIndex].word);
     });
 
     document.getElementById('btnFlashcardNext').addEventListener('click', function () {
       if (state.flashcardWords.length === 0) return;
+      learnLogCurrentCard();
       state.flashcardIndex++;
       if (state.flashcardIndex >= state.flashcardWords.length) state.flashcardIndex = 0;
       renderFlashcard();
+      learnStartCardTimer();
       if (_ttsAutoSpeak) speakWord(state.flashcardWords[state.flashcardIndex].word);
     });
+
+    // ═══════════════════════════════════════════════
+    //  单词学习监控模块
+    // ═══════════════════════════════════════════════
+    var _learnSession = null;
+    var _learnTimerInterval = null;
+    var _learnCardStartMs = 0;
+    var _learnViewedSet = new Set();
+
+    function startLearnSession() {
+      var sel = document.getElementById('learnGroupSelect');
+      var groupId = sel ? sel.value : state.currentCategoryId || 'all';
+      var groupName = sel ? (sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : groupId) : groupId;
+      applyLearnFilters();
+      initFlashcardWords();
+      _learnSession = {
+        id: 'learn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        startTime: Date.now(),
+        endTime: null,
+        groupId: groupId,
+        groupName: groupName,
+        totalCards: state.flashcardWords.length,
+        viewedCards: 0,
+        cardLogs: [],
+        durationMs: 0
+      };
+      _learnViewedSet = new Set();
+      _learnCardStartMs = Date.now();
+      if (state.flashcardWords.length > 0) {
+        _learnViewedSet.add(state.flashcardWords[0].word);
+        _learnSession.viewedCards = 1;
+      }
+      updateLearnDashboard();
+      startLearnTimer();
+    }
+
+    function applyLearnFilters() {
+      var sel = document.getElementById('learnGroupSelect');
+      if (sel) state.currentCategoryId = sel.value;
+      var rs = document.getElementById('learnRangeStart');
+      var re = document.getElementById('learnRangeEnd');
+      var mainRs = document.getElementById('rangeStart');
+      var mainRe = document.getElementById('rangeEnd');
+      if (mainRs && rs) mainRs.value = rs.value;
+      if (mainRe && re) mainRe.value = re.value;
+    }
+
+    function learnStartCardTimer() {
+      _learnCardStartMs = Date.now();
+      if (_learnSession && state.flashcardWords.length > 0) {
+        var w = state.flashcardWords[state.flashcardIndex];
+        if (w && !_learnViewedSet.has(w.word)) {
+          _learnViewedSet.add(w.word);
+          _learnSession.viewedCards = _learnViewedSet.size;
+        }
+        updateLearnDashboard();
+      }
+    }
+
+    function learnLogCurrentCard(action) {
+      if (!_learnSession || !_learnCardStartMs) return;
+      var w = state.flashcardWords[state.flashcardIndex];
+      if (!w) return;
+      var now = Date.now();
+      var dur = now - _learnCardStartMs;
+      if (dur < 100) return;
+      _learnSession.cardLogs.push({
+        word: w.word,
+        startMs: _learnCardStartMs,
+        endMs: now,
+        durationMs: dur,
+        action: action || 'nav'
+      });
+    }
+
+    function startLearnTimer() {
+      stopLearnTimer();
+      updateLearnTimerDisplay();
+      _learnTimerInterval = setInterval(updateLearnTimerDisplay, 1000);
+    }
+    function stopLearnTimer() {
+      if (_learnTimerInterval) { clearInterval(_learnTimerInterval); _learnTimerInterval = null; }
+    }
+    function updateLearnTimerDisplay() {
+      if (!_learnSession) return;
+      var elapsed = Date.now() - _learnSession.startTime;
+      var secs = Math.floor(elapsed / 1000);
+      var m = Math.floor(secs / 60);
+      var s = secs % 60;
+      var el = document.getElementById('learnTimer');
+      if (el) el.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function updateLearnDashboard() {
+      if (!_learnSession) return;
+      var el;
+      el = document.getElementById('learnViewedCount');
+      if (el) el.textContent = _learnSession.viewedCards;
+      el = document.getElementById('learnTotalCount');
+      if (el) el.textContent = _learnSession.totalCards;
+      el = document.getElementById('learnGroupLabel');
+      if (el) el.textContent = _learnSession.groupName.length > 8 ? _learnSession.groupName.substr(0, 8) + '…' : _learnSession.groupName;
+      var logs = _learnSession.cardLogs;
+      if (logs.length > 0) {
+        var totalDur = logs.reduce(function (s, l) { return s + l.durationMs; }, 0);
+        var avg = Math.round(totalDur / logs.length / 1000);
+        el = document.getElementById('learnAvgTime');
+        if (el) el.textContent = avg + 's';
+      }
+    }
+
+    function endLearnSession() {
+      if (!_learnSession) return;
+      learnLogCurrentCard();
+      stopLearnTimer();
+      _learnSession.endTime = Date.now();
+      _learnSession.durationMs = _learnSession.endTime - _learnSession.startTime;
+      if (_learnSession.viewedCards > 0 && _learnSession.durationMs > 3000) {
+        var sessions = getLearnSessionsFromStorage();
+        sessions.unshift(_learnSession);
+        saveLearnSessionsToStorage(sessions);
+        syncUserDataToCloud(true);
+      }
+      var summary = _learnSession;
+      _learnSession = null;
+      return summary;
+    }
+
+    function fillLearnGroupSelect() {
+      var sel = document.getElementById('learnGroupSelect');
+      if (!sel) return;
+      sel.innerHTML = '<option value="all">全部</option>';
+      (state.categories || []).forEach(function (c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name;
+        sel.appendChild(opt);
+      });
+      sel.value = state.currentCategoryId || 'all';
+    }
+
+    function openLearnScreen() {
+      fillLearnGroupSelect();
+      showScreen('screen-flashcard-learn');
+      startLearnSession();
+    }
+
+    document.getElementById('btnOpenFlashcardLearn').addEventListener('click', openLearnScreen);
+
+    document.getElementById('btnLearnBackHome').addEventListener('click', function () {
+      var summary = endLearnSession();
+      showScreen('screen-home');
+      if (summary && summary.viewedCards > 0) {
+        var durSec = Math.round(summary.durationMs / 1000);
+        var m = Math.floor(durSec / 60);
+        var s = durSec % 60;
+        var avgSec = summary.cardLogs.length > 0
+          ? Math.round(summary.cardLogs.reduce(function (a, l) { return a + l.durationMs; }, 0) / summary.cardLogs.length / 1000)
+          : 0;
+        alert('本次学习小结\n\n词组：' + summary.groupName +
+              '\n学习时长：' + m + '分' + s + '秒' +
+              '\n学习单词：' + summary.viewedCards + ' 个' +
+              '\n平均每卡：' + avgSec + ' 秒');
+      }
+    });
+
+    document.getElementById('learnGroupSelect').addEventListener('change', function () {
+      if (_learnSession) endLearnSession();
+      startLearnSession();
+    });
+
+    // Hook swipe actions to also log card time
+    var _origOnSwipeEnd = onSwipeEnd;
+
+    // ─── Stats Tab 切换 ───
+    document.querySelectorAll('.stats-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.stats-tab').forEach(function (t) { t.classList.remove('active'); });
+        document.querySelectorAll('.stats-tab-content').forEach(function (c) { c.classList.remove('active'); });
+        tab.classList.add('active');
+        var target = tab.getAttribute('data-stats-tab');
+        if (target === 'quiz') {
+          document.getElementById('statsTabQuiz').classList.add('active');
+        } else {
+          document.getElementById('statsTabLearn').classList.add('active');
+          renderLearnStats();
+        }
+      });
+    });
+
+    function renderLearnStats() {
+      var sessions = getLearnSessionsFromStorage();
+      var filterGroup = document.getElementById('learnStatsFilterGroup');
+      var fv = filterGroup ? filterGroup.value : 'all';
+      var filtered = fv === 'all' ? sessions : sessions.filter(function (s) { return s.groupId === fv; });
+
+      var totalSessions = filtered.length;
+      var totalDuration = filtered.reduce(function (a, s) { return a + (s.durationMs || 0); }, 0);
+      var totalWords = filtered.reduce(function (a, s) { return a + (s.viewedCards || 0); }, 0);
+      var totalCardLogs = 0, totalCardDur = 0;
+      filtered.forEach(function (s) {
+        (s.cardLogs || []).forEach(function (l) { totalCardLogs++; totalCardDur += l.durationMs; });
+      });
+      var avgCard = totalCardLogs > 0 ? Math.round(totalCardDur / totalCardLogs / 1000) : 0;
+
+      document.getElementById('statLearnSessions').textContent = totalSessions;
+      var durMin = Math.round(totalDuration / 60000);
+      document.getElementById('statLearnDuration').textContent = durMin >= 60 ? Math.round(durMin / 60 * 10) / 10 + 'h' : durMin + 'm';
+      document.getElementById('statLearnWords').textContent = totalWords;
+      document.getElementById('statLearnAvgCard').textContent = avgCard + 's';
+
+      // Fill filter
+      if (filterGroup) {
+        var current = filterGroup.value;
+        filterGroup.innerHTML = '<option value="all">全部分组</option>';
+        var groupSet = {};
+        sessions.forEach(function (s) { if (s.groupId && s.groupId !== 'all') groupSet[s.groupId] = s.groupName || s.groupId; });
+        Object.keys(groupSet).forEach(function (gid) {
+          var opt = document.createElement('option');
+          opt.value = gid; opt.textContent = groupSet[gid];
+          filterGroup.appendChild(opt);
+        });
+        filterGroup.value = current;
+      }
+
+      // Render history list
+      var list = document.getElementById('learnHistoryList');
+      if (!list) return;
+      if (filtered.length === 0) { list.innerHTML = '<div class="empty-state">暂无学习记录</div>'; return; }
+      var html = '';
+      filtered.slice(0, 30).forEach(function (s) {
+        var d = new Date(s.startTime);
+        var dateStr = (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        var durSec = Math.round((s.durationMs || 0) / 1000);
+        var durStr = durSec >= 60 ? Math.floor(durSec / 60) + '分' + (durSec % 60) + '秒' : durSec + '秒';
+        html += '<div class="learn-history-item">'
+          + '<span class="learn-history-date">' + dateStr + '</span>'
+          + '<span class="learn-history-group">' + escapeHtml(s.groupName || s.groupId || '--') + '</span>'
+          + '<span class="learn-history-stat">' + (s.viewedCards || 0) + '词 · ' + durStr + '</span>'
+          + '</div>';
+      });
+      list.innerHTML = html;
+    }
+
+    document.getElementById('learnStatsFilterGroup').addEventListener('change', renderLearnStats);
 
 
     // ═══════════════════════════════════════════════
