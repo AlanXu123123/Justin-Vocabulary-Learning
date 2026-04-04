@@ -153,6 +153,8 @@ function getVocabularyFromSpreadsheetAsCategories(spreadsheetId) {
         if (data[r].length > ai2 && data[r][ai2] != null && String(data[r][ai2]).trim()) entry.synonyms = String(data[r][ai2]).trim();
         if (data[r].length > ai3 && data[r][ai3] != null && String(data[r][ai3]).trim()) entry.relatedWords = String(data[r][ai3]).trim();
         if (data[r].length > ai4 && data[r][ai4] != null && String(data[r][ai4]).trim()) entry.partOfSpeech = String(data[r][ai4]).trim();
+        var ai5 = aiOffset + 5;
+        if (data[r].length > ai5 && data[r][ai5] != null && String(data[r][ai5]).trim()) entry.definitionCn = String(data[r][ai5]).trim();
         words.push(entry);
       }
     }
@@ -241,10 +243,10 @@ function updateAIDataInSheet(spreadsheetId, category, aiData) {
   var aiStartCol = is3Col ? 4 : 3;
 
   if (startRow === 1) {
-    sheet.getRange(1, aiStartCol, 1, 5).setValues([['AI英文解释', '音标', '同义词', '词形变化', '词性']]);
+    sheet.getRange(1, aiStartCol, 1, 6).setValues([['AI英文解释', '音标', '同义词', '词形变化', '词性', '中文释义']]);
   }
 
-  var maxCol = Math.max(sheet.getLastColumn(), aiStartCol + 4);
+  var maxCol = Math.max(sheet.getLastColumn(), aiStartCol + 5);
   var allData = sheet.getRange(1, 1, lastRow, maxCol).getValues();
 
   if (!is3Col && allData.length > startRow) {
@@ -266,12 +268,13 @@ function updateAIDataInSheet(spreadsheetId, category, aiData) {
     if (!cellWord) continue;
     var ai = aiMap[cellWord];
     if (!ai) continue;
-    sheet.getRange(r + 1, aiStartCol, 1, 5).setValues([[
+    sheet.getRange(r + 1, aiStartCol, 1, 6).setValues([[
       ai.definitionEn || '',
       ai.phonetic || '',
       ai.synonyms || '',
       ai.relatedWords || '',
-      ai.partOfSpeech || ''
+      ai.partOfSpeech || '',
+      ai.definitionCn || ''
     ]]);
     updatedCount++;
   }

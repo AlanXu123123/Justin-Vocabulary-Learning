@@ -644,6 +644,12 @@
     .flashcard-word { font-size: 1.85rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; line-height: 1.3; position: relative; z-index: 1; text-shadow: 0 1px 8px rgba(0,0,0,0.2); }
     .flashcard-back .flashcard-word { font-size: 1.1rem; font-weight: 400; color: #e0fff0; line-height: 1.55; }
     .flashcard-hint { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 0.85rem; position: relative; z-index: 1; }
+    .cn-def-row { display:flex; align-items:center; justify-content:center; gap:0.4rem; margin-top:0.5rem; position:relative; z-index:1; width:100%; }
+    .cn-def-text { font-size:0.9rem; color:#fbbf24; font-weight:600; line-height:1.4; text-align:center; transition:filter 0.3s ease; }
+    .cn-def-text.blurred { filter:blur(6px); user-select:none; pointer-events:none; }
+    .cn-def-toggle { background:none; border:none; cursor:pointer; font-size:1.1rem; padding:0.15rem 0.3rem; border-radius:4px; transition:background 0.2s; line-height:1; }
+    .cn-def-toggle:hover { background:rgba(255,255,255,0.1); }
+    .cn-def-toggle.revealed { opacity:0.5; }
     .flashcard-accuracy { font-size: 0.78rem; margin-top: 0.65rem; padding: 0.2rem 0.65rem; border-radius: var(--r-md); background: rgba(255,255,255,0.1); position: relative; z-index: 1; }
     .flashcard-accuracy.acc-high { color: var(--correct); }
     .flashcard-accuracy.acc-mid { color: var(--warning); }
@@ -669,6 +675,7 @@
     .word-ai-info { display: flex; flex-wrap: wrap; gap: 0.25rem; flex-basis: 100%; padding: 0.35rem 0.75rem 0.15rem 3.75rem; margin: 0; background: rgba(255,255,255,0.02); border-radius: 0 0 var(--r-sm) var(--r-sm); }
     .word-ai-info .ai-tag { font-size: 0.7rem; padding: 0.1rem 0.4rem; }
     .word-ai-info .ai-def-en { font-size: 0.85rem; color: var(--pink); flex-basis: 100%; margin-top: 0.2rem; line-height: 1.45; font-weight: 500; }
+    .word-ai-info .ai-def-cn { font-size: 0.82rem; color: #fbbf24; flex-basis: 100%; margin-top: 0.15rem; line-height: 1.4; font-weight: 500; }
 
     /* ===== AI Enhanced Word Info ===== */
     .ai-phonetic { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 0.3rem; position: relative; z-index: 1; font-weight: 400; letter-spacing: 0.02em; }
@@ -891,6 +898,10 @@
             </div>
             <div class="flashcard-face flashcard-back">
               <div class="flashcard-word" id="flashcardBackText">--</div>
+              <div class="cn-def-row" id="flashcardCnRow" style="display:none;">
+                <span class="cn-def-text blurred" id="flashcardCnText">中文释义</span>
+                <button type="button" class="cn-def-toggle" id="flashcardCnToggle" title="显示/隐藏中文释义">👁</button>
+              </div>
               <div id="flashcardAIBack"></div>
               <div class="flashcard-hint">点击翻转 · 左右滑动评分</div>
             </div>
@@ -1245,6 +1256,7 @@
         <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;">
           <p class="hint" style="margin:0;flex:1;">本组列表：选择具体单词组后可<strong>编辑</strong>、<strong>删除</strong>或<strong>AI解析</strong>。</p>
           <button type="button" class="btn-batch-ai" id="btnBatchAI" style="display:none;">批量AI解析</button>
+          <button type="button" class="btn-batch-ai" id="btnBatchCn" style="display:none;background:linear-gradient(135deg,#f97316,#ef4444);">批量解析中文</button>
           <span class="batch-ai-progress" id="batchAIProgress"></span>
         </div>
         <div class="word-list-wrap" id="vocabListContent" style="max-height:360px;">
@@ -2492,6 +2504,8 @@
 
       var batchBtn = document.getElementById('btnBatchAI');
       if (batchBtn) batchBtn.style.display = canEditDelete && words.length > 0 ? 'inline-block' : 'none';
+      var batchCnBtn = document.getElementById('btnBatchCn');
+      if (batchCnBtn) batchCnBtn.style.display = canEditDelete && words.length > 0 ? 'inline-block' : 'none';
 
       if (words.length === 0) {
         wrap.innerHTML = '<p class="hint" style="padding:1rem;">暂无单词。选择具体单词组后可逐条添加，或从上方粘贴列表解析。</p>';
@@ -2522,7 +2536,8 @@
           if (cached.phonetic) tags.push('<span class="ai-tag">' + escapeHtml(cached.phonetic) + '</span>');
           if (cached.partOfSpeech) tags.push('<span class="ai-tag synonym">' + escapeHtml(cached.partOfSpeech) + '</span>');
           var defEnHtml = cached.definitionEn ? '<div class="ai-def-en">EN: ' + escapeHtml(cached.definitionEn) + '</div>' : '';
-          aiInfoHtml = '<div class="word-ai-info">' + tags.join('') + defEnHtml + '</div>';
+          var defCnHtml = cached.definitionCn ? '<div class="ai-def-cn">中: ' + escapeHtml(cached.definitionCn) + '</div>' : '';
+          aiInfoHtml = '<div class="word-ai-info">' + tags.join('') + defEnHtml + defCnHtml + '</div>';
         }
         return '<div class="word-list-item" data-index="' + i + '">' +
           '<div class="item-content">' + idxHtml + '<span class="word">' + escapeHtml(item.word) + '</span><span class="def">' + escapeHtml(item.definition || '') + '</span></div>' +
@@ -2603,6 +2618,7 @@
                       });
                     }
                     if (w.partOfSpeech) cached.partOfSpeech = w.partOfSpeech;
+                    if (w.definitionCn) cached.definitionCn = w.definitionCn;
                     aiCache[key] = cached;
                   }
                 }
@@ -3413,7 +3429,8 @@
           phonetic: d.phonetic || '',
           synonyms: synonymsStr,
           relatedWords: relatedStr,
-          partOfSpeech: d.partOfSpeech || ''
+          partOfSpeech: d.partOfSpeech || '',
+          definitionCn: d.definitionCn || ''
         };
       });
       fetch(url, {
@@ -3786,6 +3803,76 @@
       runBatch(0);
     });
 
+    document.getElementById('btnBatchCn').addEventListener('click', function () {
+      var words = getCurrentWords();
+      if (!words.length) { alert('当前没有单词。'); return; }
+      var needCn = words.filter(function (w) {
+        var key = (w.word || '').toLowerCase().trim();
+        return key && (!aiCache[key] || !aiCache[key].definitionCn);
+      });
+      if (needCn.length === 0) { alert('所有单词已有中文释义。'); return; }
+      var btn = this;
+      var progressEl = document.getElementById('batchAIProgress');
+      if (!confirm('将对 ' + needCn.length + ' 个缺少中文释义的单词调用AI解析，确定继续？')) return;
+      btn.disabled = true;
+      btn.textContent = '解析中…';
+      var allWordList = needCn.map(function (w) { return w.word; });
+      var BATCH_SIZE = 25;
+      var totalBatches = Math.ceil(allWordList.length / BATCH_SIZE);
+      var totalSuccess = 0;
+      var totalProcessed = 0;
+      var allAIResults = [];
+
+      function runCnBatch(batchIndex) {
+        var start = batchIndex * BATCH_SIZE;
+        var chunk = allWordList.slice(start, start + BATCH_SIZE);
+        if (chunk.length === 0) {
+          btn.disabled = false;
+          btn.textContent = '批量解析中文';
+          if (progressEl) progressEl.textContent = '全部完成！成功 ' + totalSuccess + '/' + allWordList.length;
+          loadAIUsage();
+          renderVocabListInModal();
+          if (allAIResults.length) syncAIDataToSheet(state.currentCategoryId, allAIResults);
+          setTimeout(function () { if (progressEl) progressEl.textContent = ''; }, 8000);
+          return;
+        }
+        if (progressEl) progressEl.textContent = '中文解析 第 ' + (batchIndex + 1) + '/' + totalBatches + ' 批（已完成 ' + totalProcessed + '/' + allWordList.length + '）';
+        fetch(AI_BATCH_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ words: chunk, force: true })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (resp) {
+          if (resp.ok && resp.results) {
+            resp.results.forEach(function (r) {
+              var d = r.data;
+              if (d && d.word && r.source !== 'error') {
+                var key = d.word.toLowerCase().trim();
+                if (aiCache[key]) {
+                  aiCache[key].definitionCn = d.definitionCn || '';
+                } else {
+                  aiCache[key] = d;
+                }
+                totalSuccess++;
+                allAIResults.push(aiCache[key]);
+              }
+            });
+            totalProcessed += chunk.length;
+            renderVocabListInModal();
+          }
+          runCnBatch(batchIndex + 1);
+        })
+        .catch(function (err) {
+          totalProcessed += chunk.length;
+          console.error('[batchCn] chunk ' + (batchIndex + 1) + ' failed:', err);
+          if (progressEl) progressEl.textContent = '第 ' + (batchIndex + 1) + ' 批失败，继续下一批…';
+          runCnBatch(batchIndex + 1);
+        });
+      }
+      runCnBatch(0);
+    });
+
     document.getElementById('vocabRefresh').addEventListener('click', function () {
       tryLoadFromSheet(true).then(function (ok) {
         if (ok) { fillVocabGroupSelect(); renderVocabListInModal(); }
@@ -4052,6 +4139,13 @@
       if (posEl) { posEl.textContent = ''; posEl.style.display = 'none'; }
       if (aiBackEl) aiBackEl.innerHTML = '';
 
+      var cnRow = document.getElementById('flashcardCnRow');
+      var cnText = document.getElementById('flashcardCnText');
+      var cnToggle = document.getElementById('flashcardCnToggle');
+      if (cnRow) cnRow.style.display = 'none';
+      if (cnText) { cnText.textContent = ''; cnText.classList.add('blurred'); }
+      if (cnToggle) cnToggle.classList.remove('revealed');
+
       if (words.length === 0) {
         counter.textContent = '- / -';
         frontText.textContent = '暂无单词';
@@ -4097,6 +4191,15 @@
         if (aiBackEl) {
           var defHtml = data.definitionEn ? '<div style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin-top:0.35rem;position:relative;z-index:1;text-align:left;width:100%;line-height:1.35;">AI: ' + escapeHtml(data.definitionEn) + '</div>' : '';
           aiBackEl.innerHTML = defHtml + renderAISynonymsHtml(data.synonyms) + renderAIRelatedHtml(data.relatedWords);
+        }
+        var cnRow2 = document.getElementById('flashcardCnRow');
+        var cnText2 = document.getElementById('flashcardCnText');
+        var cnToggle2 = document.getElementById('flashcardCnToggle');
+        if (data.definitionCn && cnRow2 && cnText2) {
+          cnText2.textContent = data.definitionCn;
+          cnText2.classList.add('blurred');
+          if (cnToggle2) cnToggle2.classList.remove('revealed');
+          cnRow2.style.display = 'flex';
         }
         requestAnimationFrame(adjustFlashcardHeight);
       });
@@ -4214,6 +4317,17 @@
     chkAutoSpeak.addEventListener('change', function () {
       _ttsAutoSpeak = this.checked;
       try { localStorage.setItem('vocab_tts_auto', String(_ttsAutoSpeak)); } catch (_) {}
+    });
+
+    // ─── 中文释义切换 ───
+    document.getElementById('flashcardCnToggle').addEventListener('click', function (e) {
+      e.stopPropagation();
+      var txt = document.getElementById('flashcardCnText');
+      if (!txt) return;
+      var isBlurred = txt.classList.contains('blurred');
+      txt.classList.toggle('blurred');
+      this.classList.toggle('revealed', isBlurred);
+      requestAnimationFrame(adjustFlashcardHeight);
     });
 
     // ─── 闪卡前后按钮 ───
