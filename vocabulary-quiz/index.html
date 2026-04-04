@@ -1657,6 +1657,7 @@
     }
     function saveLearnSessionsToStorage(sessions) {
       try { localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(sessions.slice(0, MAX_LEARN_SESSIONS))); } catch (_) {}
+      syncUserDataToCloud();
     }
 
     function getQuizSize() {
@@ -3141,7 +3142,7 @@
         wrongWords: getWrongFromStorage(),
         learnSessions: getLearnSessionsFromStorage(),
       };
-      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0;
+      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0;
       var uploadFirst = hasLocalData
         ? fetch(USER_SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(localPayload) }).then(function (r) { return r.json(); }).catch(function () { return { ok: false }; })
         : Promise.resolve({ ok: true });
@@ -3228,14 +3229,20 @@
     window.addEventListener('beforeunload', function () {
       if (_learnSession) endLearnSession();
       if (!_currentUser) return;
-      var payload = JSON.stringify({
+      var data = {
         username: _currentUser,
         quizHistory: getQuizHistoryFromStorage(),
         wordStats: getWordStatsFromStorage(),
         reviewPlan: getReviewPlanFromStorage(),
         wrongWords: getWrongFromStorage(),
         learnSessions: getLearnSessionsFromStorage(),
-      });
+      };
+      var payload = JSON.stringify(data);
+      if (payload.length > 60000) {
+        data.learnSessions = data.learnSessions.slice(0, 20);
+        data.quizHistory = data.quizHistory.slice(0, 30);
+        payload = JSON.stringify(data);
+      }
       try { navigator.sendBeacon(USER_SAVE_URL, new Blob([payload], { type: 'application/json' })); } catch (_) {}
     });
 
@@ -4340,19 +4347,49 @@
       }
     }
 
+    function compactLearnSession(session) {
+      var logs = session.cardLogs || [];
+      var totalCardDur = 0;
+      var rightCount = 0, leftCount = 0, navCount = 0;
+      var wordsSeen = [];
+      logs.forEach(function (l) {
+        totalCardDur += (l.durationMs || 0);
+        if (l.action === 'right') rightCount++;
+        else if (l.action === 'left') leftCount++;
+        else navCount++;
+        if (wordsSeen.indexOf(l.word) === -1) wordsSeen.push(l.word);
+      });
+      return {
+        id: session.id,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        groupId: session.groupId,
+        groupName: session.groupName,
+        totalCards: session.totalCards,
+        viewedCards: session.viewedCards,
+        durationMs: session.durationMs,
+        cardCount: logs.length,
+        avgCardMs: logs.length > 0 ? Math.round(totalCardDur / logs.length) : 0,
+        rightCount: rightCount,
+        leftCount: leftCount,
+        navCount: navCount,
+      };
+    }
+
     function endLearnSession() {
       if (!_learnSession) return;
       learnLogCurrentCard();
       stopLearnTimer();
       _learnSession.endTime = Date.now();
       _learnSession.durationMs = _learnSession.endTime - _learnSession.startTime;
+      var summary = _learnSession;
       if (_learnSession.viewedCards > 0 && _learnSession.durationMs > 3000) {
+        var compact = compactLearnSession(_learnSession);
         var sessions = getLearnSessionsFromStorage();
-        sessions.unshift(_learnSession);
+        sessions.unshift(compact);
         saveLearnSessionsToStorage(sessions);
         syncUserDataToCloud(true);
       }
-      var summary = _learnSession;
       _learnSession = null;
       return summary;
     }
@@ -4430,7 +4467,12 @@
       var totalWords = filtered.reduce(function (a, s) { return a + (s.viewedCards || 0); }, 0);
       var totalCardLogs = 0, totalCardDur = 0;
       filtered.forEach(function (s) {
-        (s.cardLogs || []).forEach(function (l) { totalCardLogs++; totalCardDur += l.durationMs; });
+        if (s.cardCount && s.avgCardMs) {
+          totalCardLogs += s.cardCount;
+          totalCardDur += s.cardCount * s.avgCardMs;
+        } else if (s.cardLogs) {
+          s.cardLogs.forEach(function (l) { totalCardLogs++; totalCardDur += l.durationMs; });
+        }
       });
       var avgCard = totalCardLogs > 0 ? Math.round(totalCardDur / totalCardLogs / 1000) : 0;
 
