@@ -811,13 +811,12 @@
     .sentence-loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.75rem; }
 
     /* ===== Inline style overrides ===== */
-    #homeGroupSelect, #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
+    #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
     #btnRetestWrong { background: linear-gradient(135deg, var(--wrong), #e11d48) !important; }
 
     /* ══════════════════════════════════════
        iOS Light Theme — comprehensive overrides
        ══════════════════════════════════════ */
-    [data-theme="light"] #homeGroupSelect,
     [data-theme="light"] #quizSize { background: rgba(255,255,255,0.5) !important; }
 
     /* modal */
@@ -953,8 +952,6 @@
 
     /* inline hard-coded bg overrides for all #25252b elements */
     [data-theme="light"] .vocab-panel-select,
-    [data-theme="light"] #homeGroupSelect,
-    [data-theme="light"] #rangeStart, [data-theme="light"] #rangeEnd,
     [data-theme="light"] #quizSize,
     [data-theme="light"] #learnGroupSelect,
     [data-theme="light"] #learnRangeStart, [data-theme="light"] #learnRangeEnd,
@@ -1056,20 +1053,9 @@
       </div>
       <div class="card">
         <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
-        <div style="margin-top: 0.5rem;">
-          <label class="hint">选择单词组</label>
-          <select id="homeGroupSelect" style="width:100%;padding:0.5rem;margin-top:0.35rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;">
-            <option value="all">全部</option>
-          </select>
-        </div>
-        <div style="margin-top: 0.5rem; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-          <label class="hint" style="flex-shrink:0;">序号范围</label>
-          <input type="number" id="rangeStart" min="1" placeholder="起始" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
-          <span style="color:var(--muted);">—</span>
-          <input type="number" id="rangeEnd" min="1" placeholder="结束" style="width:5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.9rem;" />
-          <span class="hint" id="rangeHint" style="font-size:0.78rem;"></span>
-        </div>
-        <div style="margin-top: 0.75rem;">
+        <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:0.5rem;">当前词组：<strong style="color:var(--accent-light);" id="homeCurrentGroup">全部</strong> · <span class="hint" id="rangeHint" style="font-size:0.82rem;"></span></p>
+        <p class="hint" style="margin-bottom:0.75rem;">（在「单词学习」页面切换词组和序号范围）</p>
+        <div>
           <label class="hint">每次测验题数</label>
           <input type="number" id="quizSize" min="1" placeholder="输入题数" style="margin-top:0.35rem;padding:0.5rem;width:8rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
           <span class="hint" id="quizSizeHint" style="margin-left:0.5rem;">（1～词库总数）</span>
@@ -2661,8 +2647,8 @@
     }
 
     function getSerialRange() {
-      var startEl = document.getElementById('rangeStart');
-      var endEl = document.getElementById('rangeEnd');
+      var startEl = document.getElementById('learnRangeStart');
+      var endEl = document.getElementById('learnRangeEnd');
       var s = startEl ? parseInt(startEl.value, 10) : NaN;
       var e = endEl ? parseInt(endEl.value, 10) : NaN;
       return { start: isNaN(s) ? null : s, end: isNaN(e) ? null : e };
@@ -2803,16 +2789,8 @@
     }
 
     function fillHomeGroupSelect() {
-      var sel = document.getElementById('homeGroupSelect');
-      if (!sel) return;
-      sel.innerHTML = '<option value="all">全部</option>';
-      (state.categories || []).forEach(function (c) {
-        var opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name + '（' + (c.words ? c.words.length : 0) + '）';
-        sel.appendChild(opt);
-      });
-      sel.value = state.currentCategoryId || 'all';
+      fillLearnGroupSelect();
+      updateHomeCurrentGroup();
     }
 
     function setSourceLabel(text) {
@@ -3782,13 +3760,13 @@
       state.editingWordIndex = null;
       updateAddWordSectionVisibility();
       renderVocabListInModal();
-      // Sync home group select
-      var homeSel = document.getElementById('homeGroupSelect');
-      if (homeSel) homeSel.value = state.currentCategoryId;
+      var learnSel = document.getElementById('learnGroupSelect');
+      if (learnSel) learnSel.value = state.currentCategoryId;
+      updateHomeCurrentGroup();
     });
 
     function onGroupOrRangeChange() {
-      var sel = document.getElementById('homeGroupSelect');
+      var sel = document.getElementById('learnGroupSelect');
       state.currentCategoryId = sel ? (sel.value || 'all') : 'all';
       applyCurrentGroup();
       updateWordCount();
@@ -3796,6 +3774,7 @@
       var vocabSel = document.getElementById('vocabGroupSelect');
       if (vocabSel) vocabSel.value = state.currentCategoryId;
       updateRangeHint();
+      updateHomeCurrentGroup();
     }
 
     function updateRangeHint() {
@@ -3821,13 +3800,17 @@
       }
     }
 
-    document.getElementById('homeGroupSelect').addEventListener('change', onGroupOrRangeChange);
-
-    ['rangeStart', 'rangeEnd'].forEach(function (id) {
-      document.getElementById(id).addEventListener('input', function () {
-        onGroupOrRangeChange();
-      });
-    });
+    function updateHomeCurrentGroup() {
+      var el = document.getElementById('homeCurrentGroup');
+      if (!el) return;
+      var sel = document.getElementById('learnGroupSelect');
+      if (sel && sel.options[sel.selectedIndex]) {
+        el.textContent = sel.options[sel.selectedIndex].textContent;
+      } else {
+        var cat = state.categories.find(function (c) { return c.id === state.currentCategoryId; });
+        el.textContent = cat ? cat.name : '全部';
+      }
+    }
 
     document.getElementById('vocabUseGroup').addEventListener('click', function () {
       state.currentCategoryId = document.getElementById('vocabGroupSelect').value || 'all';
@@ -4630,12 +4613,10 @@
     function applyLearnFilters() {
       var sel = document.getElementById('learnGroupSelect');
       if (sel) state.currentCategoryId = sel.value;
-      var rs = document.getElementById('learnRangeStart');
-      var re = document.getElementById('learnRangeEnd');
-      var mainRs = document.getElementById('rangeStart');
-      var mainRe = document.getElementById('rangeEnd');
-      if (mainRs && rs) mainRs.value = rs.value;
-      if (mainRe && re) mainRe.value = re.value;
+      applyCurrentGroup();
+      updateWordCount();
+      updateRangeHint();
+      updateHomeCurrentGroup();
     }
 
     function learnStartCardTimer() {
@@ -4772,6 +4753,7 @@
 
     document.getElementById('btnLearnBackHome').addEventListener('click', function () {
       var summary = endLearnSession();
+      onGroupOrRangeChange();
       showScreen('screen-home');
       if (summary && summary.viewedCards > 0) {
         var durSec = Math.round(summary.durationMs / 1000);
@@ -4788,8 +4770,15 @@
     });
 
     document.getElementById('learnGroupSelect').addEventListener('change', function () {
+      onGroupOrRangeChange();
       if (_learnSession) endLearnSession();
       startLearnSession();
+    });
+
+    ['learnRangeStart', 'learnRangeEnd'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () {
+        onGroupOrRangeChange();
+      });
     });
 
     // Hook swipe actions to also log card time
@@ -4968,10 +4957,10 @@
     function populateSentenceGroupSelect() {
       var sel = document.getElementById('sentenceGroupSelect');
       if (!sel) return;
-      var homeSelect = document.getElementById('homeGroupSelect');
-      if (homeSelect) {
-        sel.innerHTML = homeSelect.innerHTML;
-        sel.value = homeSelect.value;
+      var learnSel = document.getElementById('learnGroupSelect');
+      if (learnSel) {
+        sel.innerHTML = learnSel.innerHTML;
+        sel.value = learnSel.value;
       }
     }
 
