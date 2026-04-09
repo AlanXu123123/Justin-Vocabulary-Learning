@@ -1051,28 +1051,9 @@
         <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
         <button type="button" class="btn" id="btnOpenFlashcardLearn" style="background:linear-gradient(135deg,#06b6d4 0%,#3b82f6 50%,#8b5cf6 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(59,130,246,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📚 单词学习</button>
       </div>
-      <div class="card">
-        <p style="margin-bottom: 0.5rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
-        <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:0.5rem;">当前词组：<strong style="color:var(--accent-light);" id="homeCurrentGroup">全部</strong> · <span class="hint" id="rangeHint" style="font-size:0.82rem;"></span></p>
-        <p class="hint" style="margin-bottom:0.75rem;">（在「单词学习」页面切换词组和序号范围）</p>
-        <div>
-          <label class="hint">每次测验题数</label>
-          <input type="number" id="quizSize" min="1" placeholder="输入题数" style="margin-top:0.35rem;padding:0.5rem;width:8rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.95rem;" />
-          <span class="hint" id="quizSizeHint" style="margin-left:0.5rem;">（1～词库总数）</span>
-        </div>
-        <div style="margin-top: 0.5rem;">
-          <label style="display:inline-flex;align-items:center;gap:0.35rem;cursor:pointer;font-size:0.9rem;">
-            <input type="checkbox" id="quizAll" />
-            考全部单词
-          </label>
-        </div>
-        <div style="margin-top: 0.75rem;">
-          <button type="button" class="btn btn-secondary" id="btnManageSource">管理词库来源</button>
-        </div>
-        <button type="button" class="btn" id="btnStart" style="margin-top: 1rem;">开始测验</button>
-      </div>
-      <div class="card">
-        <button type="button" class="btn btn-secondary" id="btnOpenVocab">打开词库</button>
+      <div class="card" style="padding:0.8rem 1rem;">
+        <p style="margin-bottom:0.3rem;font-size:0.88rem;">当前词库共 <strong id="wordCount">0</strong> 个单词。<span class="hint">来源：<span id="sourceLabel">默认词库</span></span></p>
+        <button type="button" class="btn btn-secondary" id="btnOpenVocab" style="margin-top:0.4rem;">打开词库</button>
         <span class="hint" style="margin-left:0.5rem;">当前：<span id="currentGroupLabel">默认</span>，共 <strong id="wordListCount">0</strong> 个单词</span>
       </div>
     </div>
@@ -1097,6 +1078,21 @@
           <input type="number" id="learnRangeStart" min="1" placeholder="起始" style="width:4.5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
           <span style="color:var(--muted);">—</span>
           <input type="number" id="learnRangeEnd" min="1" placeholder="结束" style="width:4.5rem;padding:0.4rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
+        </div>
+      </div>
+      <div class="card" style="padding:0.7rem 0.9rem;">
+        <p style="font-size:0.85rem;margin-bottom:0.4rem;">当前词组：<strong style="color:var(--accent-light);" id="homeCurrentGroup">全部</strong> · <span class="hint" id="rangeHint" style="font-size:0.8rem;"></span></p>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <label class="hint" style="flex-shrink:0;font-size:0.82rem;">测验题数</label>
+          <input type="number" id="quizSize" min="1" placeholder="题数" style="padding:0.35rem 0.5rem;width:5rem;background:#25252b;border:1px solid #333;border-radius:6px;color:var(--text);font-size:0.85rem;" />
+          <span class="hint" id="quizSizeHint" style="font-size:0.78rem;">（1～词库总数）</span>
+          <label style="display:inline-flex;align-items:center;gap:0.3rem;cursor:pointer;font-size:0.82rem;margin-left:auto;">
+            <input type="checkbox" id="quizAll" /> 全部
+          </label>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;">
+          <button type="button" class="btn" id="btnStart" style="margin:0;padding:0.4rem 1rem;font-size:0.88rem;">开始测验</button>
+          <button type="button" class="btn btn-secondary" id="btnManageSource" style="margin:0;padding:0.4rem 0.8rem;font-size:0.82rem;">管理词库来源</button>
         </div>
       </div>
       <div class="card flashcard-section" id="flashcardSection">
