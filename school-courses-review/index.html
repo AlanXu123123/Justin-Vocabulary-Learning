@@ -678,7 +678,22 @@ const FIREBASE_CONFIG = {
 };
 
 const GEMINI_API_KEY = "AIzaSyAnVrGVc8ITpsRDxId9rMgHUzkERmlDKgo";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
+/** 按顺序尝试；前一个不可用（模型名/配额/权限）时自动换下一个 */
+const GEMINI_MODELS = [
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro',
+  'gemini-2.5-pro'
+];
+
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 // ==================== QUESTION BANK ====================
 const QUESTIONS = {
@@ -1041,7 +1056,8 @@ async function submitAnswer() {
     saveProgress();
   } catch(e) {
     console.error('Gemini error:', e);
-    displayFallbackFeedback(q.ref);
+    const errDetail = e && e.message ? e.message : String(e);
+    displayFallbackFeedback(q.ref, errDetail);
     userProgress[q.id] = {
       question: q.q,
       answer: answer,
@@ -1049,7 +1065,7 @@ async function submitAnswer() {
       rating: null,
       feedback: {
         aiUnavailable: true,
-        unavailableMessage: 'AI grading was unavailable — use the reference answer to self-check. If this keeps happening, check network, API key, or model access. (若持续出现，请检查网络、API 密钥或模型是否可用)'
+        unavailableMessage: 'AI grading failed — compare with the reference below. Technical detail: ' + errDetail + ' （若含 API key / PERMISSION_DENIED，请在 Google AI Studio 检查密钥与 API 启用情况）'
       },
       referenceAnswer: q.ref,
       topicId: getCurrentTopicId(q.id),
@@ -1066,6 +1082,39 @@ function getCurrentTopicId(qId) {
     if (topic.questions.some(q => q.id === qId)) return topic.id;
   }
   return '';
+}
+
+async function callGeminiModel(modelId, prompt) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${GEMINI_API_KEY}`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.3, maxOutputTokens: 2048 }
+    })
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    const apiMsg = data.error?.message || data.error?.status || (typeof data.error === 'string' ? data.error : JSON.stringify(data.error || data));
+    throw new Error(`[${modelId}] ${resp.status} ${apiMsg}`);
+  }
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    const block = data.promptFeedback || data.candidates?.[0]?.finishReason || '';
+    throw new Error(`[${modelId}] No text in response. ${JSON.stringify(block).slice(0, 400)}`);
+  }
+  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (e1) {
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      try { return JSON.parse(cleaned.slice(start, end + 1)); } catch (_) {}
+    }
+    throw new Error(`[${modelId}] Invalid JSON from model: ` + (cleaned.slice(0, 200) + (cleaned.length > 200 ? '…' : '')));
+  }
 }
 
 async function evaluateWithGemini(question, studentAnswer, referenceAnswer) {
@@ -1094,30 +1143,16 @@ Respond in this EXACT JSON format (no markdown, no code fences):
 
 Scoring guide: 9-10 = covers all key points accurately; 7-8 = covers most key points; 5-6 = partial coverage; 3-4 = significant gaps; 1-2 = mostly incorrect or very incomplete.`;
 
-  const resp = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 1200 }
-    })
-  });
-
-  if (!resp.ok) throw new Error('API request failed: ' + resp.status);
-  const data = await resp.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('No AI text in response');
-  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  try {
-    return JSON.parse(cleaned);
-  } catch (e1) {
-    const start = cleaned.indexOf('{');
-    const end = cleaned.lastIndexOf('}');
-    if (start >= 0 && end > start) {
-      try { return JSON.parse(cleaned.slice(start, end + 1)); } catch (_) {}
+  let lastErr = null;
+  for (const modelId of GEMINI_MODELS) {
+    try {
+      return await callGeminiModel(modelId, prompt);
+    } catch (e) {
+      lastErr = e;
+      console.warn('Gemini model failed, trying next:', modelId, e);
     }
-    throw e1;
   }
+  throw lastErr || new Error('All Gemini models failed.');
 }
 
 function displayFeedback(feedback, referenceAnswer) {
@@ -1149,15 +1184,19 @@ function displayFeedback(feedback, referenceAnswer) {
   document.getElementById('nextBtnArea').classList.remove('hidden');
 }
 
-function displayFallbackFeedback(referenceAnswer) {
+function displayFallbackFeedback(referenceAnswer, errorDetail) {
   const area = document.getElementById('feedbackArea');
   area.classList.remove('hidden');
+  const tech = errorDetail
+    ? `<div class="feedback-section" style="margin-top:12px; padding:12px; background:rgba(255,105,97,0.08); border-radius:8px; border-left:3px solid var(--wrong); font-size:0.78rem; color:var(--text-secondary); white-space:pre-wrap; word-break:break-word;">${escapeHtml(errorDetail)}</div>`
+    : '';
   area.innerHTML = `
     <div class="feedback-card">
       <div class="feedback-body">
         <div class="feedback-section">
           <div class="feedback-section-title">⚠️ AI evaluation unavailable</div>
           Compare your answer with the reference answer below to self-evaluate.
+          ${tech}
         </div>
       </div>
       <div class="reference-answer">
