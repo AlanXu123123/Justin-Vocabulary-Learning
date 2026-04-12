@@ -5,7 +5,9 @@
       "firebase.json",
       ".firebaserc",
       "**/.*",
-      "**/node_modules/**"
+      "**/.git/**",
+      "**/node_modules/**",
+      "**/*.pdf"
     ],
     "rewrites": [],
     "headers": [

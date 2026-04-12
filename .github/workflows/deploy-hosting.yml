@@ -1,0 +1,35 @@
+# 推送到 main 后自动部署 Firebase Hosting。
+# 在 GitHub 仓库 Settings → Secrets and variables → Actions 中添加：
+#   FIREBASE_TOKEN  （在本机运行 firebase login:ci 生成）
+name: Deploy Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'school-courses-review/**'
+      - 'firebase.json'
+      - '.firebaserc'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-hosting.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: npx firebase deploy --only hosting --non-interactive

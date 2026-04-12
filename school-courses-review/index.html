@@ -317,6 +317,7 @@
     .score-excellent { background: rgba(50,215,75,0.15); color: var(--correct); border: 2px solid rgba(50,215,75,0.3); }
     .score-good { background: rgba(251,191,36,0.15); color: var(--warning); border: 2px solid rgba(251,191,36,0.3); }
     .score-needs-work { background: rgba(255,105,97,0.15); color: var(--wrong); border: 2px solid rgba(255,105,97,0.3); }
+    .score-pending { background: rgba(255,255,255,0.08); color: var(--muted); border: 2px solid var(--glass-border); }
     .feedback-label { font-size: 0.9rem; font-weight: 600; }
     .feedback-sublabel { font-size: 0.8rem; color: var(--text-secondary); }
     .feedback-body {
@@ -614,10 +615,10 @@
       </div>
 
       <div class="history-filter-bar" id="historyFilters">
-        <button class="filter-chip active" onclick="filterHistory('all')">All</button>
-        <button class="filter-chip" onclick="filterHistory('low')">Needs Review (≤6)</button>
-        <button class="filter-chip" onclick="filterHistory('basic')">Textbook</button>
-        <button class="filter-chip" onclick="filterHistory('extended')">Extended</button>
+        <button type="button" class="filter-chip active" data-filter="all" onclick="filterHistory('all', this)">All</button>
+        <button type="button" class="filter-chip" data-filter="low" onclick="filterHistory('low', this)">Needs Review (≤6)</button>
+        <button type="button" class="filter-chip" data-filter="basic" onclick="filterHistory('basic', this)">Textbook</button>
+        <button type="button" class="filter-chip" data-filter="extended" onclick="filterHistory('extended', this)">Extended</button>
       </div>
 
       <div id="historyList"></div>
@@ -677,7 +678,7 @@ const FIREBASE_CONFIG = {
 };
 
 const GEMINI_API_KEY = "AIzaSyAnVrGVc8ITpsRDxId9rMgHUzkERmlDKgo";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
 
 // ==================== QUESTION BANK ====================
 const QUESTIONS = {
@@ -1041,6 +1042,21 @@ async function submitAnswer() {
   } catch(e) {
     console.error('Gemini error:', e);
     displayFallbackFeedback(q.ref);
+    userProgress[q.id] = {
+      question: q.q,
+      answer: answer,
+      score: null,
+      rating: null,
+      feedback: {
+        aiUnavailable: true,
+        unavailableMessage: 'AI grading was unavailable — use the reference answer to self-check. If this keeps happening, check network, API key, or model access. (若持续出现，请检查网络、API 密钥或模型是否可用)'
+      },
+      referenceAnswer: q.ref,
+      topicId: getCurrentTopicId(q.id),
+      type: q.type,
+      timestamp: Date.now()
+    };
+    saveProgress();
   }
 }
 
@@ -1089,9 +1105,19 @@ Scoring guide: 9-10 = covers all key points accurately; 7-8 = covers most key po
 
   if (!resp.ok) throw new Error('API request failed: ' + resp.status);
   const data = await resp.json();
-  const text = data.candidates[0].content.parts[0].text;
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('No AI text in response');
   const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (e1) {
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      try { return JSON.parse(cleaned.slice(start, end + 1)); } catch (_) {}
+    }
+    throw e1;
+  }
 }
 
 function displayFeedback(feedback, referenceAnswer) {
@@ -1141,8 +1167,9 @@ function displayFallbackFeedback(referenceAnswer) {
     </div>
   `;
   document.getElementById('nextBtnArea').classList.remove('hidden');
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('submitBtn').textContent = 'Submit';
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submit';
 }
 
 function nextQuestion() {
@@ -1156,8 +1183,9 @@ function nextQuestion() {
 
 function showQuizComplete() {
   const answered = currentQuizQuestions.filter(q => userProgress[q.id]);
-  const avgScore = answered.length > 0
-    ? (answered.reduce((sum, q) => sum + (userProgress[q.id]?.score || 0), 0) / answered.length).toFixed(1)
+  const scored = answered.filter(q => typeof userProgress[q.id]?.score === 'number');
+  const avgScore = scored.length > 0
+    ? (scored.reduce((sum, q) => sum + userProgress[q.id].score, 0) / scored.length).toFixed(1)
     : 'N/A';
 
   document.getElementById('questionCard').innerHTML = `
@@ -1177,7 +1205,10 @@ function showQuizComplete() {
 }
 
 function retryWeak() {
-  const weak = currentQuizQuestions.filter(q => userProgress[q.id] && userProgress[q.id].score < 7);
+  const weak = currentQuizQuestions.filter(q => {
+    const p = userProgress[q.id];
+    return p && typeof p.score === 'number' && p.score < 7;
+  });
   if (weak.length === 0) {
     alert('Great job! No weak questions to retry.');
     return;
@@ -1218,7 +1249,7 @@ function updateGlobalStats() {
   const answeredBasic = basic.filter(q => userProgress[q.id]);
   const answeredExt = extended.filter(q => userProgress[q.id]);
   const allAnswered = [...answeredBasic, ...answeredExt];
-  const scores = allAnswered.map(q => userProgress[q.id]?.score || 0);
+  const scores = allAnswered.map(q => userProgress[q.id]?.score).filter(s => typeof s === 'number');
   const avg = scores.length > 0 ? (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1) : '—';
   const excellent = scores.filter(s => s >= 8).length;
 
@@ -1238,6 +1269,9 @@ function showHistory() {
   document.getElementById('quizScreen').classList.add('hidden');
   document.getElementById('historyScreen').classList.remove('hidden');
   historyFilter = 'all';
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    c.classList.toggle('active', c.getAttribute('data-filter') === 'all');
+  });
   renderHistory();
 }
 
@@ -1248,10 +1282,10 @@ function hideHistory() {
   updateChapterProgress();
 }
 
-function filterHistory(filter) {
+function filterHistory(filter, el) {
   historyFilter = filter;
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   renderHistory();
 }
 
@@ -1275,7 +1309,7 @@ function renderHistory() {
   entries.sort((a, b) => b.timestamp - a.timestamp);
 
   const filtered = entries.filter(e => {
-    if (historyFilter === 'low') return (e.score || 0) <= 6;
+    if (historyFilter === 'low') return typeof e.score === 'number' && e.score <= 6;
     if (historyFilter === 'basic') return e.type === 'basic';
     if (historyFilter === 'extended') return e.type === 'extended';
     return true;
@@ -1292,15 +1326,20 @@ function renderHistory() {
   empty.classList.add('hidden');
 
   list.innerHTML = filtered.map(e => {
-    const scoreClass = (e.score||0) >= 8 ? 'score-excellent' : (e.score||0) >= 5 ? 'score-good' : 'score-needs-work';
+    const s = e.score;
+    const scoreClass = typeof s !== 'number'
+      ? 'score-pending'
+      : s >= 8 ? 'score-excellent' : s >= 5 ? 'score-good' : 'score-needs-work';
+    const scoreLabel = typeof s === 'number' ? s : '—';
     const fb = e.feedback || {};
     const topicName = getTopicName(e.topicId);
     const typeBadge = e.type === 'extended' ? '<span style="color:var(--cyan); font-size:0.7rem; font-weight:700;">EXTENDED</span>' : '';
+    const aiNote = fb.aiUnavailable ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--warning);">⚠️ AI unavailable (未评分)</div><div class="history-detail-content">${fb.unavailableMessage || ''}</div></div>` : '';
 
     return `
       <div class="history-item" onclick="this.classList.toggle('expanded')">
         <div class="history-item-header">
-          <div class="history-score-mini ${scoreClass}">${e.score || '?'}</div>
+          <div class="history-score-mini ${scoreClass}">${scoreLabel}</div>
           <div class="history-item-body">
             <div class="history-item-question">${e.question}</div>
             <div class="history-item-meta">${topicName} ${typeBadge} · ${formatDate(e.timestamp)}</div>
@@ -1312,6 +1351,7 @@ function renderHistory() {
             <div class="history-detail-label" style="color:var(--accent-light);">Your Answer (你的回答)</div>
             <div class="history-detail-content">${e.answer || ''}</div>
           </div>
+          ${aiNote}
           ${fb.correct_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--correct);">✅ Correct Points (正确的要点)</div><div class="history-detail-content">${fb.correct_points}</div></div>` : ''}
           ${fb.incorrect_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--wrong);">❌ Incorrect Points (错误之处)</div><div class="history-detail-content">${fb.incorrect_points}</div></div>` : ''}
           ${fb.missing_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--orange);">📝 Missing Points (遗漏的要点)</div><div class="history-detail-content">${fb.missing_points}</div></div>` : ''}
