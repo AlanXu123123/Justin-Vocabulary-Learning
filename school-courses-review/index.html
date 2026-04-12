@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>SS10 Chapter Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --glass: rgba(255,255,255,0.06);
+      --glass-strong: rgba(255,255,255,0.10);
+      --glass-border: rgba(255,255,255,0.12);
+      --text: #f5f5fa;
+      --text-secondary: #c0c0cc;
+      --muted: #8e8e9a;
+      --correct: #32d74b;
+      --wrong: #ff6961;
+      --accent: #7b7ff0;
+      --accent-light: #a78bfa;
+      --cyan: #22d3ee;
+      --orange: #fb923c;
+      --warning: #fbbf24;
+      --teal: #2dd4bf;
+      --glass-blur: blur(20px) saturate(1.6);
+      --border: 1px solid var(--glass-border);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+      --r-md: 12px; --r-lg: 16px; --r-xl: 22px;
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; top: -40%; left: -20%;
+      width: 80vw; height: 80vw;
+      background: radial-gradient(circle, rgba(123,127,240,0.08) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed; bottom: -30%; right: -10%;
+      width: 60vw; height: 60vw;
+      background: radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      border: var(--border);
+      border-radius: var(--r-xl);
+    }
+    .header h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header .user-info img {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+    }
+    .header .user-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .btn {
+      padding: 8px 16px;
+      border: var(--border);
+      border-radius: var(--r-md);
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .btn:hover { background: var(--glass-strong); transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #6366f1);
+      border: none;
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+    /* Login Screen */
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      text-align: center;
+    }
+    .login-screen h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .login-screen p {
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      font-size: 1rem;
+    }
+    .login-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 32px;
+      border-radius: var(--r-lg);
+      background: var(--glass-strong);
+      backdrop-filter: var(--glass-blur);
+      border: var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .login-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .login-btn svg { width: 24px; height: 24px; }
+
+    /* Chapter Select */
+    .card {
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      border: var(--border);
+      border-radius: var(--r-xl);
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.2s var(--ease);
+    }
+    .card:hover { background: var(--glass-strong); }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .card p { color: var(--text-secondary); font-size: 0.85rem; }
+
+    /* Topic Grid */
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 500px) { .topic-grid { grid-template-columns: 1fr; } }
+    .topic-card {
+      padding: 16px;
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      border: var(--border);
+      border-radius: var(--r-lg);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .topic-card:hover { background: var(--glass-strong); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .topic-card.selected { border-color: var(--accent); background: rgba(123,127,240,0.12); }
+    .topic-card .topic-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .topic-card .topic-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+    .topic-card .topic-count { font-size: 0.75rem; color: var(--muted); }
+    .topic-card .topic-progress {
+      margin-top: 8px;
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .topic-card .topic-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      border-radius: 2px;
+      transition: width 0.3s var(--ease);
+    }
+
+    /* Quiz Area */
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .quiz-header .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--accent-light);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .quiz-progress-text { font-size: 0.85rem; color: var(--muted); }
+    .progress-bar-wrapper {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      border-radius: 3px;
+      transition: width 0.4s var(--ease);
+    }
+    .question-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .badge-basic { background: rgba(123,127,240,0.2); color: var(--accent-light); }
+    .badge-extended { background: rgba(34,211,238,0.2); color: var(--cyan); }
+    .question-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .answer-area textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 16px;
+      background: rgba(255,255,255,0.04);
+      border: var(--border);
+      border-radius: var(--r-lg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .answer-area textarea:focus { border-color: var(--accent); }
+    .answer-area textarea::placeholder { color: var(--muted); }
+    .submit-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      gap: 12px;
+    }
+    .char-count { font-size: 0.75rem; color: var(--muted); }
+
+    /* AI Feedback */
+    .feedback-card {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(123,127,240,0.06);
+      border: 1px solid rgba(123,127,240,0.2);
+      border-radius: var(--r-lg);
+      animation: fadeIn 0.4s var(--ease);
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .feedback-score {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .score-circle {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+    .score-excellent { background: rgba(50,215,75,0.15); color: var(--correct); border: 2px solid rgba(50,215,75,0.3); }
+    .score-good { background: rgba(251,191,36,0.15); color: var(--warning); border: 2px solid rgba(251,191,36,0.3); }
+    .score-needs-work { background: rgba(255,105,97,0.15); color: var(--wrong); border: 2px solid rgba(255,105,97,0.3); }
+    .feedback-label { font-size: 0.9rem; font-weight: 600; }
+    .feedback-sublabel { font-size: 0.8rem; color: var(--text-secondary); }
+    .feedback-body {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    .feedback-body strong { color: var(--text); }
+    .feedback-section { margin-bottom: 14px; }
+    .feedback-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent-light);
+      margin-bottom: 6px;
+    }
+    .reference-answer {
+      margin-top: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.04);
+      border-radius: var(--r-md);
+      border-left: 3px solid var(--cyan);
+    }
+    .reference-answer-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+    .reference-answer p {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent-light);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-chip {
+      padding: 8px 14px;
+      background: var(--glass);
+      border: var(--border);
+      border-radius: var(--r-md);
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-chip .stat-value { font-weight: 700; color: var(--accent-light); }
+    .stat-chip .stat-label { color: var(--muted); }
+
+    /* All Questions mode toggle */
+    .mode-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      background: var(--glass);
+      border: var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+    }
+    .mode-toggle button {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-toggle button.active {
+      background: rgba(123,127,240,0.15);
+      color: var(--accent-light);
+    }
+
+    /* History Screen */
+    .history-item {
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      border: var(--border);
+      border-radius: var(--r-lg);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.2s var(--ease);
+    }
+    .history-item-header {
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .history-item-header:hover { background: var(--glass-strong); }
+    .history-score-mini {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .history-item-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .history-item-question {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .history-expand-icon {
+      color: var(--muted);
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .history-item.expanded .history-expand-icon { transform: rotate(180deg); }
+    .history-detail {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .history-item.expanded .history-detail { display: block; }
+    .history-detail-section {
+      margin-top: 12px;
+    }
+    .history-detail-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .history-detail-content {
+      font-size: 0.83rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    .history-filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: var(--glass);
+      border: var(--border);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-chip:hover { background: var(--glass-strong); }
+    .filter-chip.active { background: rgba(123,127,240,0.15); color: var(--accent-light); border-color: var(--accent); }
+
+    .hidden { display: none !important; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container { padding: 16px 12px; }
+      .header h1 { font-size: 1.1rem; }
+      .question-text { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen" class="login-screen">
+  <h1>📚 SS10 Review</h1>
+  <p>Social Studies 10 — Chapter Review Tool</p>
+  <button class="login-btn" onclick="signIn()">
+    <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Sign in with Google
+  </button>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="mainApp" class="hidden">
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>📚 SS10 Review</h1>
+      <div class="user-info">
+        <button class="btn btn-sm" onclick="showHistory()" style="margin-right:4px;">📋 Records</button>
+        <span class="user-name" id="userName"></span>
+        <img id="userAvatar" src="" alt="">
+        <button class="btn btn-sm" onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- ===== CHAPTER SELECT SCREEN ===== -->
+    <div id="chapterScreen">
+      <div class="stats-bar" id="globalStats"></div>
+
+      <h2 style="font-size:1rem; color:var(--text-secondary); margin-bottom:12px; padding-left:4px;">Chapter 6: The Late 20th Century and Early 2000s</h2>
+
+      <div class="card" style="cursor:pointer;" onclick="selectChapter('ch6','basic')">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <span style="font-size:1.3rem;">📖</span>
+          <h2 style="margin:0;">Textbook Questions</h2>
+        </div>
+        <p>38 questions from the textbook exercises — Cold War, Healthcare, Economy, Immigration, NAFTA, International Law</p>
+        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
+            <div id="ch6BasicBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--cyan)); border-radius:2px; transition:width 0.3s;"></div>
+          </div>
+          <span id="ch6BasicText" style="font-size:0.75rem; color:var(--muted);">0/38</span>
+        </div>
+      </div>
+
+      <div class="card" style="cursor:pointer;" onclick="selectChapter('ch6','extended')">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <span style="font-size:1.3rem;">🚀</span>
+          <h2 style="margin:0;">Extended Questions</h2>
+        </div>
+        <p>20 deeper questions — Peacekeeping failures, Rwandan genocide, Canadarm, 9/11 response, Landmines & more</p>
+        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
+          <div style="flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
+            <div id="ch6ExtBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--teal)); border-radius:2px; transition:width 0.3s;"></div>
+          </div>
+          <span id="ch6ExtText" style="font-size:0.75rem; color:var(--muted);">0/20</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOPIC SELECT SCREEN ===== -->
+    <div id="topicScreen" class="hidden">
+      <div class="quiz-header">
+        <button class="back-btn" onclick="showChapterSelect()">← Back</button>
+        <span class="quiz-progress-text" id="chapterTitle">Chapter 6</span>
+      </div>
+
+      <div class="mode-toggle">
+        <button id="modeByTopic" class="active" onclick="setMode('topic')">By Topic</button>
+        <button id="modeAll" onclick="setMode('all')">All Questions</button>
+        <button id="modeRandom" onclick="setMode('random')">Random</button>
+      </div>
+
+      <div id="topicGrid" class="topic-grid"></div>
+
+      <div id="allStartBtn" class="hidden" style="text-align:center;">
+        <button class="btn btn-primary" style="padding:14px 40px; font-size:1rem;" onclick="startQuiz(null)" id="allStartBtnInner">
+          Start All Questions
+        </button>
+      </div>
+      <div id="randomStartBtn" class="hidden" style="text-align:center;">
+        <button class="btn btn-primary" style="padding:14px 40px; font-size:1rem;" onclick="startRandom()">
+          Start Random Quiz (10 Questions)
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== HISTORY SCREEN ===== -->
+    <div id="historyScreen" class="hidden">
+      <div class="quiz-header">
+        <button class="back-btn" onclick="hideHistory()">← Back</button>
+        <span class="quiz-progress-text">Answer Records (答题记录)</span>
+      </div>
+
+      <div class="history-filter-bar" id="historyFilters">
+        <button class="filter-chip active" onclick="filterHistory('all')">All</button>
+        <button class="filter-chip" onclick="filterHistory('low')">Needs Review (≤6)</button>
+        <button class="filter-chip" onclick="filterHistory('basic')">Textbook</button>
+        <button class="filter-chip" onclick="filterHistory('extended')">Extended</button>
+      </div>
+
+      <div id="historyList"></div>
+      <div id="historyEmpty" class="hidden" style="text-align:center; padding:40px; color:var(--muted);">
+        No records yet. Start answering questions to build your history.
+      </div>
+    </div>
+
+    <!-- ===== QUIZ SCREEN ===== -->
+    <div id="quizScreen" class="hidden">
+      <div class="quiz-header">
+        <button class="back-btn" onclick="exitQuiz()">← Exit Quiz</button>
+        <span class="quiz-progress-text" id="quizProgressText">1 / 10</span>
+      </div>
+      <div class="progress-bar-wrapper">
+        <div class="progress-bar-fill" id="quizProgressBar" style="width:0%"></div>
+      </div>
+
+      <div class="card" id="questionCard">
+        <span class="question-badge badge-basic" id="questionBadge">BASIC</span>
+        <div class="question-text" id="questionText"></div>
+        <div class="answer-area">
+          <textarea id="answerInput" placeholder="Type your answer here..." oninput="updateCharCount()"></textarea>
+          <div class="submit-row">
+            <span class="char-count" id="charCount">0 characters</span>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" id="skipBtn" onclick="skipQuestion()">Skip</button>
+              <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">Submit</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="feedbackArea" class="hidden"></div>
+
+        <div id="nextBtnArea" class="hidden" style="text-align:center; margin-top:16px;">
+          <button class="btn btn-primary" style="padding:12px 36px;" onclick="nextQuestion()">Next Question →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+// ==================== CONFIG ====================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCT1YUP2OH8y3pD_-_MjySGJl9ujviuod4",
+  authDomain: "vocab-ai-backend.firebaseapp.com",
+  projectId: "vocab-ai-backend",
+  storageBucket: "vocab-ai-backend.firebasestorage.app",
+  messagingSenderId: "388439526237",
+  appId: "1:388439526237:web:3842fb9337b14687d276b4"
+};
+
+const GEMINI_API_KEY = "AIzaSyAnVrGVc8ITpsRDxId9rMgHUzkERmlDKgo";
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${GEMINI_API_KEY}`;
+
+// ==================== QUESTION BANK ====================
+const QUESTIONS = {
+  ch6: {
+    title: "Chapter 6: The Late 20th Century and Early 2000s",
+    topics: [
+      {
+        id: "cold_war",
+        name: "The End of the Cold War",
+        icon: "🧊",
+        questions: [
+          { id:"cw1", type:"basic", q:"In a few words, describe Soviet-American relations from the late 1960s to 1979.", ref:"Relations warmed; there was a relaxation of tensions between the two superpowers, characterized by diplomatic negotiations and agreements." },
+          { id:"cw2", type:"basic", q:"Identify the term used to describe the period of relaxed tensions between the Soviet Union and the United States from the late 1960s to 1979.", ref:"Détente — it refers to a relaxation of tension and a warming of relations between the Soviet Union and the United States." },
+          { id:"cw3", type:"basic", q:"Identify three accomplishments of détente.", ref:"(1) The Nuclear Non-Proliferation Treaty (1968) — limiting the spread of nuclear weapons; (2) SALT I (1972) — limiting certain missiles; (3) The Helsinki Accords (1975) — accepting the division of Germany, respecting human rights, and easing border crossings." },
+          { id:"cw4", type:"basic", q:"Outline the Soviet invasion of Afghanistan: When did it happen? What action was taken? What was the outcome?", ref:"When: 1979. Action: The Soviets invaded Afghanistan, installed dictator Babrak Karmal as president, and deployed nearly 2,000 tanks and aircraft. Outcome: The war lasted until 1988; the Soviets withdrew due to domestic problems; it created an enormous refugee crisis in Pakistan; the West, China, and India were alarmed; the US boycotted the 1980 Moscow Olympics." },
+          { id:"cw5", type:"basic", q:"Explain the five major problems within the Soviet system that led to its collapse.", ref:"(1) Economic Stagnation — growth fell from 5% to under 2%, black markets developed, food shortages; (2) Military Spending — 15-25% of GDP vs US 5-7%, diverting from domestic needs; (3) Political Stagnation and Corruption — party officials blocked reforms to protect privilege; (4) Ideology — people lost faith in communism as the economy failed; (5) Nationalism — half the population was not ethnically Russian and sought independence." },
+          { id:"cw6", type:"basic", q:"What were Mikhail Gorbachev's initial intentions when he came to office in 1985?", ref:"He intended to reform communism, not abandon it. Initially, he worked to rid the system of corruption, but by mid-1986 he realized he needed to go further." },
+          { id:"cw7", type:"basic", q:"Why was glasnost such a shocking policy for a Soviet leader to adopt?", ref:"For the first time in Russian/Soviet history, a leader was encouraging open debate about the country's issues. Previous Soviet leaders had always suppressed free speech and dissent." },
+          { id:"cw8", type:"basic", q:"Identify and explain the policy that Gorbachev implemented in 1987.", ref:"Perestroika — meaning 'restructuring.' Gorbachev spoke of economic reforms and focusing on common human values, demonstrating his complete commitment to fundamental reform of the Soviet system." },
+          { id:"cw9", type:"basic", q:"Why weren't Gorbachev's policies as effective as he intended?", ref:"He wanted improvements without a fundamental change in ideology, and only allowed one political party. The Soviet people, having gained new freedoms through glasnost, demanded more than Gorbachev was willing to give. Their standard of living actually got lower." },
+          { id:"cw10", type:"basic", q:"How did Gorbachev's holiday in August 1991 contribute to the fall of the Soviet Union?", ref:"While Gorbachev was on vacation, a group of conspirators attempted a coup. Boris Yeltsin emerged as the effective leader and saved the day. Yeltsin then outlawed the Communist Party in the Russian Republic, which allowed independence movements in all the republics to gain momentum." },
+          { id:"cw11", type:"basic", q:"How is the former Soviet Union structured today?", ref:"It dissolved on December 26, 1991 into 15 independent states: Estonia, Latvia, Lithuania, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, Uzbekistan, Belarus, Moldova, Ukraine, Armenia, Azerbaijan, Georgia, and the Russian Federation." },
+          { id:"cw12", type:"extended", q:"Explain why the Cold War ended. Include at least three contributing factors in your answer.", ref:"(1) Soviet economic failure — the communist system could not meet people's needs, leading to black markets and food shortages; (2) Gorbachev's reforms (glasnost and perestroika) unintentionally accelerated the collapse by giving people freedom without economic improvement; (3) Nationalism — non-Russian ethnic groups sought independence; (4) The arms race cost the USSR far more than it could afford (15-25% of GDP), diverting money from social programs; (5) The Cold War was fundamentally an ideological struggle, and when communism collapsed, the war had no second side." },
+        ]
+      },
+      {
+        id: "healthcare",
+        name: "Healthcare in Canada",
+        icon: "🏥",
+        questions: [
+          { id:"hc1", type:"basic", q:"Canada's Medicare is a publicly-funded medical system. Explain what this means.", ref:"Canadians pay for healthcare through taxes. The government collects income tax and distributes much of it to Medicare. Citizens never have to pay directly when they visit a doctor or hospital for medically necessary services." },
+          { id:"hc2", type:"basic", q:"What is Canada's federal health insurance legislation called?", ref:"The Canada Health Act (CHA), passed in 1984." },
+          { id:"hc3", type:"basic", q:"What guidelines have been set by the CHA?", ref:"All Canadian citizens have equal access to medically necessary services (hospital visits, surgeries, family doctor visits) regardless of their ability to pay. Doctors and hospitals are forbidden from charging user fees for most medically necessary services. The bill is sent directly to the provincial government." },
+          { id:"hc4", type:"basic", q:"List the advantages and disadvantages of Canada's healthcare system.", ref:"Pros: Equal access regardless of wealth — whether homeless or millionaire, you get the same level of care without paying. Cons: Very expensive and underfunded; long waiting lists for surgeries; rising costs; deteriorating services; new medical technologies are expensive; some Canadians go to the US to pay for faster treatment." },
+          { id:"hc5", type:"basic", q:"What was the purpose of the Romanow Commission?", ref:"Established in November 2002, the Romanow Commission attempted to establish guidelines and make suggestions for the future of healthcare in Canada, addressing the concern that the system was heading toward bankruptcy." },
+          { id:"hc6", type:"basic", q:"Explain how a two-tier healthcare system would work, and list its pros and cons.", ref:"In a two-tier system, both private and public doctors' offices and hospitals exist. Those who can afford to pay or have private insurance receive faster care at private clinics (run like businesses for profit). Those who cannot afford it use the public system. Pros: Reduces waiting lists; everybody still has access. Cons: Government may reduce the level of public services, causing the poor to receive lower quality care (as has happened in the US)." },
+          { id:"hc7", type:"basic", q:"Explain what increased privatization of the healthcare system would entail, and list pros and cons.", ref:"Private companies provide services within hospitals (e.g., cleaning, food services) at lower wages than the government paid. Pros: Saves the government millions of dollars. Cons: Many jobs lost, quality of services compromised, opponents argue healthcare should be exempt from the capitalist profit motive." },
+          { id:"hc8", type:"basic", q:"Why is healthcare a growing concern for Canadian citizens?", ref:"The system is heading toward bankruptcy; costs keep rising while services deteriorate; long wait times for surgeries; new medical technologies are extremely expensive; there is no consensus on how to fix it." },
+        ]
+      },
+      {
+        id: "economy",
+        name: "Canadian Economics (1980s-1990s)",
+        icon: "📊",
+        questions: [
+          { id:"ec1", type:"basic", q:"Why was a new economic approach needed in the mid-1980s?", ref:"The federal government under Trudeau had incurred a massive debt as federal spending had been allowed to escalate during the 1970s. By the mid-1980s, it was evident that a new approach was required to deal with this staggering debt." },
+          { id:"ec2", type:"basic", q:"The new economic approach of the 1980s was called ___. Explain this approach and provide an example.", ref:"Neo-conservatism. It involved a reduction of government interference in the economy and an increased reliance on the market forces of supply and demand. Example: Mulroney took away family allowances and old age pensions from the wealthy, and favoured business interests as part of debt-reduction." },
+          { id:"ec3", type:"basic", q:"Why did the Canadian economy shift its focus to service industries in the 1970s?", ref:"Large companies realized it was much cheaper to produce consumer goods in countries like China, India, and Bangladesh where labour was cheaper. Many Canadian manufacturing companies relocated their factories to foreign countries. Service industries (finance, airlines, software) depended on technology and skilled workers." },
+          { id:"ec4", type:"basic", q:"Describe some of the effects of Canada's debt reduction strategies.", ref:"Rising unemployment in the early 1990s; an increasing gap between the rich and poor; the number of Canadians living below the poverty line increased." },
+          { id:"ec5", type:"basic", q:"Why were more businesses becoming multinational?", ref:"There was tremendous economic growth internationally (Japan, Hong Kong, Singapore, South Korea, Taiwan). Global markets opened up, and businesses needed to operate internationally to compete on a global scale." },
+          { id:"ec6", type:"basic", q:"What is meant by 'free trade'?", ref:"A system of trading between countries without barriers such as tariffs (taxes) or quotas (limits on certain goods)." },
+          { id:"ec7", type:"basic", q:"Identify the free trade agreement that Mulroney helped to establish.", ref:"The Free Trade Agreement (FTA) with the United States, signed in 1989." },
+          { id:"ec8", type:"basic", q:"When Mexico joined Canada and the United States' Free Trade agreement in 1994, the agreement became known as ___.", ref:"The North American Free Trade Agreement (NAFTA)." },
+        ]
+      },
+      {
+        id: "immigration",
+        name: "Immigration in Canada",
+        icon: "🌍",
+        questions: [
+          { id:"im1", type:"basic", q:"What was the purpose of the Canadian Multiculturalism Act?", ref:"Adopted in 1987 'to recognize all Canadians as full and equal participants in Canadian society,' ensuring all citizens can keep their identities, take pride in their ancestry, and have a sense of belonging. It encourages integration and active participation in social, cultural, economic, and political affairs." },
+          { id:"im2", type:"basic", q:"In the 1980s and 1990s, where were most Canadian immigrants settling?", ref:"Canada's three major cities: Toronto, Montreal, and Vancouver." },
+          { id:"im3", type:"basic", q:"Which ten countries has Canada received most of its immigrants from in recent years (2016)?", ref:"Philippines, India, Syria, China, Pakistan, USA, Iran, France, United Kingdom, and Eritrea." },
+          { id:"im4", type:"basic", q:"How does Canada's government select immigrants?", ref:"Through a points system where applicants need at least 67 out of 100 points. Primary criteria: level of education, fluency in English or French, work experience, and employment opportunities. Applicants must also submit to a medical test." },
+          { id:"im5", type:"basic", q:"What percentage of Canadian immigrants lived below the poverty line in 2012?", ref:"Approximately 12%." },
+          { id:"im6", type:"basic", q:"What does it mean to say that Canada's immigration policy was 'in sync with its business cycle'?", ref:"Immigration rates increased when the business cycle was at its peak and unemployment was low, and decreased when the economy was in recession." },
+          { id:"im7", type:"basic", q:"Explain the effects on an immigrant if he/she arrives during a recession.", ref:"They experience 'economic scarring' — their technical skills depreciate with lack of use, and they are forced into poor economic situations that persist well beyond the end of the recession." },
+          { id:"im8", type:"basic", q:"Why do some highly educated immigrants end up working at low-paying jobs in Canada?", ref:"The process of having foreign credentials and education recognized in Canada is so lengthy and cumbersome that professionals (such as surgeons or lawyers from their home countries) end up finding low-paying employment." },
+          { id:"im9", type:"extended", q:"Explain the difference between a refugee, an asylum seeker, and an economic migrant.", ref:"A refugee is a person who has left their country because of war, political turmoil, or fear of persecution based on race, religion, nationality, or public opinion. An asylum seeker is a refugee who seeks refugee status in another country because they have been persecuted or their homeland is no longer safe. An economic migrant is a person who moves from one country to another in search of better economic opportunities or standard of living." },
+          { id:"im10", type:"extended", q:"What was the Immigration and Refugee Protection Act (IRPA) and why was it needed?", ref:"Enacted in November 2001, IRPA replaced all prior immigration and refugee legislation. It required immigration officers to refer asylum claims within three days, and addressed security/criminal concerns. It was needed due to the growing backlog of refugee claims, increasing fraudulent claims, and security concerns after 9/11." },
+          { id:"im11", type:"extended", q:"How did immigration source countries change over time, and what does this tell us about Canada?", ref:"Before 1981, the top 5 were European (UK, Italy, USA, Germany, Portugal). By 2016, the top 5 were from Asia (Philippines, India, Syria, China, Pakistan). This reflects Canada's evolution into a truly multicultural society and its shift away from a European-dominated immigration policy." },
+        ]
+      },
+      {
+        id: "nafta",
+        name: "NAFTA & Free Trade",
+        icon: "🤝",
+        questions: [
+          { id:"ft1", type:"basic", q:"List arguments FOR and AGAINST free trade (NAFTA).", ref:"FOR: Increased trade and investment with the US; greater access to larger markets; economic growth; Canadian businesses become more efficient. AGAINST: Canadian job losses due to relocation; Canadian companies moved or sold to American companies; not particularly successful during global recession; increasing American influence." },
+          { id:"ft2", type:"basic", q:"Write a paragraph expressing and defending your opinion on free trade.", ref:"[Open-ended critical thinking question] A strong answer should: (1) clearly state a position; (2) provide at least 2-3 supporting arguments with evidence from the chapter; (3) acknowledge counterarguments; (4) conclude with a reasoned judgment." },
+        ]
+      },
+      {
+        id: "intl_law",
+        name: "International Law & NATO",
+        icon: "⚖️",
+        questions: [
+          { id:"il1", type:"basic", q:"Identify two cases of human rights violations in which the UN Security Council established an International War Crimes Tribunal.", ref:"(1) The former Yugoslavia (1993) — for massive human rights violations and ethnic cleansing; (2) Rwanda (1994) — for the genocide of the Tutsi people. The Rwanda Tribunal handed down the first-ever verdict by an international court on genocide." },
+          { id:"il2", type:"basic", q:"Why is Louise Arbour an important Canadian figure?", ref:"She was the chief prosecutor of the International War Crimes Tribunal from 1996 to 1999. She is known for bringing justice to those responsible for the genocide in Rwanda." },
+          { id:"il3", type:"basic", q:"In 1998, what new governing body was established to combat and punish human rights violations?", ref:"The International Criminal Court (ICC). It has jurisdiction over genocide, war crimes, crimes against humanity, and aggression. 120 countries voted in favour." },
+          { id:"il4", type:"basic", q:"Why did some countries vote against the establishment of the ICC?", ref:"Countries like the United States did not want their soldiers and leaders to be subject to an international court." },
+          { id:"il5", type:"basic", q:"Identify two areas in which NATO has been involved since the end of the Cold War.", ref:"(1) Bombing campaign against Serbia in 1999 to prevent ethnic cleansing of Kosovar Albanians; (2) A mission that brought order to the new democracy in Macedonia. Also involved in Afghanistan after 9/11." },
+          { id:"il6", type:"basic", q:"Do you think it is a wise idea for NATO to increase its membership? Why or why not?", ref:"[Open-ended] Pro: More members provide more troops and niche capabilities; new members pledged 200,000 new troops; strengthens collective security. Con: May dilute the alliance's effectiveness; small countries have less to offer in military capability; critics argue the US no longer needs NATO." },
+          { id:"il7", type:"basic", q:"What did NATO leaders agree to by signing the Prague Capabilities Commitment?", ref:"European Allies agreed to 'spend smarter,' pool their resources, and pursue specialization. They also created the NATO Response Force — approximately 25,000 troops deployable on thirty days notice. Seven new democracies (Bulgaria, Estonia, Latvia, Lithuania, Romania, Slovakia, Slovenia) were invited to join." },
+        ]
+      },
+      {
+        id: "peacekeeping",
+        name: "Peacekeeping & Conflicts",
+        icon: "🕊️",
+        questions: [
+          { id:"pk1", type:"extended", q:"How did the role of UN peacekeeping change after the Cold War? List at least three changes.", ref:"(1) Shifted from between states to within states (civil wars); (2) More organizations involved besides the UN (NATO, OSCE, OAU); (3) Changed from simply standing between armies to actively creating peace where none exists; (4) Peacekeepers now do election monitoring, police training, de-mining, refugee assistance, economic development; (5) Now includes humanitarian interventions — armed intervention to protect human rights within sovereign states." },
+          { id:"pk2", type:"extended", q:"Describe what happened during the Rwandan genocide and explain why the international community failed to act.", ref:"Over 800,000 Tutsis were killed in about three months in 1994 in systematic attacks. Women and children were specifically targeted. Gen. Romeo Dallaire warned the UN with the 'genocide fax' and pleaded for 2,000 more troops, but was denied. After 10 Belgian peacekeepers were killed, the UN cut his forces from 3,000 to 500. The US repeatedly resisted strengthening the UN presence. It is widely recognized as an extreme failure of the international community." },
+          { id:"pk3", type:"extended", q:"Why is Romeo Dallaire an important figure in Canadian history?", ref:"He was head of the UN Peacekeeping Force in Rwanda. He sent the 'genocide fax' warning the UN of the planned extermination. He pleaded for reinforcements but was denied. He and his troops were forced to witness one of history's worst genocides. He later wrote 'Shake Hands with the Devil' and said the 'international community has blood on its hands.'" },
+          { id:"pk4", type:"extended", q:"What is a humanitarian intervention, and why is it controversial?", ref:"An armed intervention with the intention of protecting human rights within another sovereign state. It is controversial because while it is important to protect human rights, it also conflicts with state sovereignty. Without protecting sovereignty, intervention could be seen as a form of imperialism. On the other hand, governments must prevent massive human rights violations and crimes against humanity." },
+          { id:"pk5", type:"extended", q:"Why was the peacekeeping mission in Somalia damaging to Canada's reputation?", ref:"Canadian Airborne Regiment soldiers beat a Somali teenager to death in custody, took 'trophy' pictures of the torture, and there was a cover-up. The Somalia Commission of Inquiry found failure of military leadership, poor organization, and a confirmed cover-up. The Canadian Airborne Regiment was disbanded. Changes were eventually made to military training." },
+          { id:"pk6", type:"extended", q:"What are anti-personnel landmines and why are they a serious global problem?", ref:"Explosive devices implanted in the ground triggered when stepped on. Over 110 million in 64+ countries; 500 people die each week; they remain after wars; cost $5 to buy but $300-$1,000 each to remove; would take 1,000+ years to clear. For every mine cleared, 20 are laid. Only 100% effective clearance method is manual (metal detectors, prodders, hand brooms)." },
+          { id:"pk7", type:"extended", q:"Describe Canada's role in the global effort to ban landmines.", ref:"In 1996, Canadian Foreign Minister Lloyd Axworthy hosted an international conference on landmines. In December 1997, over 120 countries signed the Anti-Personnel Landmines Treaty (Ottawa Accord) in Ottawa, banning the use, production, transfer, and stockpiling of landmines. Canadian peacekeepers also deactivate landmines worldwide." },
+        ]
+      },
+      {
+        id: "canada_world",
+        name: "Canada & the Modern World",
+        icon: "🍁",
+        questions: [
+          { id:"mw1", type:"extended", q:"What was the Canadarm and why was it significant for Canada?", ref:"A 15-metre robotic arm designed for NASA's space shuttle program. Canada invested $100 million. It could lift 266,000 kg in space using less electricity than a toaster. It generated over $600 million in export sales. Canadians gained worldwide recognition for robotics expertise. Featured on the Canadian $5 bill in 2013. A model of international cooperation." },
+          { id:"mw2", type:"extended", q:"What was the Strategic Defence Initiative (SDI) and why did it create tension between Canada and the US?", ref:"SDI ('Star Wars') was an American proposal to develop a defensive 'umbrella' over the US using technologies like space-based lasers to prevent incoming missiles. The Soviets were concerned it would upset nuclear parity. The Canadian government refused to become part of SDI, creating tension with the US." },
+          { id:"mw3", type:"extended", q:"Explain the Pacific Salmon conflict between Canada and the US, and how it was resolved.", ref:"Decades of disputes over fishing rights on the West Coast. The 1985 Pacific Salmon Treaty worked for 12 years but broke down in 1997 when negotiators couldn't agree on quotas. American fishing boats were seized, an Alaska ferry was blockaded in Prince Rupert. A new treaty was signed in June 1999 establishing a $140 million fund to protect salmon spawning grounds and redistributing quotas." },
+          { id:"mw4", type:"extended", q:"Why did Canada not participate in the Iraq War in 2003, and what did it do instead?", ref:"PM Chrétien said Canada would only join military action against Iraq if approved by the UN Security Council, which it was not. France and Germany took similar positions. Although Canada did not send troops, it committed over $107 million in humanitarian assistance, consistent with Canada's emphasis on human security, development, and peace building." },
+          { id:"mw5", type:"extended", q:"Compare Canada's response to 9/11 with its response to the Iraq War. What does this tell us about Canadian foreign policy?", ref:"After 9/11: Canada fully supported the US — Operation Support (hosting diverted aircraft, increasing NORAD commitment), Operation Apollo (sending ~3,000 troops to Afghanistan). Iraq War: Canada refused to send troops without UN approval, sent only humanitarian aid. This shows Canada values multilateralism and UN authority, supports collective action through proper channels, but will not follow the US into unilateral military action." },
+          { id:"mw6", type:"extended", q:"What is misinformation ('fake news') and why should Canadians be cautious about online news sources?", ref:"Misinformation is illegitimate content spread by media sources to make money (clickbait) or by politicians to sway public opinion. Examples: fake headlines for clicks, or corrupt politicians paying for articles to influence policy debates. Canadians should always verify sources and be cautious about believing what they read online, especially regarding political issues." },
+          { id:"mw7", type:"extended", q:"Do prosperous countries like Canada have a responsibility to assist poorer countries? Support your answer with evidence from Chapter 6.", ref:"[Open-ended] Evidence supporting yes: Canada's ODA program gives aid to countries in Africa, Middle East, Americas, Asia; CIDA promotes sustainable development; Canada Fund for Africa ($500M); peacekeeping missions; humanitarian aid. However: Canadian ODA has declined (0.32% of GDP vs UN goal of 0.7%); 70% of aid went to countries with serious human rights violations; aid often prioritizes trade interests over human rights." },
+          { id:"mw8", type:"extended", q:"What lessons can the international community learn from the failures in Rwanda and Somalia?", ref:"Peacekeeping needs stronger mandates and adequate forces; the world cannot be a bystander to genocide; must act on intelligence warnings; need better military training and accountability; missions need clear rules of engagement and sufficient resources; there must be consequences for cover-ups; humanitarian intervention may be necessary even without consent of parties to the conflict." },
+        ]
+      }
+    ]
+  }
+};
+
+// ==================== APP STATE ====================
+let currentUser = null;
+let db = null;
+let currentChapter = null;
+let currentBank = 'basic'; // 'basic' or 'extended'
+let currentQuizQuestions = [];
+let currentQuestionIndex = 0;
+let userProgress = {};
+
+// ==================== FIREBASE INIT ====================
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+db = firebase.firestore();
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('userName').textContent = user.displayName || 'Student';
+    document.getElementById('userAvatar').src = user.photoURL || '';
+    loadProgress();
+  } else {
+    currentUser = null;
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('mainApp').classList.add('hidden');
+  }
+});
+
+function signIn() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => alert('Sign-in failed: ' + err.message));
+}
+
+function signOut() {
+  auth.signOut();
+}
+
+// ==================== FIRESTORE ====================
+async function loadProgress() {
+  if (!currentUser) return;
+  try {
+    const doc = await db.collection('ss10_progress').doc(currentUser.uid).get();
+    if (doc.exists) {
+      userProgress = doc.data();
+    } else {
+      userProgress = {};
+    }
+  } catch(e) {
+    console.warn('Failed to load progress, using local:', e);
+    const local = localStorage.getItem('ss10_progress_' + currentUser.uid);
+    userProgress = local ? JSON.parse(local) : {};
+  }
+  updateGlobalStats();
+  updateChapterProgress();
+}
+
+async function saveProgress() {
+  if (!currentUser) return;
+  localStorage.setItem('ss10_progress_' + currentUser.uid, JSON.stringify(userProgress));
+  try {
+    await db.collection('ss10_progress').doc(currentUser.uid).set(userProgress, { merge: true });
+  } catch(e) {
+    console.warn('Failed to save to Firestore:', e);
+  }
+}
+
+// ==================== NAVIGATION ====================
+function showChapterSelect() {
+  document.getElementById('chapterScreen').classList.remove('hidden');
+  document.getElementById('topicScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.add('hidden');
+  updateGlobalStats();
+  updateChapterProgress();
+}
+
+function selectChapter(chapterId, bank) {
+  currentChapter = chapterId;
+  currentBank = bank || 'basic';
+  document.getElementById('chapterScreen').classList.add('hidden');
+  document.getElementById('topicScreen').classList.remove('hidden');
+  document.getElementById('quizScreen').classList.add('hidden');
+  const suffix = currentBank === 'basic' ? ' — Textbook Questions' : ' — Extended Questions';
+  document.getElementById('chapterTitle').textContent = 'Chapter 6' + suffix;
+  renderTopicGrid();
+  const bankQs = getBankQuestions();
+  document.getElementById('allStartBtnInner').textContent = `Start All ${bankQs.length} Questions`;
+}
+
+function getFilteredQuestions(topic) {
+  return topic.questions.filter(q => q.type === currentBank);
+}
+
+function getBankQuestions() {
+  const chapter = QUESTIONS[currentChapter || 'ch6'];
+  return chapter.topics.flatMap(t => t.questions.filter(q => q.type === currentBank));
+}
+
+function renderTopicGrid() {
+  const chapter = QUESTIONS[currentChapter];
+  const grid = document.getElementById('topicGrid');
+  grid.innerHTML = '';
+  chapter.topics.forEach(topic => {
+    const filtered = getFilteredQuestions(topic);
+    if (filtered.length === 0) return;
+    const total = filtered.length;
+    const answered = filtered.filter(q => userProgress[q.id]).length;
+    const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.onclick = () => startQuiz(topic.id);
+    card.innerHTML = `
+      <div class="topic-icon">${topic.icon}</div>
+      <div class="topic-name">${topic.name}</div>
+      <div class="topic-count">${total} questions · ${answered} answered</div>
+      <div class="topic-progress"><div class="topic-progress-bar" style="width:${pct}%"></div></div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function setMode(mode) {
+  document.getElementById('modeByTopic').classList.toggle('active', mode === 'topic');
+  document.getElementById('modeAll').classList.toggle('active', mode === 'all');
+  document.getElementById('modeRandom').classList.toggle('active', mode === 'random');
+  document.getElementById('topicGrid').classList.toggle('hidden', mode !== 'topic');
+  document.getElementById('allStartBtn').classList.toggle('hidden', mode !== 'all');
+  document.getElementById('randomStartBtn').classList.toggle('hidden', mode !== 'random');
+}
+
+// ==================== QUIZ ====================
+function startQuiz(topicId) {
+  const chapter = QUESTIONS[currentChapter];
+  if (topicId) {
+    const topic = chapter.topics.find(t => t.id === topicId);
+    currentQuizQuestions = getFilteredQuestions(topic);
+  } else {
+    currentQuizQuestions = getBankQuestions();
+  }
+  currentQuestionIndex = 0;
+  showQuizScreen();
+}
+
+function startRandom() {
+  const all = getBankQuestions();
+  const unanswered = all.filter(q => !userProgress[q.id]);
+  const pool = unanswered.length >= 10 ? unanswered : all;
+  const count = Math.min(10, pool.length);
+  currentQuizQuestions = shuffleArray([...pool]).slice(0, count);
+  currentQuestionIndex = 0;
+  showQuizScreen();
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showQuizScreen() {
+  document.getElementById('topicScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function exitQuiz() {
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('topicScreen').classList.remove('hidden');
+  renderTopicGrid();
+}
+
+function renderQuestion() {
+  const q = currentQuizQuestions[currentQuestionIndex];
+  const total = currentQuizQuestions.length;
+  document.getElementById('quizProgressText').textContent = `${currentQuestionIndex + 1} / ${total}`;
+  document.getElementById('quizProgressBar').style.width = `${((currentQuestionIndex) / total) * 100}%`;
+
+  const badge = document.getElementById('questionBadge');
+  badge.textContent = q.type === 'basic' ? 'TEXTBOOK' : 'EXTENDED';
+  badge.className = `question-badge ${q.type === 'basic' ? 'badge-basic' : 'badge-extended'}`;
+
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerInput').disabled = false;
+  document.getElementById('charCount').textContent = '0 characters';
+  document.getElementById('feedbackArea').classList.add('hidden');
+  document.getElementById('feedbackArea').innerHTML = '';
+  document.getElementById('nextBtnArea').classList.add('hidden');
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Submit';
+  document.getElementById('skipBtn').classList.remove('hidden');
+  document.getElementById('answerInput').focus();
+}
+
+function updateCharCount() {
+  const len = document.getElementById('answerInput').value.length;
+  document.getElementById('charCount').textContent = `${len} characters`;
+}
+
+function skipQuestion() {
+  nextQuestion();
+}
+
+async function submitAnswer() {
+  const answer = document.getElementById('answerInput').value.trim();
+  if (!answer) { alert('Please type your answer before submitting.'); return; }
+
+  const q = currentQuizQuestions[currentQuestionIndex];
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span>Evaluating...';
+  document.getElementById('answerInput').disabled = true;
+  document.getElementById('skipBtn').classList.add('hidden');
+
+  try {
+    const feedback = await evaluateWithGemini(q.q, answer, q.ref);
+    displayFeedback(feedback, q.ref);
+    userProgress[q.id] = {
+      question: q.q,
+      answer: answer,
+      score: feedback.score,
+      rating: feedback.rating,
+      feedback: feedback,
+      referenceAnswer: q.ref,
+      topicId: getCurrentTopicId(q.id),
+      type: q.type,
+      timestamp: Date.now()
+    };
+    saveProgress();
+  } catch(e) {
+    console.error('Gemini error:', e);
+    displayFallbackFeedback(q.ref);
+  }
+}
+
+function getCurrentTopicId(qId) {
+  const ch = QUESTIONS[currentChapter || 'ch6'];
+  for (const topic of ch.topics) {
+    if (topic.questions.some(q => q.id === qId)) return topic.id;
+  }
+  return '';
+}
+
+async function evaluateWithGemini(question, studentAnswer, referenceAnswer) {
+  const prompt = `You are an experienced Grade 10 Social Studies teacher. Evaluate the student's answer with DETAILED, SPECIFIC analysis.
+
+IMPORTANT FORMAT RULES:
+- Write primarily in English, with brief Chinese annotations in parentheses for key terms and important feedback.
+- Example: "You correctly identified détente (缓和) as the period of relaxed tensions (紧张局势的缓和)."
+
+QUESTION: ${question}
+
+STUDENT'S ANSWER: ${studentAnswer}
+
+REFERENCE ANSWER: ${referenceAnswer}
+
+Respond in this EXACT JSON format (no markdown, no code fences):
+{
+  "score": <number 1-10>,
+  "rating": "<Excellent|Good|Needs Improvement>",
+  "correct_points": "<List each correct point the student made. Be specific — quote or paraphrase what they said and explain WHY it is correct. (对每个正确的要点进行具体分析)>",
+  "incorrect_points": "<List anything the student got WRONG or stated inaccurately. Explain the correct information. If nothing is wrong, say 'No factual errors found.' (指出错误并纠正)>",
+  "missing_points": "<List the KEY points from the reference answer that the student DID NOT mention. Explain why each point matters. (列出遗漏的关键要点并解释其重要性)>",
+  "review_topics": "<Based on what was missing or wrong, list 2-4 specific topics/concepts the student should review. Be specific, e.g. 'Review the Helsinki Accords (赫尔辛基协议) and its three main agreements' rather than just 'Review détente'. (需要重点复习的知识点)>",
+  "suggestion": "<Give encouraging, actionable advice on how to improve the answer. Mention a specific study strategy if helpful. (改进建议和学习策略)>"
+}
+
+Scoring guide: 9-10 = covers all key points accurately; 7-8 = covers most key points; 5-6 = partial coverage; 3-4 = significant gaps; 1-2 = mostly incorrect or very incomplete.`;
+
+  const resp = await fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.3, maxOutputTokens: 1200 }
+    })
+  });
+
+  if (!resp.ok) throw new Error('API request failed: ' + resp.status);
+  const data = await resp.json();
+  const text = data.candidates[0].content.parts[0].text;
+  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  return JSON.parse(cleaned);
+}
+
+function displayFeedback(feedback, referenceAnswer) {
+  const scoreClass = feedback.score >= 8 ? 'score-excellent' : feedback.score >= 5 ? 'score-good' : 'score-needs-work';
+  const area = document.getElementById('feedbackArea');
+  area.classList.remove('hidden');
+  area.innerHTML = `
+    <div class="feedback-card">
+      <div class="feedback-score">
+        <div class="score-circle ${scoreClass}">${feedback.score}</div>
+        <div>
+          <div class="feedback-label">${feedback.rating}</div>
+          <div class="feedback-sublabel">Score: ${feedback.score}/10</div>
+        </div>
+      </div>
+      <div class="feedback-body">
+        ${feedback.correct_points ? `<div class="feedback-section"><div class="feedback-section-title">✅ Correct Points (正确的要点)</div><div>${feedback.correct_points}</div></div>` : ''}
+        ${feedback.incorrect_points ? `<div class="feedback-section"><div class="feedback-section-title">❌ Incorrect Points (错误之处)</div><div>${feedback.incorrect_points}</div></div>` : ''}
+        ${feedback.missing_points ? `<div class="feedback-section"><div class="feedback-section-title">📝 Missing Points (遗漏的要点)</div><div>${feedback.missing_points}</div></div>` : ''}
+        ${feedback.review_topics ? `<div class="feedback-section" style="padding:12px; background:rgba(251,191,36,0.08); border-radius:8px; border-left:3px solid var(--warning);"><div class="feedback-section-title" style="color:var(--warning);">📚 Topics to Review (需要复习的知识点)</div><div>${feedback.review_topics}</div></div>` : ''}
+        ${feedback.suggestion ? `<div class="feedback-section"><div class="feedback-section-title">💡 Improvement Tips (改进建议)</div><div>${feedback.suggestion}</div></div>` : ''}
+      </div>
+      <div class="reference-answer">
+        <div class="reference-answer-title">📖 Reference Answer (参考答案)</div>
+        <p>${referenceAnswer}</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('nextBtnArea').classList.remove('hidden');
+}
+
+function displayFallbackFeedback(referenceAnswer) {
+  const area = document.getElementById('feedbackArea');
+  area.classList.remove('hidden');
+  area.innerHTML = `
+    <div class="feedback-card">
+      <div class="feedback-body">
+        <div class="feedback-section">
+          <div class="feedback-section-title">⚠️ AI evaluation unavailable</div>
+          Compare your answer with the reference answer below to self-evaluate.
+        </div>
+      </div>
+      <div class="reference-answer">
+        <div class="reference-answer-title">📖 Reference Answer</div>
+        <p>${referenceAnswer}</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('nextBtnArea').classList.remove('hidden');
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Submit';
+}
+
+function nextQuestion() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex >= currentQuizQuestions.length) {
+    showQuizComplete();
+    return;
+  }
+  renderQuestion();
+}
+
+function showQuizComplete() {
+  const answered = currentQuizQuestions.filter(q => userProgress[q.id]);
+  const avgScore = answered.length > 0
+    ? (answered.reduce((sum, q) => sum + (userProgress[q.id]?.score || 0), 0) / answered.length).toFixed(1)
+    : 'N/A';
+
+  document.getElementById('questionCard').innerHTML = `
+    <div style="text-align:center; padding:40px 20px;">
+      <div style="font-size:3rem; margin-bottom:16px;">🎉</div>
+      <h2 style="margin-bottom:8px;">Quiz Complete!</h2>
+      <p style="color:var(--text-secondary); margin-bottom:24px;">
+        You answered ${answered.length} out of ${currentQuizQuestions.length} questions.<br>
+        Average score: <strong style="color:var(--accent-light);">${avgScore}/10</strong>
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn" onclick="exitQuiz()">Back to Topics</button>
+        <button class="btn btn-primary" onclick="retryWeak()">Retry Weak Questions</button>
+      </div>
+    </div>
+  `;
+}
+
+function retryWeak() {
+  const weak = currentQuizQuestions.filter(q => userProgress[q.id] && userProgress[q.id].score < 7);
+  if (weak.length === 0) {
+    alert('Great job! No weak questions to retry.');
+    return;
+  }
+  currentQuizQuestions = shuffleArray([...weak]);
+  currentQuestionIndex = 0;
+  document.getElementById('questionCard').innerHTML = `
+    <span class="question-badge badge-basic" id="questionBadge">TEXTBOOK</span>
+    <div class="question-text" id="questionText"></div>
+    <div class="answer-area">
+      <textarea id="answerInput" placeholder="Type your answer here..." oninput="updateCharCount()"></textarea>
+      <div class="submit-row">
+        <span class="char-count" id="charCount">0 characters</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" id="skipBtn" onclick="skipQuestion()">Skip</button>
+          <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()">Submit</button>
+        </div>
+      </div>
+    </div>
+    <div id="feedbackArea" class="hidden"></div>
+    <div id="nextBtnArea" class="hidden" style="text-align:center; margin-top:16px;">
+      <button class="btn btn-primary" style="padding:12px 36px;" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  `;
+  renderQuestion();
+}
+
+// ==================== STATS ====================
+function getAllQuestions() {
+  const ch = QUESTIONS[currentChapter || 'ch6'];
+  return ch.topics.flatMap(t => t.questions);
+}
+
+function updateGlobalStats() {
+  const all = getAllQuestions();
+  const basic = all.filter(q => q.type === 'basic');
+  const extended = all.filter(q => q.type === 'extended');
+  const answeredBasic = basic.filter(q => userProgress[q.id]);
+  const answeredExt = extended.filter(q => userProgress[q.id]);
+  const allAnswered = [...answeredBasic, ...answeredExt];
+  const scores = allAnswered.map(q => userProgress[q.id]?.score || 0);
+  const avg = scores.length > 0 ? (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1) : '—';
+  const excellent = scores.filter(s => s >= 8).length;
+
+  document.getElementById('globalStats').innerHTML = `
+    <div class="stat-chip"><span class="stat-value">${allAnswered.length}</span><span class="stat-label">Total Answered</span></div>
+    <div class="stat-chip"><span class="stat-value">${avg}</span><span class="stat-label">Avg Score</span></div>
+    <div class="stat-chip"><span class="stat-value">${excellent}</span><span class="stat-label">Excellent (8+)</span></div>
+  `;
+}
+
+// ==================== HISTORY ====================
+let historyFilter = 'all';
+
+function showHistory() {
+  document.getElementById('chapterScreen').classList.add('hidden');
+  document.getElementById('topicScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('historyScreen').classList.remove('hidden');
+  historyFilter = 'all';
+  renderHistory();
+}
+
+function hideHistory() {
+  document.getElementById('historyScreen').classList.add('hidden');
+  document.getElementById('chapterScreen').classList.remove('hidden');
+  updateGlobalStats();
+  updateChapterProgress();
+}
+
+function filterHistory(filter) {
+  historyFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  renderHistory();
+}
+
+function getTopicName(topicId) {
+  const ch = QUESTIONS['ch6'];
+  const topic = ch.topics.find(t => t.id === topicId);
+  return topic ? topic.name : '';
+}
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+}
+
+function renderHistory() {
+  const entries = [];
+  for (const [qId, data] of Object.entries(userProgress)) {
+    if (!data.question || !data.timestamp) continue;
+    entries.push({ id: qId, ...data });
+  }
+  entries.sort((a, b) => b.timestamp - a.timestamp);
+
+  const filtered = entries.filter(e => {
+    if (historyFilter === 'low') return (e.score || 0) <= 6;
+    if (historyFilter === 'basic') return e.type === 'basic';
+    if (historyFilter === 'extended') return e.type === 'extended';
+    return true;
+  });
+
+  const list = document.getElementById('historyList');
+  const empty = document.getElementById('historyEmpty');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  list.innerHTML = filtered.map(e => {
+    const scoreClass = (e.score||0) >= 8 ? 'score-excellent' : (e.score||0) >= 5 ? 'score-good' : 'score-needs-work';
+    const fb = e.feedback || {};
+    const topicName = getTopicName(e.topicId);
+    const typeBadge = e.type === 'extended' ? '<span style="color:var(--cyan); font-size:0.7rem; font-weight:700;">EXTENDED</span>' : '';
+
+    return `
+      <div class="history-item" onclick="this.classList.toggle('expanded')">
+        <div class="history-item-header">
+          <div class="history-score-mini ${scoreClass}">${e.score || '?'}</div>
+          <div class="history-item-body">
+            <div class="history-item-question">${e.question}</div>
+            <div class="history-item-meta">${topicName} ${typeBadge} · ${formatDate(e.timestamp)}</div>
+          </div>
+          <div class="history-expand-icon">▼</div>
+        </div>
+        <div class="history-detail">
+          <div class="history-detail-section">
+            <div class="history-detail-label" style="color:var(--accent-light);">Your Answer (你的回答)</div>
+            <div class="history-detail-content">${e.answer || ''}</div>
+          </div>
+          ${fb.correct_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--correct);">✅ Correct Points (正确的要点)</div><div class="history-detail-content">${fb.correct_points}</div></div>` : ''}
+          ${fb.incorrect_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--wrong);">❌ Incorrect Points (错误之处)</div><div class="history-detail-content">${fb.incorrect_points}</div></div>` : ''}
+          ${fb.missing_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--orange);">📝 Missing Points (遗漏的要点)</div><div class="history-detail-content">${fb.missing_points}</div></div>` : ''}
+          ${fb.review_topics ? `<div class="history-detail-section" style="padding:10px; background:rgba(251,191,36,0.06); border-radius:8px; border-left:3px solid var(--warning);"><div class="history-detail-label" style="color:var(--warning);">📚 Topics to Review (需要复习)</div><div class="history-detail-content">${fb.review_topics}</div></div>` : ''}
+          ${fb.suggestion ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--teal);">💡 Tips (改进建议)</div><div class="history-detail-content">${fb.suggestion}</div></div>` : ''}
+          <div class="history-detail-section" style="padding:10px; background:rgba(255,255,255,0.03); border-radius:8px; border-left:3px solid var(--cyan);">
+            <div class="history-detail-label" style="color:var(--cyan);">📖 Reference Answer (参考答案)</div>
+            <div class="history-detail-content">${e.referenceAnswer || ''}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateChapterProgress() {
+  const all = getAllQuestions();
+  const basic = all.filter(q => q.type === 'basic');
+  const extended = all.filter(q => q.type === 'extended');
+
+  const answeredBasic = basic.filter(q => userProgress[q.id]).length;
+  const pctBasic = Math.round(answeredBasic / basic.length * 100);
+  const barB = document.getElementById('ch6BasicBar');
+  const textB = document.getElementById('ch6BasicText');
+  if (barB) barB.style.width = pctBasic + '%';
+  if (textB) textB.textContent = `${answeredBasic}/${basic.length}`;
+
+  const answeredExt = extended.filter(q => userProgress[q.id]).length;
+  const pctExt = extended.length > 0 ? Math.round(answeredExt / extended.length * 100) : 0;
+  const barE = document.getElementById('ch6ExtBar');
+  const textE = document.getElementById('ch6ExtText');
+  if (barE) barE.style.width = pctExt + '%';
+  if (textE) textE.textContent = `${answeredExt}/${extended.length}`;
+}
+</script>
+</body>
+</html>
