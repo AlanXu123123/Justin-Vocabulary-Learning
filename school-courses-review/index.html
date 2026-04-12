@@ -557,11 +557,13 @@
           <h2 style="margin:0;">Textbook Questions</h2>
         </div>
         <p>38 questions from the textbook exercises — Cold War, Healthcare, Economy, Immigration, NAFTA, International Law</p>
-        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
-          <div style="flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
-            <div id="ch6BasicBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--cyan)); border-radius:2px; transition:width 0.3s;"></div>
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
+              <div id="ch6BasicBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--correct),var(--teal)); border-radius:2px; transition:width 0.3s;"></div>
+            </div>
           </div>
-          <span id="ch6BasicText" style="font-size:0.75rem; color:var(--muted);">0/38</span>
+          <div id="ch6BasicText" style="font-size:0.72rem; color:var(--muted); line-height:1.45;">做对 0/38 · 待复习 38 · 已答 0/38</div>
         </div>
       </div>
 
@@ -571,11 +573,13 @@
           <h2 style="margin:0;">Extended Questions</h2>
         </div>
         <p>20 deeper questions — Peacekeeping failures, Rwandan genocide, Canadarm, 9/11 response, Landmines & more</p>
-        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
-          <div style="flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
-            <div id="ch6ExtBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--teal)); border-radius:2px; transition:width 0.3s;"></div>
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;">
+              <div id="ch6ExtBar" style="height:100%; width:0%; background:linear-gradient(90deg,var(--correct),var(--cyan)); border-radius:2px; transition:width 0.3s;"></div>
+            </div>
           </div>
-          <span id="ch6ExtText" style="font-size:0.75rem; color:var(--muted);">0/20</span>
+          <div id="ch6ExtText" style="font-size:0.72rem; color:var(--muted); line-height:1.45;">做对 0/20 · 待复习 20 · 已答 0/20</div>
         </div>
       </div>
     </div>
@@ -830,6 +834,8 @@ let currentBank = 'basic'; // 'basic' or 'extended'
 let currentQuizQuestions = [];
 let currentQuestionIndex = 0;
 let userProgress = {};
+/** 得分 ≥ 此值视为「做对」；与 Retry weak（低于 7 分）一致 */
+const MASTERY_SCORE = 7;
 
 // ==================== FIREBASE INIT ====================
 firebase.initializeApp(FIREBASE_CONFIG);
@@ -927,16 +933,15 @@ function renderTopicGrid() {
   chapter.topics.forEach(topic => {
     const filtered = getFilteredQuestions(topic);
     if (filtered.length === 0) return;
-    const total = filtered.length;
-    const answered = filtered.filter(q => userProgress[q.id]).length;
-    const pct = total > 0 ? Math.round(answered / total * 100) : 0;
+    const st = masteryStats(filtered);
+    const pct = st.total > 0 ? Math.round(st.passed / st.total * 100) : 0;
     const card = document.createElement('div');
     card.className = 'topic-card';
     card.onclick = () => startQuiz(topic.id);
     card.innerHTML = `
       <div class="topic-icon">${topic.icon}</div>
       <div class="topic-name">${topic.name}</div>
-      <div class="topic-count">${total} questions · ${answered} answered</div>
+      <div class="topic-count"><span style="color:var(--correct);font-weight:700">${st.passed}/${st.total}</span> 做对 · <span style="color:var(--warning);font-weight:600">${st.toReview}</span> 待复习 · <span style="color:var(--muted)">${st.answered}/${st.total} 已答</span></div>
       <div class="topic-progress"><div class="topic-progress-bar" style="width:${pct}%"></div></div>
     `;
     grid.appendChild(card);
@@ -1250,7 +1255,7 @@ function showQuizComplete() {
 function retryWeak() {
   const weak = currentQuizQuestions.filter(q => {
     const p = userProgress[q.id];
-    return p && typeof p.score === 'number' && p.score < 7;
+    return p && typeof p.score === 'number' && p.score < MASTERY_SCORE;
   });
   if (weak.length === 0) {
     alert('Great job! No weak questions to retry.');
@@ -1285,6 +1290,19 @@ function getAllQuestions() {
   return ch.topics.flatMap(t => t.questions);
 }
 
+function isQuestionMastered(qId) {
+  const p = userProgress[qId];
+  return !!(p && typeof p.score === 'number' && p.score >= MASTERY_SCORE);
+}
+
+/** 做对 / 待复习 / 已答 统计（待复习 = 总题数 − 做对，含未做与低分） */
+function masteryStats(questions) {
+  const total = questions.length;
+  const passed = questions.filter(q => isQuestionMastered(q.id)).length;
+  const answered = questions.filter(q => userProgress[q.id]).length;
+  return { total, passed, toReview: total - passed, answered };
+}
+
 function updateGlobalStats() {
   const all = getAllQuestions();
   const basic = all.filter(q => q.type === 'basic');
@@ -1295,9 +1313,12 @@ function updateGlobalStats() {
   const scores = allAnswered.map(q => userProgress[q.id]?.score).filter(s => typeof s === 'number');
   const avg = scores.length > 0 ? (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1) : '—';
   const excellent = scores.filter(s => s >= 8).length;
+  const mAll = masteryStats(all);
 
   document.getElementById('globalStats').innerHTML = `
-    <div class="stat-chip"><span class="stat-value">${allAnswered.length}</span><span class="stat-label">Total Answered</span></div>
+    <div class="stat-chip"><span class="stat-value" style="color:var(--correct);">${mAll.passed}/${mAll.total}</span><span class="stat-label">做对 Passed (≥${MASTERY_SCORE})</span></div>
+    <div class="stat-chip"><span class="stat-value" style="color:var(--warning);">${mAll.toReview}</span><span class="stat-label">待复习 To review</span></div>
+    <div class="stat-chip"><span class="stat-value">${allAnswered.length}</span><span class="stat-label">已答 Answered</span></div>
     <div class="stat-chip"><span class="stat-value">${avg}</span><span class="stat-label">Avg Score</span></div>
     <div class="stat-chip"><span class="stat-value">${excellent}</span><span class="stat-label">Excellent (8+)</span></div>
   `;
@@ -1417,19 +1438,19 @@ function updateChapterProgress() {
   const basic = all.filter(q => q.type === 'basic');
   const extended = all.filter(q => q.type === 'extended');
 
-  const answeredBasic = basic.filter(q => userProgress[q.id]).length;
-  const pctBasic = Math.round(answeredBasic / basic.length * 100);
+  const sb = masteryStats(basic);
+  const pctBasic = sb.total > 0 ? Math.round(sb.passed / sb.total * 100) : 0;
   const barB = document.getElementById('ch6BasicBar');
   const textB = document.getElementById('ch6BasicText');
   if (barB) barB.style.width = pctBasic + '%';
-  if (textB) textB.textContent = `${answeredBasic}/${basic.length}`;
+  if (textB) textB.textContent = `做对 ${sb.passed}/${sb.total} · 待复习 ${sb.toReview} · 已答 ${sb.answered}/${sb.total}`;
 
-  const answeredExt = extended.filter(q => userProgress[q.id]).length;
-  const pctExt = extended.length > 0 ? Math.round(answeredExt / extended.length * 100) : 0;
+  const se = masteryStats(extended);
+  const pctExt = se.total > 0 ? Math.round(se.passed / se.total * 100) : 0;
   const barE = document.getElementById('ch6ExtBar');
   const textE = document.getElementById('ch6ExtText');
   if (barE) barE.style.width = pctExt + '%';
-  if (textE) textE.textContent = `${answeredExt}/${extended.length}`;
+  if (textE) textE.textContent = `做对 ${se.passed}/${se.total} · 待复习 ${se.toReview} · 已答 ${se.answered}/${se.total}`;
 }
 </script>
 </body>
