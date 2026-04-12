@@ -1145,7 +1145,8 @@ Scoring guide: 9-10 = covers all key points accurately; 7-8 = covers most key po
   let lastErr = null;
   for (const modelId of GEMINI_MODELS) {
     try {
-      return await callGeminiModel(modelId, prompt);
+      const parsed = await callGeminiModel(modelId, prompt);
+      return { ...parsed, graderModel: modelId };
     } catch (e) {
       lastErr = e;
       console.warn('Gemini model failed, trying next:', modelId, e);
@@ -1156,6 +1157,9 @@ Scoring guide: 9-10 = covers all key points accurately; 7-8 = covers most key po
 
 function displayFeedback(feedback, referenceAnswer) {
   const scoreClass = feedback.score >= 8 ? 'score-excellent' : feedback.score >= 5 ? 'score-good' : 'score-needs-work';
+  const modelLine = feedback.graderModel
+    ? `<div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--glass-border); font-size:0.78rem; color:var(--muted);">Analysis by <strong style="color:var(--accent-light);">'${escapeHtml(feedback.graderModel)}'</strong> <span style="color:var(--muted);">(批改模型)</span></div>`
+    : '';
   const area = document.getElementById('feedbackArea');
   area.classList.remove('hidden');
   area.innerHTML = `
@@ -1173,6 +1177,7 @@ function displayFeedback(feedback, referenceAnswer) {
         ${feedback.missing_points ? `<div class="feedback-section"><div class="feedback-section-title">📝 Missing Points (遗漏的要点)</div><div>${feedback.missing_points}</div></div>` : ''}
         ${feedback.review_topics ? `<div class="feedback-section" style="padding:12px; background:rgba(251,191,36,0.08); border-radius:8px; border-left:3px solid var(--warning);"><div class="feedback-section-title" style="color:var(--warning);">📚 Topics to Review (需要复习的知识点)</div><div>${feedback.review_topics}</div></div>` : ''}
         ${feedback.suggestion ? `<div class="feedback-section"><div class="feedback-section-title">💡 Improvement Tips (改进建议)</div><div>${feedback.suggestion}</div></div>` : ''}
+        ${modelLine}
       </div>
       <div class="reference-answer">
         <div class="reference-answer-title">📖 Reference Answer (参考答案)</div>
@@ -1373,6 +1378,7 @@ function renderHistory() {
     const topicName = getTopicName(e.topicId);
     const typeBadge = e.type === 'extended' ? '<span style="color:var(--cyan); font-size:0.7rem; font-weight:700;">EXTENDED</span>' : '';
     const aiNote = fb.aiUnavailable ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--warning);">⚠️ AI unavailable (未评分)</div><div class="history-detail-content">${fb.unavailableMessage || ''}</div></div>` : '';
+    const modelNote = (!fb.aiUnavailable && fb.graderModel) ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--muted);">Analysis by (批改模型)</div><div class="history-detail-content"><strong style="color:var(--accent-light);">'${escapeHtml(fb.graderModel)}'</strong></div></div>` : '';
 
     return `
       <div class="history-item" onclick="this.classList.toggle('expanded')">
@@ -1389,6 +1395,7 @@ function renderHistory() {
             <div class="history-detail-label" style="color:var(--accent-light);">Your Answer (你的回答)</div>
             <div class="history-detail-content">${e.answer || ''}</div>
           </div>
+          ${modelNote}
           ${aiNote}
           ${fb.correct_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--correct);">✅ Correct Points (正确的要点)</div><div class="history-detail-content">${fb.correct_points}</div></div>` : ''}
           ${fb.incorrect_points ? `<div class="history-detail-section"><div class="history-detail-label" style="color:var(--wrong);">❌ Incorrect Points (错误之处)</div><div class="history-detail-content">${fb.incorrect_points}</div></div>` : ''}
