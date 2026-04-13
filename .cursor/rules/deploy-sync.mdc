@@ -1,5 +1,5 @@
 ---
-description: After editing the SS10 web app or Firebase config, deploy and push
+description: After editing Justin_Study_Agent (school-courses-review) or Firebase config, deploy and push
 globs: school-courses-review/**,firebase.json,.firebaserc,package.json,package-lock.json,.github/workflows/**
 alwaysApply: false
 ---
