@@ -1,6 +1,6 @@
 {
   "name": "functions",
-  "description": "SS10 answer grading via Gemini (callable)",
+  "description": "Justin_Study_Agent — SS10 answer grading via Gemini (callable)",
   "engines": {
     "node": "20"
   },
