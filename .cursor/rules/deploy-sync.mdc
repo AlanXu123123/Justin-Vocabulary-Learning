@@ -6,6 +6,6 @@ alwaysApply: false
 
 When you change `school-courses-review/`, `firebase.json`, `.firebaserc`, or `package.json`:
 
-1. From project root `d:\Cursor_Projects\Justin_School_Course`, run `npm.cmd run deploy:hosting` so Firebase Hosting matches local files (requires Firebase CLI login on that machine).
+1. From project root `d:\Cursor_Projects\Justin_School_Course`, run `npm.cmd run deploy:all` (Hosting + Cloud Functions). Use `deploy:hosting` or `deploy:functions` if you only changed one side. Requires Firebase CLI login; Functions need Blaze plan and Secret `GEMINI_API_KEY` (see `DEPLOY.md`).
 2. Commit and push to `origin main` for the changed files. Do **not** commit `Chapter 6.pdf`, `.firebase/`, or `node_modules/`.
 3. If GitHub Actions secret `FIREBASE_TOKEN` is set, pushing to `main` also deploys hosting automatically—local `firebase deploy` is still optional for instant verification.
