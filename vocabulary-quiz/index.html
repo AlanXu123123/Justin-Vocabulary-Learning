@@ -810,6 +810,51 @@
     .sentence-loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
     .sentence-loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 0.75rem; }
 
+    /* ===== Chemistry 11 Assistant ===== */
+    .chem-home-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-top: 0.9rem; }
+    .chem-home-card {
+      border: 1px solid var(--glass-border); border-radius: var(--r-lg);
+      background: var(--glass); padding: 1rem; cursor: pointer;
+      transition: transform var(--fast) var(--ease), border-color var(--fast), background var(--fast);
+    }
+    .chem-home-card:hover { transform: translateY(-2px); border-color: var(--accent); background: var(--glass-strong); }
+    .chem-unit-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.5rem; margin:0.75rem 0; }
+    .chem-unit-btn {
+      padding:0.55rem 0.6rem; border-radius:var(--r-sm); border:1px solid var(--glass-border);
+      background:rgba(255,255,255,0.04); color:var(--text-secondary); cursor:pointer; font-family:inherit;
+      font-size:0.78rem; text-align:left; transition:all 0.2s;
+    }
+    .chem-unit-btn.active, .chem-unit-btn:hover { border-color:var(--accent); color:var(--text); background:rgba(123,127,240,0.14); }
+    .chem-filter-row { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; margin:0.75rem 0; }
+    .chem-term-card {
+      border:1px solid var(--glass-border); border-radius:var(--r-md); padding:0.75rem;
+      background:rgba(255,255,255,0.035); margin-bottom:0.6rem;
+    }
+    .chem-term-head { display:flex; gap:0.5rem; justify-content:space-between; align-items:flex-start; }
+    .chem-term-title { font-size:1rem; font-weight:700; color:var(--accent-light); }
+    .chem-phonetic { font-size:0.75rem; color:var(--muted); margin-top:0.1rem; }
+    .chem-priority { font-size:0.68rem; padding:0.12rem 0.45rem; border-radius:999px; background:rgba(123,127,240,0.14); color:var(--accent-light); white-space:nowrap; }
+    .chem-priority.important { background:rgba(251,191,36,0.12); color:var(--warning); }
+    .chem-priority.support { background:rgba(34,211,238,0.12); color:var(--cyan); }
+    .chem-def-en { color:var(--text); line-height:1.55; margin-top:0.45rem; font-size:0.9rem; }
+    .chem-def-cn { color:var(--text-secondary); line-height:1.6; margin-top:0.35rem; font-size:0.88rem; }
+    .chem-source { font-size:0.68rem; color:var(--muted); margin-top:0.45rem; }
+    .chem-test-option {
+      width:100%; text-align:left; margin-top:0.45rem; padding:0.65rem 0.8rem;
+      border-radius:var(--r-sm); border:1px solid var(--glass-border);
+      background:rgba(255,255,255,0.04); color:var(--text); cursor:pointer; font-family:inherit;
+    }
+    .chem-test-option.correct { border-color:var(--correct); background:rgba(50,215,75,0.12); }
+    .chem-test-option.wrong { border-color:var(--wrong); background:rgba(255,105,97,0.12); }
+    .chem-test-option:disabled { cursor:default; opacity:0.9; }
+    .chem-result-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin:0.75rem 0; }
+    .chem-result-box { text-align:center; border:1px solid var(--glass-border); border-radius:var(--r-md); padding:0.7rem; background:var(--glass); }
+    .chem-result-value { font-size:1.25rem; font-weight:700; color:var(--accent-light); }
+    .chem-result-label { font-size:0.72rem; color:var(--muted); margin-top:0.15rem; }
+    [data-theme="light"] .chem-unit-btn,
+    [data-theme="light"] .chem-term-card,
+    [data-theme="light"] .chem-test-option { background:rgba(255,255,255,0.42); }
+
     /* ===== Inline style overrides ===== */
     #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
     #btnRetestWrong { background: linear-gradient(135deg, var(--wrong), #e11d48) !important; }
@@ -1049,6 +1094,7 @@
         <button type="button" class="btn" id="btnOpenReviewHome" style="background:var(--correct);color:#fff;">查看复习计划</button>
         <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(118,75,162,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📖 语法专项训练（AI）</button>
         <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
+        <button type="button" class="btn" id="btnOpenChemistry" style="background:linear-gradient(135deg,#14b8a6 0%,#22c55e 50%,#84cc16 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(34,197,94,0.35);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">⚗️ Chemistry 11 学习助手</button>
         <button type="button" class="btn" id="btnOpenFlashcardLearn" style="background:linear-gradient(135deg,#06b6d4 0%,#3b82f6 50%,#8b5cf6 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(59,130,246,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📚 单词学习</button>
       </div>
       <div class="card" style="padding:0.8rem 1rem;">
@@ -1239,6 +1285,124 @@
       <div class="card">
         <h3 style="text-align:center;margin-bottom:0.5rem;" id="grammarDetailTitle">--</h3>
         <div id="grammarDetailBody"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11 学习助手：首页 ═══ -->
+    <div id="screen-chem-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemBackHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">Chemistry 11 学习助手</h3>
+        <p class="hint">按 BC Chemistry 11 范围组织，适合 ELL 学生预习术语、概念和单元测试。</p>
+        <div class="chem-home-grid">
+          <div class="chem-home-card" id="chemOpenVocab">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--accent-light);">单词 / 概念词库</div>
+            <div class="hint">按 Unit 查看核心术语、英文解释、中文解释、音标和来源。</div>
+          </div>
+          <div class="chem-home-card" id="chemOpenTest">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--teal);">单元测试</div>
+            <div class="hint">固定题库测试，提交后生成 AI 薄弱点分析和复习建议。</div>
+          </div>
+          <div class="chem-home-card" id="chemOpenHistory">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--orange);">测试历史</div>
+            <div class="hint">查看最近 Chemistry 11 测试记录和高频薄弱概念。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="chemProfileCard" style="display:none;">
+        <h4 style="margin-bottom:0.5rem;">我的 Chemistry 11 画像</h4>
+        <div id="chemProfileBody"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：词库 ═══ -->
+    <div id="screen-chem-vocab" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemVocabBack">← 返回 Chemistry 11</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">Chemistry 11 单词 / 概念</h3>
+        <p class="hint">覆盖 BC Chemistry 11 核心范围；英文解释采用开放教材风格表述，适合预习。</p>
+        <div class="chem-unit-grid" id="chemVocabUnitGrid"></div>
+        <div class="chem-filter-row">
+          <input type="text" id="chemSearchInput" placeholder="搜索 term / 中文 / 英文解释" style="flex:1;min-width:180px;" />
+          <select id="chemPriorityFilter" style="min-width:120px;">
+            <option value="all">全部优先级</option>
+            <option value="core">core 核心</option>
+            <option value="important">important 重要</option>
+            <option value="support">support 支撑</option>
+          </select>
+        </div>
+        <div id="chemVocabStats" class="hint" style="margin-bottom:0.6rem;"></div>
+        <div id="chemTermList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：单元测试配置 ═══ -->
+    <div id="screen-chem-test-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemTestHomeBack">← 返回 Chemistry 11</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">Chemistry 11 单元测试</h3>
+        <p class="hint">选择 Unit 后开始固定题库测试。AI 只用于结果分析，不动态出题。</p>
+        <div class="chem-unit-grid" id="chemTestUnitGrid"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-top:0.75rem;">
+          <label class="hint" style="margin-top:0;">题数</label>
+          <input type="number" id="chemQuizSize" min="3" max="20" value="10" style="width:5.5rem;" />
+          <span class="hint" id="chemTestHint"></span>
+        </div>
+        <button type="button" class="btn" id="btnStartChemTest" style="width:100%;margin-top:0.9rem;">开始 Chemistry 测试</button>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：答题 ═══ -->
+    <div id="screen-chem-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemQuizBack">← 返回测试选择</button>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="progress" id="chemQuizProgress">第 1 / 1 题</span>
+          <span style="font-size:0.78rem;color:var(--muted);" id="chemQuizUnit"></span>
+        </div>
+        <div class="grammar-progress-bar" id="chemProgressBar"></div>
+        <div class="grammar-q-card">
+          <div class="grammar-q-sentence" id="chemQuestionText"></div>
+          <div id="chemOptions"></div>
+          <div class="grammar-explanation" id="chemExplanation"></div>
+        </div>
+        <div class="quiz-nav" style="margin-top:1rem;">
+          <button type="button" class="btn" id="btnChemNext" disabled>下一题</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：结果 ═══ -->
+    <div id="screen-chem-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemResultHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;">Chemistry 11 测试完成</h3>
+        <div style="text-align:center;font-size:2.4rem;font-weight:700;color:var(--accent-light);" id="chemScoreNum">--</div>
+        <div class="chem-result-meta">
+          <div class="chem-result-box"><div class="chem-result-value" id="chemCorrectCount">0</div><div class="chem-result-label">正确</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="chemWrongCount">0</div><div class="chem-result-label">错误</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="chemConceptCount">0</div><div class="chem-result-label">概念标签</div></div>
+        </div>
+        <div id="chemAnalysisBody">
+          <div style="text-align:center;color:var(--muted);padding:1rem 0;">AI 分析加载中...</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <button type="button" class="btn" id="btnChemRetry" style="flex:1;">再测一次</button>
+          <button type="button" class="btn btn-secondary" id="btnChemResultBack" style="flex:1;">返回模块</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：历史 ═══ -->
+    <div id="screen-chem-history" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemHistoryBack">← 返回 Chemistry 11</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">Chemistry 11 测试历史</h3>
+        <div id="chemHistoryOverview" style="margin-bottom:1rem;"></div>
+        <div id="chemHistoryList"></div>
+        <div style="margin-top:0.75rem;text-align:center;">
+          <button type="button" class="btn btn-secondary" id="btnClearChemHistory" style="font-size:0.75rem;padding:0.3rem 0.8rem;">清空历史</button>
+        </div>
       </div>
     </div>
 
@@ -1570,6 +1734,7 @@
     </div>
   </div>
 
+  <script src="chemistry11-data.js"></script>
   <script>
     // ─── Theme Toggle (runs immediately to avoid flash) ───
     (function () {
@@ -1584,6 +1749,8 @@
     const STORAGE_CATEGORIES_CACHE = 'vocab_quiz_categories_cache';
     const STORAGE_QUIZ_HISTORY = 'vocab_quiz_history';
     const STORAGE_REVIEW_PLAN = 'vocab_quiz_review_plan';
+    const CHEM_HISTORY_KEY = 'chemistry11_history';
+    const CHEM_PROFILE_KEY = 'chemistry11_profile';
     const LEARN_SESSIONS_KEY = 'learnSessions';
     const MAX_LEARN_SESSIONS = 50;
     const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // legacy, kept for migration
@@ -1888,6 +2055,20 @@
     }
     function saveLearnSessionsToStorage(sessions) {
       try { localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(sessions.slice(0, MAX_LEARN_SESSIONS))); } catch (_) {}
+      syncUserDataToCloud();
+    }
+    function getChemHistoryFromStorage() {
+      try { return JSON.parse(localStorage.getItem(CHEM_HISTORY_KEY)) || []; } catch (_) { return []; }
+    }
+    function saveChemHistoryToStorage(history) {
+      try { localStorage.setItem(CHEM_HISTORY_KEY, JSON.stringify(history.slice(-50))); } catch (_) {}
+      syncUserDataToCloud();
+    }
+    function getChemProfileFromStorage() {
+      try { return JSON.parse(localStorage.getItem(CHEM_PROFILE_KEY)) || {}; } catch (_) { return {}; }
+    }
+    function saveChemProfileToStorage(profile) {
+      try { localStorage.setItem(CHEM_PROFILE_KEY, JSON.stringify(profile || {})); } catch (_) {}
       syncUserDataToCloud();
     }
 
@@ -3344,6 +3525,8 @@
           wordStats: hasExistingData ? existingStats : {},
           reviewPlan: hasExistingData ? existingPlan : {},
           wrongWords: hasExistingData ? existingWrong : [],
+          chemistryHistory: getChemHistoryFromStorage(),
+          chemistryProfile: getChemProfileFromStorage(),
         }),
       }).catch(function (e) { console.warn('createUser save failed:', e); });
 
@@ -3368,8 +3551,10 @@
         reviewPlan: getReviewPlanFromStorage(),
         wrongWords: getWrongFromStorage(),
         learnSessions: getLearnSessionsFromStorage(),
+        chemistryHistory: getChemHistoryFromStorage(),
+        chemistryProfile: getChemProfileFromStorage(),
       };
-      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0;
+      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0 || localPayload.chemistryHistory.length > 0 || Object.keys(localPayload.chemistryProfile).length > 0;
       var uploadFirst = hasLocalData
         ? fetch(USER_SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(localPayload) }).then(function (r) { return r.json(); }).catch(function () { return { ok: false }; })
         : Promise.resolve({ ok: true });
@@ -3385,6 +3570,8 @@
             if (d.reviewPlan) localStorage.setItem(STORAGE_REVIEW_PLAN, JSON.stringify(d.reviewPlan));
             if (d.wrongWords) localStorage.setItem(STORAGE_WRONG, JSON.stringify(d.wrongWords));
             if (d.learnSessions) localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(d.learnSessions));
+            if (d.chemistryHistory) localStorage.setItem(CHEM_HISTORY_KEY, JSON.stringify(d.chemistryHistory));
+            if (d.chemistryProfile) localStorage.setItem(CHEM_PROFILE_KEY, JSON.stringify(d.chemistryProfile));
             var dn = d.displayName || username;
             if (el) el.textContent = dn;
             _updateBarAvatar(dn);
@@ -3419,6 +3606,8 @@
           reviewPlan: getReviewPlanFromStorage(),
           wrongWords: getWrongFromStorage(),
           learnSessions: getLearnSessionsFromStorage(),
+          chemistryHistory: getChemHistoryFromStorage(),
+          chemistryProfile: getChemProfileFromStorage(),
         };
         var body = JSON.stringify(payload);
         var attempt = function (retries) {
@@ -3463,11 +3652,14 @@
         reviewPlan: getReviewPlanFromStorage(),
         wrongWords: getWrongFromStorage(),
         learnSessions: getLearnSessionsFromStorage(),
+        chemistryHistory: getChemHistoryFromStorage(),
+        chemistryProfile: getChemProfileFromStorage(),
       };
       var payload = JSON.stringify(data);
       if (payload.length > 60000) {
         data.learnSessions = data.learnSessions.slice(0, 20);
         data.quizHistory = data.quizHistory.slice(0, 30);
+        data.chemistryHistory = data.chemistryHistory.slice(-20);
         payload = JSON.stringify(data);
       }
       try { navigator.sendBeacon(USER_SAVE_URL, new Blob([payload], { type: 'application/json' })); } catch (_) {}
@@ -6344,6 +6536,381 @@
       var item = e.target.closest('.sentence-result-item');
       if (!item || item.dataset.ghistIdx === undefined) return;
       openGrammarHistoryDetail(parseInt(item.dataset.ghistIdx, 10));
+    });
+
+    // ═══════════════════════════════════════════════
+    //  Chemistry 11 学习助手
+    // ═══════════════════════════════════════════════
+    var CHEM_ANALYZE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/analyzeChemistryResult';
+    var chemistryState = {
+      selectedUnit: 'atomic-structure',
+      testUnit: 'atomic-structure',
+      questions: [],
+      answers: [],
+      currentIndex: 0,
+      startedAt: null,
+      lastAnalysis: null
+    };
+
+    function getChemUnits() {
+      return window.CHEM11_UNITS || [];
+    }
+
+    function getChemQuestions(unitId) {
+      return (window.CHEM11_QUESTIONS || []).filter(function (q) { return q.unitId === unitId; });
+    }
+
+    function getChemUnit(unitId) {
+      return getChemUnits().find(function (u) { return u.id === unitId; }) || getChemUnits()[0] || null;
+    }
+
+    function openChemHome() {
+      renderChemProfile();
+      showScreen('screen-chem-home');
+    }
+
+    function renderChemUnitGrid(containerId, activeId, onClickName) {
+      var grid = document.getElementById(containerId);
+      if (!grid) return;
+      grid.innerHTML = getChemUnits().map(function (u) {
+        var active = u.id === activeId ? ' active' : '';
+        var count = (u.terms || []).length;
+        return '<button type="button" class="chem-unit-btn' + active + '" data-unit-id="' + u.id + '" data-action="' + onClickName + '">' +
+          '<strong>' + escapeHtml(u.name) + '</strong><br><span style="font-size:0.68rem;color:var(--muted);">' + count + ' terms</span></button>';
+      }).join('');
+    }
+
+    function openChemVocab() {
+      if (!chemistryState.selectedUnit) {
+        var first = getChemUnits()[0];
+        chemistryState.selectedUnit = first ? first.id : '';
+      }
+      renderChemUnitGrid('chemVocabUnitGrid', chemistryState.selectedUnit, 'chem-vocab-unit');
+      renderChemTerms();
+      showScreen('screen-chem-vocab');
+    }
+
+    function renderChemTerms() {
+      var unit = getChemUnit(chemistryState.selectedUnit);
+      var list = document.getElementById('chemTermList');
+      var stats = document.getElementById('chemVocabStats');
+      if (!unit || !list) return;
+      var query = (document.getElementById('chemSearchInput').value || '').trim().toLowerCase();
+      var priority = document.getElementById('chemPriorityFilter').value || 'all';
+      var terms = (unit.terms || []).filter(function (t) {
+        var matchesPriority = priority === 'all' || t.priority === priority;
+        var hay = [t.term, t.phonetic, t.definitionEn, t.definitionCn, t.source, t.sourceNote].join(' ').toLowerCase();
+        var matchesQuery = !query || hay.indexOf(query) !== -1;
+        return matchesPriority && matchesQuery;
+      });
+      if (stats) {
+        var coreCount = (unit.terms || []).filter(function (t) { return t.priority === 'core'; }).length;
+        stats.textContent = unit.name + '：显示 ' + terms.length + ' / ' + (unit.terms || []).length + ' 个术语（core ' + coreCount + ' 个）';
+      }
+      if (terms.length === 0) {
+        list.innerHTML = '<div class="empty-state">没有匹配的词条</div>';
+        return;
+      }
+      list.innerHTML = terms.map(function (t) {
+        return '<div class="chem-term-card">' +
+          '<div class="chem-term-head"><div><div class="chem-term-title">' + escapeHtml(t.term) + '</div><div class="chem-phonetic">' + escapeHtml(t.phonetic || '') + '</div></div>' +
+          '<span class="chem-priority ' + escapeHtml(t.priority || 'core') + '">' + escapeHtml(t.priority || 'core') + '</span></div>' +
+          '<div class="chem-def-en">' + escapeHtml(t.definitionEn || '') + '</div>' +
+          '<div class="chem-def-cn">' + escapeHtml(t.definitionCn || '') + '</div>' +
+          '<div class="chem-source">Source: ' + escapeHtml(t.source || '') + (t.sourceNote ? ' · ' + escapeHtml(t.sourceNote) : '') + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function openChemTestHome() {
+      if (!chemistryState.testUnit) {
+        var first = getChemUnits()[0];
+        chemistryState.testUnit = first ? first.id : '';
+      }
+      renderChemUnitGrid('chemTestUnitGrid', chemistryState.testUnit, 'chem-test-unit');
+      updateChemTestHint();
+      showScreen('screen-chem-test-home');
+    }
+
+    function updateChemTestHint() {
+      var hint = document.getElementById('chemTestHint');
+      if (!hint) return;
+      var qs = getChemQuestions(chemistryState.testUnit);
+      hint.textContent = '题库 ' + qs.length + ' 题';
+      var btn = document.getElementById('btnStartChemTest');
+      if (btn) btn.disabled = qs.length === 0;
+    }
+
+    function shuffleCopy(arr) {
+      return arr.slice().sort(function () { return Math.random() - 0.5; });
+    }
+
+    function startChemTest() {
+      var pool = getChemQuestions(chemistryState.testUnit);
+      if (!pool.length) { alert('这个 Unit 暂无题目。'); return; }
+      var size = parseInt(document.getElementById('chemQuizSize').value, 10) || 10;
+      size = Math.max(3, Math.min(size, pool.length));
+      chemistryState.questions = shuffleCopy(pool).slice(0, size);
+      chemistryState.answers = [];
+      chemistryState.currentIndex = 0;
+      chemistryState.startedAt = Date.now();
+      chemistryState.lastAnalysis = null;
+      showScreen('screen-chem-quiz');
+      renderChemQuestion();
+    }
+
+    function renderChemQuestion() {
+      var qn = chemistryState.questions[chemistryState.currentIndex];
+      if (!qn) return;
+      var total = chemistryState.questions.length;
+      var unit = getChemUnit(chemistryState.testUnit);
+      document.getElementById('chemQuizProgress').textContent = '第 ' + (chemistryState.currentIndex + 1) + ' / ' + total + ' 题';
+      document.getElementById('chemQuizUnit').textContent = unit ? unit.name : '';
+      document.getElementById('chemQuestionText').textContent = qn.question;
+      var bar = '';
+      for (var i = 0; i < total; i++) {
+        var cls = i === chemistryState.currentIndex ? ' current' : '';
+        if (chemistryState.answers[i]) cls = chemistryState.answers[i].isCorrect ? ' correct' : ' wrong';
+        bar += '<span class="grammar-progress-dot' + cls + '"></span>';
+      }
+      document.getElementById('chemProgressBar').innerHTML = bar;
+      var ans = chemistryState.answers[chemistryState.currentIndex];
+      document.getElementById('chemOptions').innerHTML = qn.options.map(function (opt, idx) {
+        var cls = '';
+        if (ans) {
+          if (idx === qn.correctIndex) cls = ' correct';
+          else if (idx === ans.selected) cls = ' wrong';
+        }
+        return '<button type="button" class="chem-test-option' + cls + '" data-chem-opt="' + idx + '"' + (ans ? ' disabled' : '') + '>' + String.fromCharCode(65 + idx) + '. ' + escapeHtml(opt) + '</button>';
+      }).join('');
+      var exp = document.getElementById('chemExplanation');
+      exp.textContent = ans ? qn.explanation : '';
+      exp.classList.toggle('show', !!ans);
+      document.getElementById('btnChemNext').disabled = !ans;
+      document.getElementById('btnChemNext').textContent = chemistryState.currentIndex === total - 1 ? '完成并分析' : '下一题';
+    }
+
+    function selectChemOption(idx) {
+      var qn = chemistryState.questions[chemistryState.currentIndex];
+      if (!qn || chemistryState.answers[chemistryState.currentIndex]) return;
+      chemistryState.answers[chemistryState.currentIndex] = {
+        selected: idx,
+        isCorrect: idx === qn.correctIndex,
+        timeSec: Math.round((Date.now() - chemistryState.startedAt) / 1000)
+      };
+      renderChemQuestion();
+    }
+
+    function chemNext() {
+      if (chemistryState.currentIndex < chemistryState.questions.length - 1) {
+        chemistryState.currentIndex++;
+        renderChemQuestion();
+      } else {
+        finishChemTest();
+      }
+    }
+
+    function buildChemFallbackAnalysis() {
+      var total = chemistryState.questions.length;
+      var correct = chemistryState.answers.filter(function (a) { return a && a.isCorrect; }).length;
+      var wrongQs = chemistryState.questions.filter(function (q, i) { return !(chemistryState.answers[i] && chemistryState.answers[i].isCorrect); });
+      var tagCounts = {};
+      wrongQs.forEach(function (q) { (q.conceptTags || []).forEach(function (t) { tagCounts[t] = (tagCounts[t] || 0) + 1; }); });
+      var weak = Object.keys(tagCounts).sort(function (a, b) { return tagCounts[b] - tagCounts[a]; }).slice(0, 5);
+      return {
+        score: Math.round(correct / Math.max(total, 1) * 100),
+        totalCorrect: correct,
+        totalQuestions: total,
+        diagnosis: '本次测试基于固定题库完成。请重点复习错误题对应的概念标签：' + (weak.join(', ') || '暂无明显薄弱标签') + '。',
+        conceptWeaknesses: weak.map(function (w) { return { concept: w, evidence: tagCounts[w] + ' 道相关错题', recommendation: '回到词库中复习该概念的英文定义和中文解释。' }; }),
+        strengths: correct === total ? ['本单元核心概念掌握良好。'] : ['已答对的题目说明部分基础概念已有掌握。'],
+        studyPlan: ['先复习错题对应词条', '重新阅读英文定义并用中文解释一遍', '隔天再测同一 Unit']
+      };
+    }
+
+    async function finishChemTest() {
+      var fallback = buildChemFallbackAnalysis();
+      chemistryState.lastAnalysis = fallback;
+      renderChemResult(fallback, true);
+      showScreen('screen-chem-result');
+      try {
+        var resp = await fetch(CHEM_ANALYZE_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: _currentUser || '',
+            unitId: chemistryState.testUnit,
+            questions: chemistryState.questions,
+            answers: chemistryState.answers
+          })
+        });
+        var result = await resp.json();
+        if (result.ok && result.data) {
+          chemistryState.lastAnalysis = result.data;
+          renderChemResult(result.data, false);
+          loadAIUsage();
+        }
+      } catch (e) {
+        console.warn('Chemistry analysis fallback used:', e.message);
+      }
+      saveChemResult(chemistryState.lastAnalysis || fallback);
+    }
+
+    function renderChemResult(data, loading) {
+      var score = data.score || 0;
+      document.getElementById('chemScoreNum').textContent = score + '%';
+      document.getElementById('chemCorrectCount').textContent = data.totalCorrect || 0;
+      document.getElementById('chemWrongCount').textContent = Math.max(0, (data.totalQuestions || chemistryState.questions.length) - (data.totalCorrect || 0));
+      var tags = {};
+      chemistryState.questions.forEach(function (q) { (q.conceptTags || []).forEach(function (t) { tags[t] = true; }); });
+      document.getElementById('chemConceptCount').textContent = Object.keys(tags).length;
+      var html = '';
+      if (loading) html += '<div class="hint" style="margin-bottom:0.75rem;">AI 分析中，先显示本地诊断...</div>';
+      html += '<div class="grammar-report-section"><div class="grammar-report-title">诊断分析</div><div class="grammar-diagnosis-text">' + escapeHtml(data.diagnosis || '') + '</div></div>';
+      html += '<div class="grammar-report-section"><div class="grammar-report-title">薄弱概念</div>';
+      if (data.conceptWeaknesses && data.conceptWeaknesses.length) {
+        data.conceptWeaknesses.forEach(function (w) {
+          html += '<div class="grammar-rule-item"><span class="grammar-rule-name">' + escapeHtml(w.concept || '') + '</span><span class="grammar-rule-score">' + escapeHtml(w.evidence || '') + '</span></div>';
+          if (w.recommendation) html += '<div style="font-size:0.75rem;color:var(--muted);padding:0 0 0.45rem 0.5rem;">' + escapeHtml(w.recommendation) + '</div>';
+        });
+      } else {
+        html += '<div class="hint">暂无明显薄弱概念。</div>';
+      }
+      html += '</div><div class="grammar-report-section"><div class="grammar-report-title">复习计划</div><ul class="grammar-tip-list">';
+      (data.studyPlan || data.studyTips || []).forEach(function (tip) { html += '<li>' + escapeHtml(tip) + '</li>'; });
+      html += '</ul></div>';
+      document.getElementById('chemAnalysisBody').innerHTML = html;
+    }
+
+    function saveChemResult(data) {
+      var history = getChemHistoryFromStorage();
+      var unit = getChemUnit(chemistryState.testUnit);
+      var details = chemistryState.questions.map(function (q, i) {
+        var a = chemistryState.answers[i] || {};
+        return {
+          question: q.question,
+          userAnswer: q.options[a.selected] || '',
+          correctAnswer: q.options[q.correctIndex],
+          isCorrect: !!a.isCorrect,
+          explanation: q.explanation,
+          conceptTags: q.conceptTags || []
+        };
+      });
+      var item = {
+        id: 'chem_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        date: new Date().toISOString(),
+        user: _currentUser || '',
+        unitId: chemistryState.testUnit,
+        unitName: unit ? unit.name : chemistryState.testUnit,
+        score: data.score || 0,
+        totalCorrect: data.totalCorrect || 0,
+        totalQuestions: data.totalQuestions || chemistryState.questions.length,
+        diagnosis: data.diagnosis || '',
+        conceptWeaknesses: data.conceptWeaknesses || [],
+        studyPlan: data.studyPlan || data.studyTips || [],
+        details: details
+      };
+      history.push(item);
+      saveChemHistoryToStorage(history);
+      updateChemProfileFromHistory(getChemHistoryFromStorage());
+    }
+
+    function updateChemProfileFromHistory(history) {
+      var profile = {};
+      history.filter(function (h) { return h.user === (_currentUser || ''); }).forEach(function (h) {
+        if (!profile[h.unitId]) profile[h.unitId] = { attempts: 0, bestScore: 0, lastScore: 0, weakConcepts: {} };
+        var p = profile[h.unitId];
+        p.attempts++;
+        p.bestScore = Math.max(p.bestScore, h.score || 0);
+        p.lastScore = h.score || 0;
+        (h.conceptWeaknesses || []).forEach(function (w) {
+          if (!w.concept) return;
+          p.weakConcepts[w.concept] = (p.weakConcepts[w.concept] || 0) + 1;
+        });
+      });
+      profile.lastUpdated = new Date().toISOString();
+      saveChemProfileToStorage(profile);
+      renderChemProfile();
+    }
+
+    function renderChemProfile() {
+      var card = document.getElementById('chemProfileCard');
+      var body = document.getElementById('chemProfileBody');
+      if (!card || !body) return;
+      var profile = getChemProfileFromStorage();
+      var keys = Object.keys(profile).filter(function (k) { return k !== 'lastUpdated'; });
+      if (!keys.length) { card.style.display = 'none'; return; }
+      card.style.display = 'block';
+      body.innerHTML = keys.map(function (unitId) {
+        var unit = getChemUnit(unitId);
+        var p = profile[unitId];
+        var weak = Object.keys(p.weakConcepts || {}).sort(function (a, b) { return p.weakConcepts[b] - p.weakConcepts[a]; }).slice(0, 3);
+        return '<div style="margin-bottom:0.65rem;"><strong>' + escapeHtml(unit ? unit.name : unitId) + '</strong>' +
+          '<div class="hint">尝试 ' + p.attempts + ' 次 · 最高 ' + p.bestScore + '% · 最近 ' + p.lastScore + '%' +
+          (weak.length ? ' · 薄弱：' + escapeHtml(weak.join(', ')) : '') + '</div></div>';
+      }).join('');
+    }
+
+    function openChemHistory() {
+      var history = getChemHistoryFromStorage().filter(function (h) { return h.user === (_currentUser || ''); });
+      var overview = document.getElementById('chemHistoryOverview');
+      var list = document.getElementById('chemHistoryList');
+      if (!history.length) {
+        overview.innerHTML = '<div class="empty-state">暂无 Chemistry 11 测试记录</div>';
+        list.innerHTML = '';
+      } else {
+        var avg = Math.round(history.reduce(function (a, h) { return a + (h.score || 0); }, 0) / history.length);
+        overview.innerHTML = '<div class="chem-result-meta"><div class="chem-result-box"><div class="chem-result-value">' + history.length + '</div><div class="chem-result-label">次数</div></div><div class="chem-result-box"><div class="chem-result-value">' + avg + '%</div><div class="chem-result-label">平均</div></div><div class="chem-result-box"><div class="chem-result-value">' + Math.max.apply(null, history.map(function (h) { return h.score || 0; })) + '%</div><div class="chem-result-label">最高</div></div></div>';
+        list.innerHTML = history.slice().reverse().map(function (h) {
+          var date = new Date(h.date).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          return '<div class="sentence-result-item"><span class="sri-num">' + (h.score || 0) + '%</span><span class="sri-word">' + escapeHtml(h.unitName || h.unitId) + '</span><span class="sri-score">' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + '</span><div class="hint" style="flex-basis:100%;margin-left:2.4rem;">' + date + '</div></div>';
+        }).join('');
+      }
+      showScreen('screen-chem-history');
+    }
+
+    document.getElementById('btnOpenChemistry').addEventListener('click', openChemHome);
+    document.getElementById('btnChemBackHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('chemOpenVocab').addEventListener('click', openChemVocab);
+    document.getElementById('chemOpenTest').addEventListener('click', openChemTestHome);
+    document.getElementById('chemOpenHistory').addEventListener('click', openChemHistory);
+    document.getElementById('btnChemVocabBack').addEventListener('click', openChemHome);
+    document.getElementById('btnChemTestHomeBack').addEventListener('click', openChemHome);
+    document.getElementById('btnChemQuizBack').addEventListener('click', openChemTestHome);
+    document.getElementById('btnChemResultHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('btnChemResultBack').addEventListener('click', openChemHome);
+    document.getElementById('btnChemRetry').addEventListener('click', function () { startChemTest(); });
+    document.getElementById('btnChemHistoryBack').addEventListener('click', openChemHome);
+    document.getElementById('btnStartChemTest').addEventListener('click', startChemTest);
+    document.getElementById('btnChemNext').addEventListener('click', chemNext);
+    document.getElementById('chemSearchInput').addEventListener('input', renderChemTerms);
+    document.getElementById('chemPriorityFilter').addEventListener('change', renderChemTerms);
+    document.getElementById('chemQuizSize').addEventListener('input', updateChemTestHint);
+    document.getElementById('chemVocabUnitGrid').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-action="chem-vocab-unit"]');
+      if (!btn) return;
+      chemistryState.selectedUnit = btn.dataset.unitId;
+      renderChemUnitGrid('chemVocabUnitGrid', chemistryState.selectedUnit, 'chem-vocab-unit');
+      renderChemTerms();
+    });
+    document.getElementById('chemTestUnitGrid').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-action="chem-test-unit"]');
+      if (!btn) return;
+      chemistryState.testUnit = btn.dataset.unitId;
+      renderChemUnitGrid('chemTestUnitGrid', chemistryState.testUnit, 'chem-test-unit');
+      updateChemTestHint();
+    });
+    document.getElementById('chemOptions').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-chem-opt]');
+      if (!btn || btn.disabled) return;
+      selectChemOption(parseInt(btn.dataset.chemOpt, 10));
+    });
+    document.getElementById('btnClearChemHistory').addEventListener('click', function () {
+      if (!confirm('确定清空 Chemistry 11 测试历史吗？')) return;
+      var keep = getChemHistoryFromStorage().filter(function (h) { return h.user !== (_currentUser || ''); });
+      localStorage.setItem(CHEM_HISTORY_KEY, JSON.stringify(keep));
+      updateChemProfileFromHistory(keep);
+      openChemHistory();
     });
 
     // ─── Theme Toggle ───
