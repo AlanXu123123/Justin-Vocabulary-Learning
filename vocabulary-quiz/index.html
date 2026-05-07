@@ -1299,6 +1299,10 @@
             <div style="font-size:1.15rem;font-weight:700;color:var(--accent-light);">单词 / 概念词库</div>
             <div class="hint">按 Unit 查看核心术语、英文解释、中文解释、音标和来源。</div>
           </div>
+          <div class="chem-home-card" id="chemOpenWordTest">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--pink);">单词测试</div>
+            <div class="hint">看中英文概念解释，输入对应英文术语，适合 ELL 预习自测。</div>
+          </div>
           <div class="chem-home-card" id="chemOpenTest">
             <div style="font-size:1.15rem;font-weight:700;color:var(--teal);">单元测试</div>
             <div class="hint">固定题库测试，提交后生成 AI 薄弱点分析和复习建议。</div>
@@ -1333,6 +1337,66 @@
         </div>
         <div id="chemVocabStats" class="hint" style="margin-bottom:0.6rem;"></div>
         <div id="chemTermList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：单词测试配置 ═══ -->
+    <div id="screen-chem-word-test-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemWordHomeBack">← 返回 Chemistry 11</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">Chemistry 11 单词测试</h3>
+        <p class="hint">选择 Unit 后，系统会显示中英文概念解释，你需要输入对应英文术语。</p>
+        <div class="chem-unit-grid" id="chemWordUnitGrid"></div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-top:0.75rem;">
+          <label class="hint" style="margin-top:0;">题数</label>
+          <input type="number" id="chemWordQuizSize" min="3" max="30" value="10" style="width:5.5rem;" />
+          <span class="hint" id="chemWordTestHint"></span>
+        </div>
+        <button type="button" class="btn" id="btnStartChemWordTest" style="width:100%;margin-top:0.9rem;background:linear-gradient(135deg,var(--pink),var(--accent-light));">开始单词测试</button>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：单词测试答题 ═══ -->
+    <div id="screen-chem-word-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemWordQuizBack">← 返回单词测试</button>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="progress" id="chemWordProgress">第 1 / 1 题</span>
+          <span style="font-size:0.78rem;color:var(--muted);" id="chemWordUnit"></span>
+        </div>
+        <div class="grammar-progress-bar" id="chemWordProgressBar"></div>
+        <div class="grammar-q-card">
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.35rem;">根据解释输入英文术语：</div>
+          <div class="chem-def-en" id="chemWordDefEn"></div>
+          <div class="chem-def-cn" id="chemWordDefCn"></div>
+          <div class="input-row" style="margin-top:0.8rem;">
+            <input type="text" id="chemWordAnswerInput" placeholder="Type the chemistry term..." autocomplete="off" spellcheck="false" />
+            <span class="feedback" id="chemWordFeedback" style="display:none;"></span>
+          </div>
+          <div class="grammar-explanation" id="chemWordExplanation"></div>
+        </div>
+        <div class="quiz-nav" style="margin-top:1rem;">
+          <button type="button" class="btn" id="btnChemWordNext">提交</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Chemistry 11：单词测试结果 ═══ -->
+    <div id="screen-chem-word-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnChemWordResultHome">← 返回 Chemistry 11</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;">Chemistry 11 单词测试完成</h3>
+        <div style="text-align:center;font-size:2.4rem;font-weight:700;color:var(--pink);" id="chemWordScoreNum">--</div>
+        <div class="chem-result-meta">
+          <div class="chem-result-box"><div class="chem-result-value" id="chemWordCorrectCount">0</div><div class="chem-result-label">正确</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="chemWordWrongCount">0</div><div class="chem-result-label">错误</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="chemWordTotalCount">0</div><div class="chem-result-label">总题数</div></div>
+        </div>
+        <div id="chemWordResultList"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <button type="button" class="btn" id="btnChemWordRetry" style="flex:1;background:linear-gradient(135deg,var(--pink),var(--accent-light));">再测一次</button>
+          <button type="button" class="btn btn-secondary" id="btnChemWordResultBack" style="flex:1;">返回模块</button>
+        </div>
       </div>
     </div>
 
@@ -6544,6 +6608,11 @@
     var CHEM_ANALYZE_BASE = 'https://us-central1-vocab-ai-backend.cloudfunctions.net/analyzeChemistryResult';
     var chemistryState = {
       selectedUnit: 'atomic-structure',
+      wordUnit: 'atomic-structure',
+      wordQuestions: [],
+      wordAnswers: [],
+      wordIndex: 0,
+      wordStartedAt: null,
       testUnit: 'atomic-structure',
       questions: [],
       answers: [],
@@ -6620,6 +6689,182 @@
           '<div class="chem-source">Source: ' + escapeHtml(t.source || '') + (t.sourceNote ? ' · ' + escapeHtml(t.sourceNote) : '') + '</div>' +
           '</div>';
       }).join('');
+    }
+
+    function getChemTerms(unitId) {
+      var unit = getChemUnit(unitId);
+      return unit ? (unit.terms || []) : [];
+    }
+
+    function openChemWordTestHome() {
+      if (!chemistryState.wordUnit) {
+        var first = getChemUnits()[0];
+        chemistryState.wordUnit = first ? first.id : '';
+      }
+      renderChemUnitGrid('chemWordUnitGrid', chemistryState.wordUnit, 'chem-word-unit');
+      updateChemWordTestHint();
+      showScreen('screen-chem-word-test-home');
+    }
+
+    function updateChemWordTestHint() {
+      var hint = document.getElementById('chemWordTestHint');
+      if (!hint) return;
+      var count = getChemTerms(chemistryState.wordUnit).length;
+      hint.textContent = '词库 ' + count + ' 个术语';
+      var btn = document.getElementById('btnStartChemWordTest');
+      if (btn) btn.disabled = count === 0;
+    }
+
+    function normalizeChemTermAnswer(text) {
+      return String(text || '')
+        .toLowerCase()
+        .replace(/&/g, ' and ')
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function isChemWordAnswerCorrect(userInput, targetTerm) {
+      var user = normalizeChemTermAnswer(userInput);
+      var target = normalizeChemTermAnswer(targetTerm);
+      if (!user || !target) return false;
+      if (user === target) return true;
+      return similarity(user, target) >= 0.84;
+    }
+
+    function startChemWordTest() {
+      var pool = getChemTerms(chemistryState.wordUnit);
+      if (!pool.length) { alert('这个 Unit 暂无术语。'); return; }
+      var size = parseInt(document.getElementById('chemWordQuizSize').value, 10) || 10;
+      size = Math.max(3, Math.min(size, pool.length));
+      chemistryState.wordQuestions = shuffleCopy(pool).slice(0, size);
+      chemistryState.wordAnswers = [];
+      chemistryState.wordIndex = 0;
+      chemistryState.wordStartedAt = Date.now();
+      showScreen('screen-chem-word-quiz');
+      renderChemWordQuestion();
+    }
+
+    function renderChemWordQuestion() {
+      var term = chemistryState.wordQuestions[chemistryState.wordIndex];
+      if (!term) return;
+      var total = chemistryState.wordQuestions.length;
+      var unit = getChemUnit(chemistryState.wordUnit);
+      document.getElementById('chemWordProgress').textContent = '第 ' + (chemistryState.wordIndex + 1) + ' / ' + total + ' 题';
+      document.getElementById('chemWordUnit').textContent = unit ? unit.name : '';
+      document.getElementById('chemWordDefEn').textContent = term.definitionEn || '';
+      document.getElementById('chemWordDefCn').textContent = term.definitionCn || '';
+      var bar = '';
+      for (var i = 0; i < total; i++) {
+        var cls = i === chemistryState.wordIndex ? ' current' : '';
+        if (chemistryState.wordAnswers[i]) cls = chemistryState.wordAnswers[i].isCorrect ? ' correct' : ' wrong';
+        bar += '<span class="grammar-progress-dot' + cls + '"></span>';
+      }
+      document.getElementById('chemWordProgressBar').innerHTML = bar;
+      var ans = chemistryState.wordAnswers[chemistryState.wordIndex];
+      var input = document.getElementById('chemWordAnswerInput');
+      var feedback = document.getElementById('chemWordFeedback');
+      var exp = document.getElementById('chemWordExplanation');
+      input.value = ans ? ans.userAnswer : '';
+      input.disabled = !!ans;
+      feedback.style.display = ans ? 'inline-block' : 'none';
+      feedback.textContent = ans ? (ans.isCorrect ? '正确' : '错误') : '';
+      feedback.className = 'feedback ' + (ans && ans.isCorrect ? 'correct' : 'wrong');
+      exp.classList.toggle('show', !!ans);
+      exp.innerHTML = ans ? '正确答案：<strong>' + escapeHtml(term.term) + '</strong>' +
+        (term.phonetic ? ' <span class="chem-phonetic">' + escapeHtml(term.phonetic) + '</span>' : '') : '';
+      document.getElementById('btnChemWordNext').textContent = ans ? (chemistryState.wordIndex === total - 1 ? '查看结果' : '下一题') : '提交';
+      if (!ans) setTimeout(function () { input.focus(); }, 0);
+    }
+
+    function submitChemWordAnswer() {
+      var term = chemistryState.wordQuestions[chemistryState.wordIndex];
+      if (!term || chemistryState.wordAnswers[chemistryState.wordIndex]) return;
+      var input = document.getElementById('chemWordAnswerInput');
+      var userAnswer = (input.value || '').trim();
+      if (!userAnswer) return;
+      chemistryState.wordAnswers[chemistryState.wordIndex] = {
+        userAnswer: userAnswer,
+        correctAnswer: term.term,
+        isCorrect: isChemWordAnswerCorrect(userAnswer, term.term),
+        timeSec: Math.round((Date.now() - chemistryState.wordStartedAt) / 1000)
+      };
+      renderChemWordQuestion();
+    }
+
+    function chemWordNext() {
+      if (!chemistryState.wordAnswers[chemistryState.wordIndex]) {
+        submitChemWordAnswer();
+        return;
+      }
+      if (chemistryState.wordIndex < chemistryState.wordQuestions.length - 1) {
+        chemistryState.wordIndex++;
+        renderChemWordQuestion();
+      } else {
+        finishChemWordTest();
+      }
+    }
+
+    function finishChemWordTest() {
+      var total = chemistryState.wordQuestions.length;
+      var correct = chemistryState.wordAnswers.filter(function (a) { return a && a.isCorrect; }).length;
+      var score = Math.round(correct / Math.max(total, 1) * 100);
+      document.getElementById('chemWordScoreNum').textContent = score + '%';
+      document.getElementById('chemWordCorrectCount').textContent = correct;
+      document.getElementById('chemWordWrongCount').textContent = total - correct;
+      document.getElementById('chemWordTotalCount').textContent = total;
+      var wrongRows = chemistryState.wordQuestions.map(function (t, i) {
+        var a = chemistryState.wordAnswers[i] || {};
+        if (a.isCorrect) return '';
+        return '<div class="chem-term-card">' +
+          '<div class="chem-term-head"><div><div class="chem-term-title">' + escapeHtml(t.term) + '</div><div class="chem-phonetic">' + escapeHtml(t.phonetic || '') + '</div></div>' +
+          '<span class="chem-priority important">需复习</span></div>' +
+          '<div class="hint">你的答案：' + escapeHtml(a.userAnswer || '未作答') + '</div>' +
+          '<div class="chem-def-en">' + escapeHtml(t.definitionEn || '') + '</div>' +
+          '<div class="chem-def-cn">' + escapeHtml(t.definitionCn || '') + '</div>' +
+          '</div>';
+      }).join('');
+      document.getElementById('chemWordResultList').innerHTML = wrongRows || '<div class="empty-state">全部正确，可以继续挑战下一个 Unit。</div>';
+      saveChemWordResult(score, correct, total);
+      showScreen('screen-chem-word-result');
+    }
+
+    function saveChemWordResult(score, correct, total) {
+      var history = getChemHistoryFromStorage();
+      var unit = getChemUnit(chemistryState.wordUnit);
+      var wrongTerms = chemistryState.wordQuestions.filter(function (_t, i) {
+        return !(chemistryState.wordAnswers[i] && chemistryState.wordAnswers[i].isCorrect);
+      });
+      history.push({
+        id: 'chem_word_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        type: 'word-test',
+        date: new Date().toISOString(),
+        user: _currentUser || '',
+        unitId: chemistryState.wordUnit,
+        unitName: unit ? unit.name : chemistryState.wordUnit,
+        score: score,
+        totalCorrect: correct,
+        totalQuestions: total,
+        diagnosis: wrongTerms.length ? '单词测试中需要复习：' + wrongTerms.map(function (t) { return t.term; }).join(', ') : '本次单词测试全部正确。',
+        conceptWeaknesses: wrongTerms.slice(0, 8).map(function (t) {
+          return { concept: t.term, evidence: '单词测试拼写/术语回忆错误', recommendation: '回到词库复习该术语的英文定义、中文解释和音标。' };
+        }),
+        studyPlan: wrongTerms.length ? ['重读错词的中英文定义', '遮住英文术语，用中文解释反向回忆', '隔天再做同一 Unit 单词测试'] : ['继续测试下一个 Unit', '尝试用英文解释核心术语'],
+        details: chemistryState.wordQuestions.map(function (t, i) {
+          var a = chemistryState.wordAnswers[i] || {};
+          return {
+            question: t.definitionEn || t.definitionCn || '',
+            userAnswer: a.userAnswer || '',
+            correctAnswer: t.term,
+            isCorrect: !!a.isCorrect,
+            explanation: t.definitionCn || '',
+            conceptTags: [t.term]
+          };
+        })
+      });
+      saveChemHistoryToStorage(history);
+      updateChemProfileFromHistory(getChemHistoryFromStorage());
     }
 
     function openChemTestHome() {
@@ -6863,7 +7108,8 @@
         overview.innerHTML = '<div class="chem-result-meta"><div class="chem-result-box"><div class="chem-result-value">' + history.length + '</div><div class="chem-result-label">次数</div></div><div class="chem-result-box"><div class="chem-result-value">' + avg + '%</div><div class="chem-result-label">平均</div></div><div class="chem-result-box"><div class="chem-result-value">' + Math.max.apply(null, history.map(function (h) { return h.score || 0; })) + '%</div><div class="chem-result-label">最高</div></div></div>';
         list.innerHTML = history.slice().reverse().map(function (h) {
           var date = new Date(h.date).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-          return '<div class="sentence-result-item"><span class="sri-num">' + (h.score || 0) + '%</span><span class="sri-word">' + escapeHtml(h.unitName || h.unitId) + '</span><span class="sri-score">' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + '</span><div class="hint" style="flex-basis:100%;margin-left:2.4rem;">' + date + '</div></div>';
+          var typeLabel = h.type === 'word-test' ? '单词测试' : '单元测试';
+          return '<div class="sentence-result-item"><span class="sri-num">' + (h.score || 0) + '%</span><span class="sri-word">' + escapeHtml(h.unitName || h.unitId) + '</span><span class="sri-score">' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + '</span><div class="hint" style="flex-basis:100%;margin-left:2.4rem;">' + escapeHtml(typeLabel) + ' · ' + date + '</div></div>';
         }).join('');
       }
       showScreen('screen-chem-history');
@@ -6872,9 +7118,15 @@
     document.getElementById('btnOpenChemistry').addEventListener('click', openChemHome);
     document.getElementById('btnChemBackHome').addEventListener('click', function () { showScreen('screen-home'); });
     document.getElementById('chemOpenVocab').addEventListener('click', openChemVocab);
+    document.getElementById('chemOpenWordTest').addEventListener('click', openChemWordTestHome);
     document.getElementById('chemOpenTest').addEventListener('click', openChemTestHome);
     document.getElementById('chemOpenHistory').addEventListener('click', openChemHistory);
     document.getElementById('btnChemVocabBack').addEventListener('click', openChemHome);
+    document.getElementById('btnChemWordHomeBack').addEventListener('click', openChemHome);
+    document.getElementById('btnChemWordQuizBack').addEventListener('click', openChemWordTestHome);
+    document.getElementById('btnChemWordResultHome').addEventListener('click', openChemHome);
+    document.getElementById('btnChemWordResultBack').addEventListener('click', openChemHome);
+    document.getElementById('btnChemWordRetry').addEventListener('click', function () { startChemWordTest(); });
     document.getElementById('btnChemTestHomeBack').addEventListener('click', openChemHome);
     document.getElementById('btnChemQuizBack').addEventListener('click', openChemTestHome);
     document.getElementById('btnChemResultHome').addEventListener('click', function () { showScreen('screen-home'); });
@@ -6885,6 +7137,12 @@
     document.getElementById('btnChemNext').addEventListener('click', chemNext);
     document.getElementById('chemSearchInput').addEventListener('input', renderChemTerms);
     document.getElementById('chemPriorityFilter').addEventListener('change', renderChemTerms);
+    document.getElementById('chemWordQuizSize').addEventListener('input', updateChemWordTestHint);
+    document.getElementById('btnStartChemWordTest').addEventListener('click', startChemWordTest);
+    document.getElementById('btnChemWordNext').addEventListener('click', chemWordNext);
+    document.getElementById('chemWordAnswerInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') chemWordNext();
+    });
     document.getElementById('chemQuizSize').addEventListener('input', updateChemTestHint);
     document.getElementById('chemVocabUnitGrid').addEventListener('click', function (e) {
       var btn = e.target.closest('[data-action="chem-vocab-unit"]');
@@ -6892,6 +7150,13 @@
       chemistryState.selectedUnit = btn.dataset.unitId;
       renderChemUnitGrid('chemVocabUnitGrid', chemistryState.selectedUnit, 'chem-vocab-unit');
       renderChemTerms();
+    });
+    document.getElementById('chemWordUnitGrid').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-action="chem-word-unit"]');
+      if (!btn) return;
+      chemistryState.wordUnit = btn.dataset.unitId;
+      renderChemUnitGrid('chemWordUnitGrid', chemistryState.wordUnit, 'chem-word-unit');
+      updateChemWordTestHint();
     });
     document.getElementById('chemTestUnitGrid').addEventListener('click', function (e) {
       var btn = e.target.closest('[data-action="chem-test-unit"]');
