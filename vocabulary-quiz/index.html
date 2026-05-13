@@ -855,6 +855,44 @@
     [data-theme="light"] .chem-term-card,
     [data-theme="light"] .chem-test-option { background:rgba(255,255,255,0.42); }
 
+    .life-card {
+      min-height: 280px;
+      border-radius: var(--r-xl);
+      padding: 1.4rem;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(45,212,191,0.18), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(99,102,241,0.18), transparent 35%),
+        var(--glass-strong);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-md), inset 0 1px 0 var(--glass-highlight);
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+    .life-card-source { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .life-card-word { font-size: 2.25rem; font-weight: 800; color: var(--text); letter-spacing: -0.03em; }
+    .life-card-meta { margin-top: 0.3rem; font-size: 0.8rem; color: var(--teal); }
+    .life-card-cn { margin-top: 0.9rem; font-size: 1.15rem; color: var(--warning); font-weight: 700; line-height: 1.5; }
+    .life-card-en { margin-top: 0.65rem; font-size: 0.96rem; line-height: 1.55; color: var(--text-secondary); }
+    .life-card-sub { margin-top: 0.75rem; font-size: 0.75rem; color: var(--muted); }
+    .life-slashed-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(239,68,68,0.15);
+      color: #fca5a5;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 0.35rem;
+    }
+    [data-theme="light"] .life-card {
+      background:
+        radial-gradient(circle at 20% 10%, rgba(20,184,166,0.08), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(99,102,241,0.08), transparent 35%),
+        rgba(255,255,255,0.58);
+    }
+
     /* ===== Inline style overrides ===== */
     #quizSize { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--glass-border) !important; }
     #btnRetestWrong { background: linear-gradient(135deg, var(--wrong), #e11d48) !important; }
@@ -1095,6 +1133,7 @@
         <button type="button" class="btn" id="btnOpenGrammar" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(118,75,162,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📖 语法专项训练（AI）</button>
         <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
         <button type="button" class="btn" id="btnOpenChemistry" style="background:linear-gradient(135deg,#14b8a6 0%,#22c55e 50%,#84cc16 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(34,197,94,0.35);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">⚗️ Chemistry 11 学习助手</button>
+        <button type="button" class="btn" id="btnOpenLifeBasics" style="background:linear-gradient(135deg,#10b981 0%,#06b6d4 50%,#6366f1 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(16,185,129,0.35);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">🏡 生活英语单词</button>
         <button type="button" class="btn" id="btnOpenFlashcardLearn" style="background:linear-gradient(135deg,#06b6d4 0%,#3b82f6 50%,#8b5cf6 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(59,130,246,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📚 单词学习</button>
       </div>
       <div class="card" style="padding:0.8rem 1rem;">
@@ -1174,6 +1213,147 @@
         <div class="flashcard-settings">
           <label><input type="checkbox" id="chkAutoSpeak" /> 自动朗读</label>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：首页 ═══ -->
+    <div id="screen-life-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeBackHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">生活英语单词</h3>
+        <p class="hint">补齐食物、家居、衣服、身体、基础动作、学校指令等生活基础词。会的词可以「斩掉」，后续学习和测试默认不再出现。</p>
+        <div class="chem-home-grid">
+          <div class="chem-home-card" id="lifeOpenCards">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--teal);">分类词卡学习</div>
+            <div class="hint">按分类看词卡，认识的词直接斩掉。</div>
+          </div>
+          <div class="chem-home-card" id="lifeOpenTest">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--accent-light);">单词测试</div>
+            <div class="hint">看中英文解释输入英文词，支持轻微拼写错误。</div>
+          </div>
+          <div class="chem-home-card" id="lifeOpenHistory">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--orange);">测试历史</div>
+            <div class="hint">查看每次生活英语测试成绩和错词。</div>
+          </div>
+          <div class="chem-home-card" id="lifeOpenSlashed">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--pink);">已斩单词</div>
+            <div class="hint">查看已经掌握并斩掉的词，也可以恢复。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:0.5rem;">学习概览</h4>
+        <div id="lifeOverview"></div>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：词卡学习 ═══ -->
+    <div id="screen-life-cards" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeCardsBack">← 返回生活英语</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">生活英语分类词卡</h3>
+        <p class="hint">默认隐藏已斩词；如果要复习已斩词，可以关闭「只学未斩词」。</p>
+        <div class="chem-filter-row">
+          <select id="lifeCardCategory" style="flex:1;min-width:170px;"></select>
+          <label class="hint" style="display:inline-flex;align-items:center;gap:0.35rem;margin-top:0;"><input type="checkbox" id="lifeHideSlashed" checked /> 只学未斩词</label>
+        </div>
+        <div id="lifeCardStats" class="hint" style="margin-bottom:0.6rem;"></div>
+        <div class="life-card">
+          <div class="life-card-source" id="lifeCardSource">Life Basics</div>
+          <div class="life-card-word" id="lifeCardWord">--</div>
+          <div class="life-card-meta" id="lifeCardMeta"></div>
+          <div class="life-card-cn" id="lifeCardCn"></div>
+          <div class="life-card-en" id="lifeCardEn"></div>
+          <div class="life-card-sub" id="lifeCardSub"></div>
+        </div>
+        <div class="flashcard-nav">
+          <button type="button" class="btn btn-secondary" id="btnLifePrev">上一个</button>
+          <button type="button" class="btn-tts" id="btnLifeSpeak" title="朗读单词">🔊</button>
+          <button type="button" class="btn" id="btnLifeSlash" style="background:linear-gradient(135deg,#ef4444,#f97316);">斩掉</button>
+          <button type="button" class="btn" id="btnLifeNext">下一个</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：测试配置 ═══ -->
+    <div id="screen-life-test-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeTestBack">← 返回生活英语</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">生活英语单词测试</h3>
+        <p class="hint">选择分类和题数。测试默认只抽未斩词，避免反复考已经掌握的词。</p>
+        <div class="chem-filter-row">
+          <select id="lifeTestCategory" style="flex:1;min-width:170px;"></select>
+          <input type="number" id="lifeTestSize" min="3" max="50" value="10" style="width:5.5rem;" />
+          <label class="hint" style="display:inline-flex;align-items:center;gap:0.35rem;margin-top:0;"><input type="checkbox" id="lifeTestUnslashedOnly" checked /> 只考未斩词</label>
+        </div>
+        <div id="lifeTestHint" class="hint"></div>
+        <button type="button" class="btn" id="btnStartLifeTest" style="width:100%;margin-top:0.9rem;background:linear-gradient(135deg,#10b981,#06b6d4);">开始测试</button>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：答题 ═══ -->
+    <div id="screen-life-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeQuizBack">← 返回测试选择</button>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="progress" id="lifeQuizProgress">第 1 / 1 题</span>
+          <span style="font-size:0.78rem;color:var(--muted);" id="lifeQuizCategory"></span>
+        </div>
+        <div class="grammar-progress-bar" id="lifeProgressBar"></div>
+        <div class="grammar-q-card">
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.35rem;">根据解释输入英文单词/短语：</div>
+          <div class="chem-def-cn" id="lifeQuestionCn"></div>
+          <div class="chem-def-en" id="lifeQuestionEn"></div>
+          <div class="input-row" style="margin-top:0.8rem;">
+            <input type="text" id="lifeAnswerInput" placeholder="Type the English word..." autocomplete="off" spellcheck="false" />
+            <span class="feedback" id="lifeFeedback" style="display:none;"></span>
+          </div>
+          <div class="grammar-explanation" id="lifeExplanation"></div>
+        </div>
+        <div class="quiz-nav" style="margin-top:1rem;">
+          <button type="button" class="btn" id="btnLifeQuizNext">提交</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：结果 ═══ -->
+    <div id="screen-life-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeResultHome">← 返回生活英语</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;">生活英语测试完成</h3>
+        <div style="text-align:center;font-size:2.4rem;font-weight:700;color:var(--teal);" id="lifeScoreNum">--</div>
+        <div class="chem-result-meta">
+          <div class="chem-result-box"><div class="chem-result-value" id="lifeCorrectCount">0</div><div class="chem-result-label">正确</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="lifeWrongCount">0</div><div class="chem-result-label">错误</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="lifeTotalCount">0</div><div class="chem-result-label">总题数</div></div>
+        </div>
+        <div id="lifeResultList"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <button type="button" class="btn" id="btnLifeSlashCorrect" style="flex:1;background:linear-gradient(135deg,#ef4444,#f97316);">斩掉本次答对词</button>
+          <button type="button" class="btn btn-secondary" id="btnLifeResultBack" style="flex:1;">返回模块</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：历史 ═══ -->
+    <div id="screen-life-history" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeHistoryBack">← 返回生活英语</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">生活英语测试历史</h3>
+        <div id="lifeHistoryOverview" style="margin-bottom:1rem;"></div>
+        <div id="lifeHistoryList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ 生活英语单词：已斩词 ═══ -->
+    <div id="screen-life-slashed" class="screen">
+      <button type="button" class="btn-back-home" id="btnLifeSlashedBack">← 返回生活英语</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">已斩单词</h3>
+        <div class="chem-filter-row">
+          <select id="lifeSlashedCategory" style="flex:1;min-width:170px;"></select>
+        </div>
+        <div id="lifeSlashedList"></div>
       </div>
     </div>
 
@@ -1798,6 +1978,7 @@
     </div>
   </div>
 
+  <script src="life-basics-data.js"></script>
   <script src="chemistry11-data.js"></script>
   <script>
     // ─── Theme Toggle (runs immediately to avoid flash) ───
@@ -1813,6 +1994,8 @@
     const STORAGE_CATEGORIES_CACHE = 'vocab_quiz_categories_cache';
     const STORAGE_QUIZ_HISTORY = 'vocab_quiz_history';
     const STORAGE_REVIEW_PLAN = 'vocab_quiz_review_plan';
+    const LIFE_HISTORY_KEY = 'life_basics_history';
+    const LIFE_SLASHED_KEY = 'life_basics_slashed';
     const CHEM_HISTORY_KEY = 'chemistry11_history';
     const CHEM_PROFILE_KEY = 'chemistry11_profile';
     const LEARN_SESSIONS_KEY = 'learnSessions';
@@ -2119,6 +2302,20 @@
     }
     function saveLearnSessionsToStorage(sessions) {
       try { localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(sessions.slice(0, MAX_LEARN_SESSIONS))); } catch (_) {}
+      syncUserDataToCloud();
+    }
+    function getLifeHistoryFromStorage() {
+      try { return JSON.parse(localStorage.getItem(LIFE_HISTORY_KEY)) || []; } catch (_) { return []; }
+    }
+    function saveLifeHistoryToStorage(history) {
+      try { localStorage.setItem(LIFE_HISTORY_KEY, JSON.stringify(history.slice(-80))); } catch (_) {}
+      syncUserDataToCloud();
+    }
+    function getLifeSlashedFromStorage() {
+      try { return JSON.parse(localStorage.getItem(LIFE_SLASHED_KEY)) || {}; } catch (_) { return {}; }
+    }
+    function saveLifeSlashedToStorage(items) {
+      try { localStorage.setItem(LIFE_SLASHED_KEY, JSON.stringify(items || {})); } catch (_) {}
       syncUserDataToCloud();
     }
     function getChemHistoryFromStorage() {
@@ -3591,6 +3788,8 @@
           wrongWords: hasExistingData ? existingWrong : [],
           chemistryHistory: getChemHistoryFromStorage(),
           chemistryProfile: getChemProfileFromStorage(),
+          lifeHistory: getLifeHistoryFromStorage(),
+          lifeSlashed: getLifeSlashedFromStorage(),
         }),
       }).catch(function (e) { console.warn('createUser save failed:', e); });
 
@@ -3617,8 +3816,10 @@
         learnSessions: getLearnSessionsFromStorage(),
         chemistryHistory: getChemHistoryFromStorage(),
         chemistryProfile: getChemProfileFromStorage(),
+        lifeHistory: getLifeHistoryFromStorage(),
+        lifeSlashed: getLifeSlashedFromStorage(),
       };
-      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0 || localPayload.chemistryHistory.length > 0 || Object.keys(localPayload.chemistryProfile).length > 0;
+      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0 || localPayload.chemistryHistory.length > 0 || Object.keys(localPayload.chemistryProfile).length > 0 || localPayload.lifeHistory.length > 0 || Object.keys(localPayload.lifeSlashed).length > 0;
       var uploadFirst = hasLocalData
         ? fetch(USER_SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(localPayload) }).then(function (r) { return r.json(); }).catch(function () { return { ok: false }; })
         : Promise.resolve({ ok: true });
@@ -3636,6 +3837,8 @@
             if (d.learnSessions) localStorage.setItem(LEARN_SESSIONS_KEY, JSON.stringify(d.learnSessions));
             if (d.chemistryHistory) localStorage.setItem(CHEM_HISTORY_KEY, JSON.stringify(d.chemistryHistory));
             if (d.chemistryProfile) localStorage.setItem(CHEM_PROFILE_KEY, JSON.stringify(d.chemistryProfile));
+            if (d.lifeHistory) localStorage.setItem(LIFE_HISTORY_KEY, JSON.stringify(d.lifeHistory));
+            if (d.lifeSlashed) localStorage.setItem(LIFE_SLASHED_KEY, JSON.stringify(d.lifeSlashed));
             var dn = d.displayName || username;
             if (el) el.textContent = dn;
             _updateBarAvatar(dn);
@@ -3672,6 +3875,8 @@
           learnSessions: getLearnSessionsFromStorage(),
           chemistryHistory: getChemHistoryFromStorage(),
           chemistryProfile: getChemProfileFromStorage(),
+          lifeHistory: getLifeHistoryFromStorage(),
+          lifeSlashed: getLifeSlashedFromStorage(),
         };
         var body = JSON.stringify(payload);
         var attempt = function (retries) {
@@ -3718,12 +3923,15 @@
         learnSessions: getLearnSessionsFromStorage(),
         chemistryHistory: getChemHistoryFromStorage(),
         chemistryProfile: getChemProfileFromStorage(),
+        lifeHistory: getLifeHistoryFromStorage(),
+        lifeSlashed: getLifeSlashedFromStorage(),
       };
       var payload = JSON.stringify(data);
       if (payload.length > 60000) {
         data.learnSessions = data.learnSessions.slice(0, 20);
         data.quizHistory = data.quizHistory.slice(0, 30);
         data.chemistryHistory = data.chemistryHistory.slice(-20);
+        data.lifeHistory = data.lifeHistory.slice(-30);
         payload = JSON.stringify(data);
       }
       try { navigator.sendBeacon(USER_SAVE_URL, new Blob([payload], { type: 'application/json' })); } catch (_) {}
@@ -6600,6 +6808,400 @@
       var item = e.target.closest('.sentence-result-item');
       if (!item || item.dataset.ghistIdx === undefined) return;
       openGrammarHistoryDetail(parseInt(item.dataset.ghistIdx, 10));
+    });
+
+    // ═══════════════════════════════════════════════
+    //  Life Basics 生活英语单词
+    // ═══════════════════════════════════════════════
+    var lifeState = {
+      cardCategory: 'all',
+      cardWords: [],
+      cardIndex: 0,
+      testCategory: 'all',
+      questions: [],
+      answers: [],
+      currentIndex: 0,
+      lastCorrectIds: []
+    };
+
+    function getLifeCategories() {
+      return window.LIFE_BASICS_CATEGORIES || [];
+    }
+
+    function getLifeWords(categoryId, includeSlashed) {
+      var words = (window.LIFE_BASICS_WORDS || []).filter(function (w) {
+        return categoryId === 'all' || w.categoryId === categoryId;
+      });
+      if (!includeSlashed) {
+        var slashed = getLifeSlashedFromStorage();
+        words = words.filter(function (w) { return !slashed[w.id]; });
+      }
+      return words;
+    }
+
+    function getLifeCategoryName(categoryId) {
+      if (categoryId === 'all') return '全部分类';
+      var c = getLifeCategories().find(function (cat) { return cat.id === categoryId; });
+      return c ? c.name : categoryId;
+    }
+
+    function fillLifeCategorySelect(selectId, value) {
+      var el = document.getElementById(selectId);
+      if (!el) return;
+      var options = '<option value="all">全部分类</option>' + getLifeCategories().map(function (cat) {
+        return '<option value="' + escapeHtml(cat.id) + '">' + escapeHtml(cat.name) + '</option>';
+      }).join('');
+      el.innerHTML = options;
+      el.value = value || 'all';
+    }
+
+    function renderLifeOverview() {
+      var el = document.getElementById('lifeOverview');
+      if (!el) return;
+      var words = window.LIFE_BASICS_WORDS || [];
+      var slashed = getLifeSlashedFromStorage();
+      var slashedCount = words.filter(function (w) { return slashed[w.id]; }).length;
+      var history = getLifeHistoryFromStorage().filter(function (h) { return h.user === (_currentUser || ''); });
+      var avg = history.length ? Math.round(history.reduce(function (sum, h) { return sum + (h.score || 0); }, 0) / history.length) : 0;
+      el.innerHTML = '<div class="chem-result-meta">' +
+        '<div class="chem-result-box"><div class="chem-result-value">' + words.length + '</div><div class="chem-result-label">总词数</div></div>' +
+        '<div class="chem-result-box"><div class="chem-result-value">' + slashedCount + '</div><div class="chem-result-label">已斩</div></div>' +
+        '<div class="chem-result-box"><div class="chem-result-value">' + avg + '%</div><div class="chem-result-label">平均分</div></div>' +
+        '</div><div class="hint">词库参考 Fluent Forever 625、Cambridge Young Learners、CEFR A1/A2 和 Oxford 基础高频词范围，释义为原创简明解释。</div>';
+    }
+
+    function openLifeHome() {
+      renderLifeOverview();
+      showScreen('screen-life-home');
+    }
+
+    function openLifeCards() {
+      fillLifeCategorySelect('lifeCardCategory', lifeState.cardCategory);
+      renderLifeCardDeck(true);
+      showScreen('screen-life-cards');
+    }
+
+    function renderLifeCardDeck(resetIndex) {
+      var includeSlashed = !document.getElementById('lifeHideSlashed').checked;
+      lifeState.cardCategory = document.getElementById('lifeCardCategory').value || 'all';
+      lifeState.cardWords = getLifeWords(lifeState.cardCategory, includeSlashed);
+      if (resetIndex) lifeState.cardIndex = 0;
+      if (lifeState.cardIndex >= lifeState.cardWords.length) lifeState.cardIndex = Math.max(0, lifeState.cardWords.length - 1);
+      renderLifeCard();
+    }
+
+    function renderLifeCard() {
+      var stats = document.getElementById('lifeCardStats');
+      var slashed = getLifeSlashedFromStorage();
+      var totalInCategory = getLifeWords(lifeState.cardCategory, true).length;
+      var remaining = lifeState.cardWords.length;
+      if (stats) stats.textContent = getLifeCategoryName(lifeState.cardCategory) + '：当前可学 ' + remaining + ' / ' + totalInCategory + ' 个词';
+      var word = lifeState.cardWords[lifeState.cardIndex];
+      var slashBtn = document.getElementById('btnLifeSlash');
+      if (!word) {
+        document.getElementById('lifeCardSource').textContent = 'Life Basics';
+        document.getElementById('lifeCardWord').textContent = '本分类暂无未斩词';
+        document.getElementById('lifeCardMeta').textContent = '';
+        document.getElementById('lifeCardCn').textContent = '可以切换分类，或取消「只学未斩词」查看已斩词。';
+        document.getElementById('lifeCardEn').textContent = '';
+        document.getElementById('lifeCardSub').textContent = '';
+        slashBtn.disabled = true;
+        return;
+      }
+      document.getElementById('lifeCardSource').textContent = word.source || 'Life Basics';
+      document.getElementById('lifeCardWord').innerHTML = escapeHtml(word.word) + (slashed[word.id] ? '<span class="life-slashed-badge">已斩</span>' : '');
+      document.getElementById('lifeCardMeta').textContent = (word.pos || '') + ' · ' + (word.categoryName || '');
+      document.getElementById('lifeCardCn').textContent = word.definitionCn || '';
+      document.getElementById('lifeCardEn').textContent = word.definitionEn || '';
+      document.getElementById('lifeCardSub').textContent = word.subcategory ? 'Subcategory: ' + word.subcategory : '';
+      slashBtn.disabled = !!slashed[word.id];
+    }
+
+    function moveLifeCard(delta) {
+      if (!lifeState.cardWords.length) return;
+      lifeState.cardIndex = (lifeState.cardIndex + delta + lifeState.cardWords.length) % lifeState.cardWords.length;
+      renderLifeCard();
+    }
+
+    function slashLifeWord(word, reason) {
+      if (!word) return;
+      var slashed = getLifeSlashedFromStorage();
+      slashed[word.id] = {
+        id: word.id,
+        word: word.word,
+        categoryId: word.categoryId,
+        categoryName: word.categoryName,
+        definitionCn: word.definitionCn,
+        definitionEn: word.definitionEn,
+        slashedAt: new Date().toISOString(),
+        reason: reason || 'manual'
+      };
+      saveLifeSlashedToStorage(slashed);
+    }
+
+    function slashCurrentLifeCard() {
+      var word = lifeState.cardWords[lifeState.cardIndex];
+      if (!word) return;
+      slashLifeWord(word, 'card');
+      lifeState.cardWords.splice(lifeState.cardIndex, 1);
+      if (lifeState.cardIndex >= lifeState.cardWords.length) lifeState.cardIndex = Math.max(0, lifeState.cardWords.length - 1);
+      renderLifeCard();
+      renderLifeOverview();
+    }
+
+    function normalizeLifeAnswer(text) {
+      return String(text || '').toLowerCase()
+        .replace(/&/g, ' and ')
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function isLifeAnswerCorrect(userInput, targetWord) {
+      var user = normalizeLifeAnswer(userInput);
+      var target = normalizeLifeAnswer(targetWord);
+      if (!user || !target) return false;
+      if (user === target) return true;
+      return wordSimilarity(user, target) >= 0.82;
+    }
+
+    function openLifeTestHome() {
+      fillLifeCategorySelect('lifeTestCategory', lifeState.testCategory);
+      updateLifeTestHint();
+      showScreen('screen-life-test-home');
+    }
+
+    function updateLifeTestHint() {
+      lifeState.testCategory = document.getElementById('lifeTestCategory').value || 'all';
+      var includeSlashed = !document.getElementById('lifeTestUnslashedOnly').checked;
+      var count = getLifeWords(lifeState.testCategory, includeSlashed).length;
+      document.getElementById('lifeTestHint').textContent = getLifeCategoryName(lifeState.testCategory) + '：可测试 ' + count + ' 个词';
+      document.getElementById('btnStartLifeTest').disabled = count === 0;
+    }
+
+    function startLifeTest() {
+      var includeSlashed = !document.getElementById('lifeTestUnslashedOnly').checked;
+      var pool = getLifeWords(lifeState.testCategory, includeSlashed);
+      if (!pool.length) { alert('这个分类暂无可测试单词。'); return; }
+      var size = parseInt(document.getElementById('lifeTestSize').value, 10) || 10;
+      size = Math.max(3, Math.min(size, pool.length));
+      lifeState.questions = shuffleCopy(pool).slice(0, size);
+      lifeState.answers = [];
+      lifeState.currentIndex = 0;
+      lifeState.lastCorrectIds = [];
+      showScreen('screen-life-quiz');
+      renderLifeQuestion();
+    }
+
+    function renderLifeQuestion() {
+      var q = lifeState.questions[lifeState.currentIndex];
+      if (!q) return;
+      var total = lifeState.questions.length;
+      document.getElementById('lifeQuizProgress').textContent = '第 ' + (lifeState.currentIndex + 1) + ' / ' + total + ' 题';
+      document.getElementById('lifeQuizCategory').textContent = getLifeCategoryName(lifeState.testCategory);
+      document.getElementById('lifeQuestionCn').textContent = q.definitionCn || '';
+      document.getElementById('lifeQuestionEn').textContent = q.definitionEn || '';
+      var bar = '';
+      for (var i = 0; i < total; i++) {
+        var cls = i === lifeState.currentIndex ? ' current' : '';
+        if (lifeState.answers[i]) cls = lifeState.answers[i].isCorrect ? ' correct' : ' wrong';
+        bar += '<span class="grammar-progress-dot' + cls + '"></span>';
+      }
+      document.getElementById('lifeProgressBar').innerHTML = bar;
+      var ans = lifeState.answers[lifeState.currentIndex];
+      var input = document.getElementById('lifeAnswerInput');
+      var feedback = document.getElementById('lifeFeedback');
+      var exp = document.getElementById('lifeExplanation');
+      input.value = ans ? ans.userAnswer : '';
+      input.disabled = !!ans;
+      input.classList.toggle('correct', !!ans && ans.isCorrect);
+      input.classList.toggle('wrong', !!ans && !ans.isCorrect);
+      feedback.style.display = ans ? 'inline-block' : 'none';
+      feedback.textContent = ans ? (ans.isCorrect ? '正确' : '错误') : '';
+      feedback.className = 'feedback ' + (ans && ans.isCorrect ? 'correct' : 'wrong');
+      exp.classList.toggle('show', !!ans);
+      exp.innerHTML = ans ? '正确答案：<strong>' + escapeHtml(q.word) + '</strong><br><span class="hint">' + escapeHtml(q.pos || '') + ' · ' + escapeHtml(q.categoryName || '') + '</span>' : '';
+      document.getElementById('btnLifeQuizNext').textContent = ans ? (lifeState.currentIndex === total - 1 ? '查看结果' : '下一题') : '提交';
+      if (!ans) setTimeout(function () { input.focus(); }, 0);
+    }
+
+    function submitLifeAnswer() {
+      var q = lifeState.questions[lifeState.currentIndex];
+      if (!q || lifeState.answers[lifeState.currentIndex]) return;
+      var userAnswer = (document.getElementById('lifeAnswerInput').value || '').trim();
+      if (!userAnswer) return;
+      lifeState.answers[lifeState.currentIndex] = {
+        userAnswer: userAnswer,
+        correctAnswer: q.word,
+        isCorrect: isLifeAnswerCorrect(userAnswer, q.word)
+      };
+      renderLifeQuestion();
+    }
+
+    function lifeQuizNext() {
+      if (!lifeState.answers[lifeState.currentIndex]) {
+        submitLifeAnswer();
+        return;
+      }
+      if (lifeState.currentIndex < lifeState.questions.length - 1) {
+        lifeState.currentIndex++;
+        renderLifeQuestion();
+      } else {
+        finishLifeTest();
+      }
+    }
+
+    function finishLifeTest() {
+      var total = lifeState.questions.length;
+      var correct = lifeState.answers.filter(function (a) { return a && a.isCorrect; }).length;
+      var score = Math.round(correct / Math.max(total, 1) * 100);
+      lifeState.lastCorrectIds = lifeState.questions.filter(function (_q, i) { return lifeState.answers[i] && lifeState.answers[i].isCorrect; }).map(function (q) { return q.id; });
+      document.getElementById('lifeScoreNum').textContent = score + '%';
+      document.getElementById('lifeCorrectCount').textContent = correct;
+      document.getElementById('lifeWrongCount').textContent = total - correct;
+      document.getElementById('lifeTotalCount').textContent = total;
+      var wrongHtml = lifeState.questions.map(function (q, i) {
+        var a = lifeState.answers[i] || {};
+        if (a.isCorrect) return '';
+        return '<div class="chem-term-card">' +
+          '<div class="chem-term-head"><div><div class="chem-term-title">' + escapeHtml(q.word) + '</div><div class="chem-phonetic">' + escapeHtml(q.pos || '') + ' · ' + escapeHtml(q.categoryName || '') + '</div></div><span class="chem-priority important">需复习</span></div>' +
+          '<div class="hint">你的答案：' + escapeHtml(a.userAnswer || '未作答') + '</div>' +
+          '<div class="chem-def-cn">' + escapeHtml(q.definitionCn || '') + '</div>' +
+          '<div class="chem-def-en">' + escapeHtml(q.definitionEn || '') + '</div>' +
+          '</div>';
+      }).join('');
+      document.getElementById('lifeResultList').innerHTML = wrongHtml || '<div class="empty-state">全部正确，可以点击「斩掉本次答对词」。</div>';
+      saveLifeTestResult(score, correct, total);
+      showScreen('screen-life-result');
+    }
+
+    function saveLifeTestResult(score, correct, total) {
+      var history = getLifeHistoryFromStorage();
+      var item = {
+        id: 'life_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        date: new Date().toISOString(),
+        user: _currentUser || '',
+        categoryId: lifeState.testCategory,
+        categoryName: getLifeCategoryName(lifeState.testCategory),
+        score: score,
+        totalCorrect: correct,
+        totalQuestions: total,
+        details: lifeState.questions.map(function (q, i) {
+          var a = lifeState.answers[i] || {};
+          return {
+            word: q.word,
+            userAnswer: a.userAnswer || '',
+            correctAnswer: q.word,
+            isCorrect: !!a.isCorrect,
+            definitionCn: q.definitionCn,
+            definitionEn: q.definitionEn,
+            categoryName: q.categoryName
+          };
+        })
+      };
+      history.push(item);
+      saveLifeHistoryToStorage(history);
+      renderLifeOverview();
+    }
+
+    function slashLifeCorrectWords() {
+      var byId = {};
+      (window.LIFE_BASICS_WORDS || []).forEach(function (w) { byId[w.id] = w; });
+      lifeState.lastCorrectIds.forEach(function (id) {
+        if (byId[id]) slashLifeWord(byId[id], 'test-correct');
+      });
+      renderLifeOverview();
+      alert('已斩掉本次答对的 ' + lifeState.lastCorrectIds.length + ' 个词。');
+    }
+
+    function openLifeHistory() {
+      var history = getLifeHistoryFromStorage().filter(function (h) { return h.user === (_currentUser || ''); });
+      var overview = document.getElementById('lifeHistoryOverview');
+      var list = document.getElementById('lifeHistoryList');
+      if (!history.length) {
+        overview.innerHTML = '<div class="empty-state">暂无生活英语测试记录</div>';
+        list.innerHTML = '';
+      } else {
+        var avg = Math.round(history.reduce(function (sum, h) { return sum + (h.score || 0); }, 0) / history.length);
+        overview.innerHTML = '<div class="chem-result-meta"><div class="chem-result-box"><div class="chem-result-value">' + history.length + '</div><div class="chem-result-label">次数</div></div><div class="chem-result-box"><div class="chem-result-value">' + avg + '%</div><div class="chem-result-label">平均</div></div><div class="chem-result-box"><div class="chem-result-value">' + Math.max.apply(null, history.map(function (h) { return h.score || 0; })) + '%</div><div class="chem-result-label">最高</div></div></div>';
+        list.innerHTML = history.slice().reverse().map(function (h) {
+          var date = new Date(h.date).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          var wrong = (h.details || []).filter(function (d) { return !d.isCorrect; }).map(function (d) { return d.word; }).slice(0, 6);
+          return '<div class="sentence-result-item"><span class="sri-num">' + (h.score || 0) + '%</span><span class="sri-word">' + escapeHtml(h.categoryName || '全部分类') + '</span><span class="sri-score">' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + '</span><div class="hint" style="flex-basis:100%;margin-left:2.4rem;">' + date + (wrong.length ? ' · 错词：' + escapeHtml(wrong.join(', ')) : ' · 全对') + '</div></div>';
+        }).join('');
+      }
+      showScreen('screen-life-history');
+    }
+
+    function openLifeSlashed() {
+      fillLifeCategorySelect('lifeSlashedCategory', lifeState.cardCategory);
+      renderLifeSlashedList();
+      showScreen('screen-life-slashed');
+    }
+
+    function renderLifeSlashedList() {
+      var category = document.getElementById('lifeSlashedCategory').value || 'all';
+      var slashed = getLifeSlashedFromStorage();
+      var items = Object.keys(slashed).map(function (id) { return slashed[id]; }).filter(function (item) {
+        return category === 'all' || item.categoryId === category;
+      }).sort(function (a, b) { return String(b.slashedAt || '').localeCompare(String(a.slashedAt || '')); });
+      var list = document.getElementById('lifeSlashedList');
+      if (!items.length) {
+        list.innerHTML = '<div class="empty-state">暂无已斩单词</div>';
+        return;
+      }
+      list.innerHTML = items.map(function (item) {
+        var date = item.slashedAt ? new Date(item.slashedAt).toLocaleDateString('zh-CN') : '';
+        return '<div class="chem-term-card">' +
+          '<div class="chem-term-head"><div><div class="chem-term-title">' + escapeHtml(item.word || '') + '</div><div class="chem-phonetic">' + escapeHtml(item.categoryName || '') + '</div></div><button type="button" class="btn btn-secondary" data-life-restore="' + escapeHtml(item.id) + '" style="margin:0;padding:0.25rem 0.55rem;font-size:0.75rem;">恢复</button></div>' +
+          '<div class="chem-def-cn">' + escapeHtml(item.definitionCn || '') + '</div>' +
+          '<div class="chem-def-en">' + escapeHtml(item.definitionEn || '') + '</div>' +
+          '<div class="chem-source">斩词时间：' + escapeHtml(date) + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    document.getElementById('btnOpenLifeBasics').addEventListener('click', openLifeHome);
+    document.getElementById('btnLifeBackHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('lifeOpenCards').addEventListener('click', openLifeCards);
+    document.getElementById('lifeOpenTest').addEventListener('click', openLifeTestHome);
+    document.getElementById('lifeOpenHistory').addEventListener('click', openLifeHistory);
+    document.getElementById('lifeOpenSlashed').addEventListener('click', openLifeSlashed);
+    document.getElementById('btnLifeCardsBack').addEventListener('click', openLifeHome);
+    document.getElementById('btnLifeTestBack').addEventListener('click', openLifeHome);
+    document.getElementById('btnLifeQuizBack').addEventListener('click', openLifeTestHome);
+    document.getElementById('btnLifeResultHome').addEventListener('click', openLifeHome);
+    document.getElementById('btnLifeResultBack').addEventListener('click', openLifeHome);
+    document.getElementById('btnLifeHistoryBack').addEventListener('click', openLifeHome);
+    document.getElementById('btnLifeSlashedBack').addEventListener('click', openLifeHome);
+    document.getElementById('lifeCardCategory').addEventListener('change', function () { renderLifeCardDeck(true); });
+    document.getElementById('lifeHideSlashed').addEventListener('change', function () { renderLifeCardDeck(true); });
+    document.getElementById('btnLifePrev').addEventListener('click', function () { moveLifeCard(-1); });
+    document.getElementById('btnLifeNext').addEventListener('click', function () { moveLifeCard(1); });
+    document.getElementById('btnLifeSpeak').addEventListener('click', function () {
+      var word = lifeState.cardWords[lifeState.cardIndex];
+      if (word) speakWord(word.word);
+    });
+    document.getElementById('btnLifeSlash').addEventListener('click', slashCurrentLifeCard);
+    document.getElementById('lifeTestCategory').addEventListener('change', updateLifeTestHint);
+    document.getElementById('lifeTestUnslashedOnly').addEventListener('change', updateLifeTestHint);
+    document.getElementById('lifeTestSize').addEventListener('input', updateLifeTestHint);
+    document.getElementById('btnStartLifeTest').addEventListener('click', startLifeTest);
+    document.getElementById('btnLifeQuizNext').addEventListener('click', lifeQuizNext);
+    document.getElementById('lifeAnswerInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') lifeQuizNext();
+    });
+    document.getElementById('btnLifeSlashCorrect').addEventListener('click', slashLifeCorrectWords);
+    document.getElementById('lifeSlashedCategory').addEventListener('change', renderLifeSlashedList);
+    document.getElementById('lifeSlashedList').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-life-restore]');
+      if (!btn) return;
+      var slashed = getLifeSlashedFromStorage();
+      delete slashed[btn.dataset.lifeRestore];
+      saveLifeSlashedToStorage(slashed);
+      renderLifeSlashedList();
+      renderLifeOverview();
     });
 
     // ═══════════════════════════════════════════════
