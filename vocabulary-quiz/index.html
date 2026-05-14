@@ -2862,6 +2862,30 @@
           opt.textContent = c.name;
           sel.appendChild(opt);
         });
+        var lifeCats = window.LIFE_BASICS_CATEGORIES || [];
+        if (lifeCats.length) {
+          var grpLife = document.createElement('optgroup');
+          grpLife.label = '🏡 生活英语';
+          lifeCats.forEach(function (c) {
+            var opt = document.createElement('option');
+            opt.value = 'life:' + c.id;
+            opt.textContent = c.name;
+            grpLife.appendChild(opt);
+          });
+          sel.appendChild(grpLife);
+        }
+        var chemUnits = window.CHEM11_UNITS || [];
+        if (chemUnits.length) {
+          var grpChem = document.createElement('optgroup');
+          grpChem.label = '🧪 Chemistry 11';
+          chemUnits.forEach(function (u) {
+            var opt = document.createElement('option');
+            opt.value = 'chem:' + u.id;
+            opt.textContent = u.name || u.id;
+            grpChem.appendChild(opt);
+          });
+          sel.appendChild(grpChem);
+        }
       });
     }
 
@@ -7011,11 +7035,17 @@
       if (!q || lifeState.answers[lifeState.currentIndex]) return;
       var userAnswer = (document.getElementById('lifeAnswerInput').value || '').trim();
       if (!userAnswer) return;
+      var isCorrect = isLifeAnswerCorrect(userAnswer, q.word);
       lifeState.answers[lifeState.currentIndex] = {
         userAnswer: userAnswer,
         correctAnswer: q.word,
-        isCorrect: isLifeAnswerCorrect(userAnswer, q.word)
+        isCorrect: isCorrect
       };
+      try {
+        var catId = 'life:' + (q.categoryId || 'unknown');
+        var def = q.definitionCn || q.definitionEn || '';
+        recordWordResult(q.word, def, catId, isCorrect, isCorrect ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN);
+      } catch (_) {}
       renderLifeQuestion();
     }
 
@@ -7366,12 +7396,18 @@
       var input = document.getElementById('chemWordAnswerInput');
       var userAnswer = (input.value || '').trim();
       if (!userAnswer) return;
+      var isCorrect = isChemWordAnswerCorrect(userAnswer, term.term);
       chemistryState.wordAnswers[chemistryState.wordIndex] = {
         userAnswer: userAnswer,
         correctAnswer: term.term,
-        isCorrect: isChemWordAnswerCorrect(userAnswer, term.term),
+        isCorrect: isCorrect,
         timeSec: Math.round((Date.now() - chemistryState.wordStartedAt) / 1000)
       };
+      try {
+        var catId = 'chem:' + (chemistryState.wordUnit || 'unknown');
+        var def = term.definitionCn || term.definitionEn || '';
+        recordWordResult(term.term, def, catId, isCorrect, isCorrect ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN);
+      } catch (_) {}
       renderChemWordQuestion();
     }
 
