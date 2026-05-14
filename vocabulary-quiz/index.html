@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1062,23 +1062,9 @@
     /* sentence module */
     [data-theme="light"] .sentence-word-card { background: rgba(235,235,240,0.7); }
 
-    /* theme toggle */
-    .theme-toggle {
-      position: fixed; top: 1rem; right: 1rem; z-index: 999;
-      width: 42px; height: 42px; border-radius: 50%;
-      border: 1px solid var(--glass-border);
-      background: var(--glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; color: var(--text);
-      box-shadow: var(--shadow-md);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .theme-toggle:hover { transform: scale(1.08); box-shadow: var(--shadow-lg); }
-    .theme-toggle:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
-  <button type="button" class="theme-toggle" id="themeToggle" title="切换亮色/暗色主题">🌙</button>
   <div class="container">
     <h1>背单词测验</h1>
     <p class="subtitle">自选题数 · 下次测验含部分错题</p>
@@ -1981,12 +1967,6 @@
   <script src="life-basics-data.js"></script>
   <script src="chemistry11-data.js"></script>
   <script>
-    // ─── Theme Toggle (runs immediately to avoid flash) ───
-    (function () {
-      var saved = localStorage.getItem('app_theme');
-      if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
-    })();
-
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
     const STORAGE_QUIZ_SIZE = 'vocab_quiz_size';
@@ -7779,29 +7759,6 @@
       updateChemProfileFromHistory(keep);
       openChemHistory();
     });
-
-    // ─── Theme Toggle ───
-    (function () {
-      var btn = document.getElementById('themeToggle');
-      function applyTheme(theme) {
-        if (theme === 'light') {
-          document.documentElement.setAttribute('data-theme', 'light');
-          btn.textContent = '☀️';
-          btn.title = '切换暗色主题';
-        } else {
-          document.documentElement.removeAttribute('data-theme');
-          btn.textContent = '🌙';
-          btn.title = '切换亮色主题';
-        }
-      }
-      applyTheme(localStorage.getItem('app_theme') || 'dark');
-      btn.addEventListener('click', function () {
-        var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-        var next = isLight ? 'dark' : 'light';
-        localStorage.setItem('app_theme', next);
-        applyTheme(next);
-      });
-    })();
 
     (function init() {
       var sizeEl = document.getElementById('quizSize');
