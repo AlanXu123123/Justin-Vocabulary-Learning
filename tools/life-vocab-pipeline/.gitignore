@@ -1,0 +1,5 @@
+# Raw GitHub repos are large and reproducible via 01-download.mjs
+data/raw/
+
+# Pipeline log
+output/translate.log
