@@ -3,3 +3,4 @@ data/raw/
 
 # Pipeline log
 output/translate.log
+output/translate-hs.log
