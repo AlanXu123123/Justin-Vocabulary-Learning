@@ -1,0 +1,5 @@
+# Raw GitHub downloads reproducible via 01-download-ww.mjs
+data/raw/
+
+# Pipeline log
+output/translate-ww.log

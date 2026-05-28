@@ -1120,6 +1120,7 @@
         <button type="button" class="btn" id="btnOpenSentence" style="background:linear-gradient(135deg,#f59e0b 0%,#ef4444 50%,#ec4899 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">✍️ 单词造句训练（AI）</button>
         <button type="button" class="btn" id="btnOpenChemistry" style="background:linear-gradient(135deg,#14b8a6 0%,#22c55e 50%,#84cc16 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(34,197,94,0.35);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">⚗️ Chemistry 11 学习助手</button>
         <button type="button" class="btn" id="btnOpenLifeBasics" style="background:linear-gradient(135deg,#10b981 0%,#06b6d4 50%,#6366f1 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(16,185,129,0.35);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">🏡 生活英语单词</button>
+        <button type="button" class="btn" id="btnOpenWW3000" style="background:linear-gradient(135deg,#7c3aed 0%,#db2777 50%,#f59e0b 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(124,58,237,0.35);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📘 WW3000 词汇精读</button>
         <button type="button" class="btn" id="btnOpenFlashcardLearn" style="background:linear-gradient(135deg,#06b6d4 0%,#3b82f6 50%,#8b5cf6 100%);color:#fff;font-weight:700;font-size:0.95rem;padding:0.6rem 1.2rem;box-shadow:0 4px 15px rgba(59,130,246,0.4);border:none;letter-spacing:0.05em;width:100%;margin-top:0.25rem;">📚 单词学习</button>
       </div>
       <div class="card" style="padding:0.8rem 1rem;">
@@ -1340,6 +1341,149 @@
           <select id="lifeSlashedCategory" style="flex:1;min-width:170px;"></select>
         </div>
         <div id="lifeSlashedList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000 词汇精读：首页 ═══ -->
+    <div id="screen-ww-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWBackHome">← 返回主页</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">WW3000 词汇精读</h3>
+        <p class="hint">Wordly Wise 3000 Books 5-10（北美 5-10 年级教材），每册 20 个 Lesson × 15 词。已学会的词可以「斩掉」，单词测试默认只考未斩词。</p>
+        <div class="chem-home-grid">
+          <div class="chem-home-card" id="wwOpenCards">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--teal);">分册词卡学习</div>
+            <div class="hint">按 Book + Lesson 看词卡，认识的词直接斩掉。</div>
+          </div>
+          <div class="chem-home-card" id="wwOpenTest">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--accent-light);">单词测试</div>
+            <div class="hint">看中英文解释输入英文词，支持轻微拼写错误。</div>
+          </div>
+          <div class="chem-home-card" id="wwOpenHistory">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--orange);">测试历史</div>
+            <div class="hint">查看每次 WW3000 测试成绩和错词。</div>
+          </div>
+          <div class="chem-home-card" id="wwOpenSlashed">
+            <div style="font-size:1.15rem;font-weight:700;color:var(--pink);">已斩单词</div>
+            <div class="hint">查看已经掌握并斩掉的词，也可以恢复。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:0.5rem;">学习概览</h4>
+        <div id="wwOverview"></div>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000：词卡学习 ═══ -->
+    <div id="screen-ww-cards" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWCardsBack">← 返回 WW3000</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">WW3000 词卡学习</h3>
+        <p class="hint">默认隐藏已斩词；如需复习已斩词，可关闭「只学未斩词」。</p>
+        <div class="chem-filter-row">
+          <select id="wwCardBook" style="flex:1;min-width:140px;"></select>
+          <select id="wwCardLesson" style="flex:1;min-width:140px;"></select>
+          <label class="hint" style="display:inline-flex;align-items:center;gap:0.35rem;margin-top:0;"><input type="checkbox" id="wwHideSlashed" checked /> 只学未斩词</label>
+        </div>
+        <div id="wwCardStats" class="hint" style="margin-bottom:0.6rem;"></div>
+        <div class="life-card">
+          <div class="life-card-source" id="wwCardSource">WW3000</div>
+          <div class="life-card-word" id="wwCardWord">--</div>
+          <div class="life-card-meta" id="wwCardMeta"></div>
+          <div class="life-card-cn" id="wwCardCn"></div>
+          <div class="life-card-en" id="wwCardEn"></div>
+          <div class="life-card-sub" id="wwCardSub"></div>
+        </div>
+        <div class="flashcard-nav">
+          <button type="button" class="btn btn-secondary" id="btnWWPrev">上一个</button>
+          <button type="button" class="btn-tts" id="btnWWSpeak" title="朗读单词">🔊</button>
+          <button type="button" class="btn" id="btnWWSlash" style="background:linear-gradient(135deg,#ef4444,#f97316);">斩掉</button>
+          <button type="button" class="btn" id="btnWWNext">下一个</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000：测试配置 ═══ -->
+    <div id="screen-ww-test-home" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWTestBack">← 返回 WW3000</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.25rem;">WW3000 单词测试</h3>
+        <p class="hint">选择册和 Lesson 后开始；选择「整册随机」可跨 Lesson 抽题。</p>
+        <div class="chem-filter-row">
+          <select id="wwTestBook" style="flex:1;min-width:140px;"></select>
+          <select id="wwTestLesson" style="flex:1;min-width:140px;"></select>
+          <input type="number" id="wwTestSize" min="3" max="50" value="10" style="width:5.5rem;" />
+          <label class="hint" style="display:inline-flex;align-items:center;gap:0.35rem;margin-top:0;"><input type="checkbox" id="wwTestUnslashedOnly" checked /> 只考未斩词</label>
+        </div>
+        <div id="wwTestHint" class="hint"></div>
+        <button type="button" class="btn" id="btnStartWWTest" style="width:100%;margin-top:0.9rem;background:linear-gradient(135deg,#7c3aed,#db2777);">开始测试</button>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000：答题 ═══ -->
+    <div id="screen-ww-quiz" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWQuizBack">← 返回测试选择</button>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="progress" id="wwQuizProgress">第 1 / 1 题</span>
+          <span style="font-size:0.78rem;color:var(--muted);" id="wwQuizScope"></span>
+        </div>
+        <div class="grammar-progress-bar" id="wwProgressBar"></div>
+        <div class="grammar-q-card">
+          <div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.35rem;">根据解释输入英文单词：</div>
+          <div class="chem-def-cn" id="wwQuestionCn"></div>
+          <div class="chem-def-en" id="wwQuestionEn"></div>
+          <div class="input-row" style="margin-top:0.8rem;">
+            <input type="text" id="wwAnswerInput" placeholder="Type the English word..." autocomplete="off" spellcheck="false" />
+            <span class="feedback" id="wwFeedback" style="display:none;"></span>
+          </div>
+          <div class="grammar-explanation" id="wwExplanation"></div>
+        </div>
+        <div class="quiz-nav" style="margin-top:1rem;">
+          <button type="button" class="btn" id="btnWWQuizNext">提交</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000：结果 ═══ -->
+    <div id="screen-ww-result" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWResultHome">← 返回 WW3000</button>
+      <div class="card">
+        <h3 style="text-align:center;margin-bottom:0.5rem;">WW3000 测试完成</h3>
+        <div style="text-align:center;font-size:2.4rem;font-weight:700;color:#7c3aed;" id="wwScoreNum">--</div>
+        <div class="chem-result-meta">
+          <div class="chem-result-box"><div class="chem-result-value" id="wwCorrectCount">0</div><div class="chem-result-label">正确</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="wwWrongCount">0</div><div class="chem-result-label">错误</div></div>
+          <div class="chem-result-box"><div class="chem-result-value" id="wwTotalCount">0</div><div class="chem-result-label">总题数</div></div>
+        </div>
+        <div id="wwResultList"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <button type="button" class="btn" id="btnWWSlashCorrect" style="flex:1;background:linear-gradient(135deg,#ef4444,#f97316);">斩掉本次答对词</button>
+          <button type="button" class="btn btn-secondary" id="btnWWResultBack" style="flex:1;">返回模块</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000：历史 ═══ -->
+    <div id="screen-ww-history" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWHistoryBack">← 返回 WW3000</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">WW3000 测试历史</h3>
+        <div id="wwHistoryOverview" style="margin-bottom:1rem;"></div>
+        <div id="wwHistoryList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ WW3000：已斩词 ═══ -->
+    <div id="screen-ww-slashed" class="screen">
+      <button type="button" class="btn-back-home" id="btnWWSlashedBack">← 返回 WW3000</button>
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">已斩单词</h3>
+        <div class="chem-filter-row">
+          <select id="wwSlashedBook" style="flex:1;min-width:170px;"></select>
+        </div>
+        <div id="wwSlashedList"></div>
       </div>
     </div>
 
@@ -1966,6 +2110,7 @@
 
   <script src="life-basics-data.js"></script>
   <script src="chemistry11-data.js"></script>
+  <script src="ww3000-data.js"></script>
   <script>
     const STORAGE_WRONG = 'vocab_quiz_wrong';
     const STORAGE_VOCAB_URL = 'vocab_quiz_source_url';
@@ -1977,6 +2122,8 @@
     const LIFE_HISTORY_KEY = 'life_basics_history';
     const LIFE_SLASHED_KEY = 'life_basics_slashed';
     const CHEM_HISTORY_KEY = 'chemistry11_history';
+    const WW3000_HISTORY_KEY = 'ww3000_history';
+    const WW3000_SLASHED_KEY = 'ww3000_slashed';
     const CHEM_PROFILE_KEY = 'chemistry11_profile';
     const LEARN_SESSIONS_KEY = 'learnSessions';
     const MAX_LEARN_SESSIONS = 50;
@@ -2303,6 +2450,20 @@
     }
     function saveChemHistoryToStorage(history) {
       try { localStorage.setItem(CHEM_HISTORY_KEY, JSON.stringify(history.slice(-50))); } catch (_) {}
+      syncUserDataToCloud();
+    }
+    function getWW3000HistoryFromStorage() {
+      try { return JSON.parse(localStorage.getItem(WW3000_HISTORY_KEY)) || []; } catch (_) { return []; }
+    }
+    function saveWW3000HistoryToStorage(history) {
+      try { localStorage.setItem(WW3000_HISTORY_KEY, JSON.stringify(history.slice(-80))); } catch (_) {}
+      syncUserDataToCloud();
+    }
+    function getWW3000SlashedFromStorage() {
+      try { return JSON.parse(localStorage.getItem(WW3000_SLASHED_KEY)) || {}; } catch (_) { return {}; }
+    }
+    function saveWW3000SlashedToStorage(items) {
+      try { localStorage.setItem(WW3000_SLASHED_KEY, JSON.stringify(items || {})); } catch (_) {}
       syncUserDataToCloud();
     }
     function getChemProfileFromStorage() {
@@ -2886,6 +3047,18 @@
           });
           sel.appendChild(grpChem);
         }
+        var wwBooks = window.WW3000_BOOKS || [];
+        wwBooks.forEach(function (b) {
+          var grpWW = document.createElement('optgroup');
+          grpWW.label = '📘 WW3000 ' + (b.label || ('Book ' + b.grade));
+          (b.lessons || []).forEach(function (ls) {
+            var opt = document.createElement('option');
+            opt.value = 'ww:' + ls.id;
+            opt.textContent = ls.name || ('Lesson ' + ls.lesson);
+            grpWW.appendChild(opt);
+          });
+          sel.appendChild(grpWW);
+        });
       });
     }
 
@@ -3822,8 +3995,10 @@
         chemistryProfile: getChemProfileFromStorage(),
         lifeHistory: getLifeHistoryFromStorage(),
         lifeSlashed: getLifeSlashedFromStorage(),
+        ww3000History: getWW3000HistoryFromStorage(),
+        ww3000Slashed: getWW3000SlashedFromStorage(),
       };
-      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0 || localPayload.chemistryHistory.length > 0 || Object.keys(localPayload.chemistryProfile).length > 0 || localPayload.lifeHistory.length > 0 || Object.keys(localPayload.lifeSlashed).length > 0;
+      var hasLocalData = localPayload.quizHistory.length > 0 || Object.keys(localPayload.wordStats).length > 0 || localPayload.learnSessions.length > 0 || localPayload.chemistryHistory.length > 0 || Object.keys(localPayload.chemistryProfile).length > 0 || localPayload.lifeHistory.length > 0 || Object.keys(localPayload.lifeSlashed).length > 0 || localPayload.ww3000History.length > 0 || Object.keys(localPayload.ww3000Slashed).length > 0;
       var uploadFirst = hasLocalData
         ? fetch(USER_SAVE_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(localPayload) }).then(function (r) { return r.json(); }).catch(function () { return { ok: false }; })
         : Promise.resolve({ ok: true });
@@ -3843,6 +4018,8 @@
             if (d.chemistryProfile) localStorage.setItem(CHEM_PROFILE_KEY, JSON.stringify(d.chemistryProfile));
             if (d.lifeHistory) localStorage.setItem(LIFE_HISTORY_KEY, JSON.stringify(d.lifeHistory));
             if (d.lifeSlashed) localStorage.setItem(LIFE_SLASHED_KEY, JSON.stringify(d.lifeSlashed));
+            if (d.ww3000History) localStorage.setItem(WW3000_HISTORY_KEY, JSON.stringify(d.ww3000History));
+            if (d.ww3000Slashed) localStorage.setItem(WW3000_SLASHED_KEY, JSON.stringify(d.ww3000Slashed));
             var dn = d.displayName || username;
             if (el) el.textContent = dn;
             _updateBarAvatar(dn);
@@ -3881,6 +4058,8 @@
           chemistryProfile: getChemProfileFromStorage(),
           lifeHistory: getLifeHistoryFromStorage(),
           lifeSlashed: getLifeSlashedFromStorage(),
+          ww3000History: getWW3000HistoryFromStorage(),
+          ww3000Slashed: getWW3000SlashedFromStorage(),
         };
         var body = JSON.stringify(payload);
         var attempt = function (retries) {
@@ -3929,6 +4108,8 @@
         chemistryProfile: getChemProfileFromStorage(),
         lifeHistory: getLifeHistoryFromStorage(),
         lifeSlashed: getLifeSlashedFromStorage(),
+        ww3000History: getWW3000HistoryFromStorage(),
+        ww3000Slashed: getWW3000SlashedFromStorage(),
       };
       var payload = JSON.stringify(data);
       if (payload.length > 60000) {
@@ -3936,6 +4117,7 @@
         data.quizHistory = data.quizHistory.slice(0, 30);
         data.chemistryHistory = data.chemistryHistory.slice(-20);
         data.lifeHistory = data.lifeHistory.slice(-30);
+        data.ww3000History = data.ww3000History.slice(-30);
         payload = JSON.stringify(data);
       }
       try { navigator.sendBeacon(USER_SAVE_URL, new Blob([payload], { type: 'application/json' })); } catch (_) {}
@@ -7212,6 +7394,474 @@
       saveLifeSlashedToStorage(slashed);
       renderLifeSlashedList();
       renderLifeOverview();
+    });
+
+    // ═══════════════════════════════════════════════
+    //  WW3000 词汇精读 (Books 5-10)
+    // ═══════════════════════════════════════════════
+    var ww3000State = {
+      cardBookId: '',
+      cardLessonId: 'all',
+      cardWords: [],
+      cardIndex: 0,
+      testBookId: '',
+      testLessonId: 'all',
+      testSize: 10,
+      testScopeLabel: '',
+      questions: [],
+      answers: [],
+      currentIndex: 0,
+      lastCorrectIds: [],
+      slashedFilterBook: 'all'
+    };
+
+    function getWWBooks() { return window.WW3000_BOOKS || []; }
+    function getWWLessons() { return window.WW3000_LESSONS || []; }
+    function getWWWords() { return window.WW3000_WORDS || []; }
+
+    function getWWBook(bookId) {
+      return getWWBooks().find(function (b) { return b.id === bookId; }) || getWWBooks()[0] || null;
+    }
+    function getWWLesson(lessonId) {
+      return getWWLessons().find(function (ls) { return ls.id === lessonId; }) || null;
+    }
+
+    function getWWLabel(bookId, lessonId) {
+      var b = getWWBook(bookId);
+      if (!b) return 'WW3000';
+      if (!lessonId || lessonId === 'all') return b.label + ' · 整册';
+      var ls = (b.lessons || []).find(function (l) { return l.id === lessonId; });
+      return b.label + (ls ? ' · ' + ls.name : '');
+    }
+
+    function getWWPool(bookId, lessonId, includeSlashed) {
+      var words = getWWWords().filter(function (w) {
+        if (bookId && bookId !== 'all' && w.bookId !== bookId) return false;
+        if (lessonId && lessonId !== 'all' && w.lessonId !== lessonId) return false;
+        return true;
+      });
+      if (!includeSlashed) {
+        var slashed = getWW3000SlashedFromStorage();
+        words = words.filter(function (w) { return !slashed[w.id]; });
+      }
+      return words;
+    }
+
+    function fillWWBookSelect(selectId, value, opts) {
+      var el = document.getElementById(selectId);
+      if (!el) return;
+      var allowAll = opts && opts.allowAll;
+      var books = getWWBooks();
+      var html = allowAll ? '<option value="all">全部 Books</option>' : '';
+      html += books.map(function (b) {
+        return '<option value="' + escapeHtml(b.id) + '">' + escapeHtml(b.label) + '</option>';
+      }).join('');
+      el.innerHTML = html;
+      var fallback = books[0] ? books[0].id : 'all';
+      el.value = value || fallback;
+      if (!el.value) el.value = fallback;
+    }
+
+    function fillWWLessonSelect(selectId, bookId, value) {
+      var el = document.getElementById(selectId);
+      if (!el) return;
+      var book = getWWBook(bookId);
+      var html = '<option value="all">整册随机</option>';
+      if (book) {
+        html += (book.lessons || []).map(function (ls) {
+          return '<option value="' + escapeHtml(ls.id) + '">' + escapeHtml(ls.name) + '（' + (ls.items || []).length + ' 词）</option>';
+        }).join('');
+      }
+      el.innerHTML = html;
+      el.value = value || 'all';
+    }
+
+    function renderWWOverview() {
+      var el = document.getElementById('wwOverview');
+      if (!el) return;
+      var words = getWWWords();
+      var slashed = getWW3000SlashedFromStorage();
+      var slashedCount = words.filter(function (w) { return slashed[w.id]; }).length;
+      var history = getWW3000HistoryFromStorage().filter(function (h) { return h.user === (_currentUser || ''); });
+      var avg = history.length ? Math.round(history.reduce(function (sum, h) { return sum + (h.score || 0); }, 0) / history.length) : 0;
+      el.innerHTML = '<div class="chem-result-meta">' +
+        '<div class="chem-result-box"><div class="chem-result-value">' + words.length + '</div><div class="chem-result-label">总词数</div></div>' +
+        '<div class="chem-result-box"><div class="chem-result-value">' + slashedCount + '</div><div class="chem-result-label">已斩</div></div>' +
+        '<div class="chem-result-box"><div class="chem-result-value">' + avg + '%</div><div class="chem-result-label">平均分</div></div>' +
+        '</div><div class="hint">Wordly Wise 3000 Book 5-10 共 ' + getWWBooks().length + ' 册 / ' + getWWLessons().length + ' Lessons / ' + words.length + ' 词。每次测试结果会自动写入复习计划。</div>';
+    }
+
+    function openWW3000Home() {
+      if (!ww3000State.cardBookId) {
+        var first = getWWBooks()[0];
+        if (first) {
+          ww3000State.cardBookId = first.id;
+          ww3000State.testBookId = first.id;
+        }
+      }
+      renderWWOverview();
+      showScreen('screen-ww-home');
+    }
+
+    function openWWCards() {
+      fillWWBookSelect('wwCardBook', ww3000State.cardBookId);
+      ww3000State.cardBookId = document.getElementById('wwCardBook').value;
+      fillWWLessonSelect('wwCardLesson', ww3000State.cardBookId, ww3000State.cardLessonId);
+      renderWWCardDeck(true);
+      showScreen('screen-ww-cards');
+    }
+
+    function renderWWCardDeck(resetIndex) {
+      ww3000State.cardBookId = document.getElementById('wwCardBook').value;
+      ww3000State.cardLessonId = document.getElementById('wwCardLesson').value || 'all';
+      var includeSlashed = !document.getElementById('wwHideSlashed').checked;
+      ww3000State.cardWords = getWWPool(ww3000State.cardBookId, ww3000State.cardLessonId, includeSlashed);
+      if (resetIndex) ww3000State.cardIndex = 0;
+      if (ww3000State.cardIndex >= ww3000State.cardWords.length) ww3000State.cardIndex = Math.max(0, ww3000State.cardWords.length - 1);
+      renderWWCard();
+    }
+
+    function renderWWCard() {
+      var stats = document.getElementById('wwCardStats');
+      var slashed = getWW3000SlashedFromStorage();
+      var totalInScope = getWWPool(ww3000State.cardBookId, ww3000State.cardLessonId, true).length;
+      var remaining = ww3000State.cardWords.length;
+      if (stats) stats.textContent = getWWLabel(ww3000State.cardBookId, ww3000State.cardLessonId) + '：当前可学 ' + remaining + ' / ' + totalInScope + ' 个词';
+      var word = ww3000State.cardWords[ww3000State.cardIndex];
+      var slashBtn = document.getElementById('btnWWSlash');
+      if (!word) {
+        document.getElementById('wwCardSource').textContent = 'WW3000';
+        document.getElementById('wwCardWord').textContent = '本范围暂无未斩词';
+        document.getElementById('wwCardMeta').textContent = '';
+        document.getElementById('wwCardCn').textContent = '可以切换 Book / Lesson 或取消「只学未斩词」查看已斩词。';
+        document.getElementById('wwCardEn').textContent = '';
+        document.getElementById('wwCardSub').textContent = '';
+        slashBtn.disabled = true;
+        return;
+      }
+      document.getElementById('wwCardSource').textContent = word.level || ('WW3000 ' + (word.bookLabel || ''));
+      document.getElementById('wwCardWord').innerHTML = escapeHtml(word.word) + (slashed[word.id] ? '<span class="life-slashed-badge">已斩</span>' : '');
+      document.getElementById('wwCardMeta').textContent = (word.pos || '') + (word.phonetic ? ' · ' + word.phonetic : '') + ' · ' + (word.bookLabel || '');
+      document.getElementById('wwCardCn').textContent = word.definitionCn || '';
+      document.getElementById('wwCardEn').textContent = word.definitionEn || '';
+      var ls = getWWLesson(word.lessonId);
+      document.getElementById('wwCardSub').textContent = ls ? ls.name : '';
+      slashBtn.disabled = !!slashed[word.id];
+    }
+
+    function moveWWCard(delta) {
+      if (!ww3000State.cardWords.length) return;
+      ww3000State.cardIndex = (ww3000State.cardIndex + delta + ww3000State.cardWords.length) % ww3000State.cardWords.length;
+      renderWWCard();
+    }
+
+    function slashWWWord(word, reason) {
+      if (!word) return;
+      var slashed = getWW3000SlashedFromStorage();
+      slashed[word.id] = {
+        id: word.id,
+        word: word.word,
+        bookId: word.bookId,
+        bookLabel: word.bookLabel,
+        lessonId: word.lessonId,
+        definitionCn: word.definitionCn,
+        definitionEn: word.definitionEn,
+        slashedAt: new Date().toISOString(),
+        reason: reason || 'manual'
+      };
+      saveWW3000SlashedToStorage(slashed);
+    }
+
+    function slashCurrentWWCard() {
+      var word = ww3000State.cardWords[ww3000State.cardIndex];
+      if (!word) return;
+      slashWWWord(word, 'card');
+      ww3000State.cardWords.splice(ww3000State.cardIndex, 1);
+      if (ww3000State.cardIndex >= ww3000State.cardWords.length) ww3000State.cardIndex = Math.max(0, ww3000State.cardWords.length - 1);
+      renderWWCard();
+      renderWWOverview();
+    }
+
+    function normalizeWWAnswer(text) {
+      return String(text || '').toLowerCase()
+        .replace(/&/g, ' and ')
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function isWWAnswerCorrect(userInput, targetWord) {
+      var user = normalizeWWAnswer(userInput);
+      var target = normalizeWWAnswer(targetWord);
+      if (!user || !target) return false;
+      if (user === target) return true;
+      return wordSimilarity(user, target) >= 0.85;
+    }
+
+    function openWWTestHome() {
+      fillWWBookSelect('wwTestBook', ww3000State.testBookId);
+      ww3000State.testBookId = document.getElementById('wwTestBook').value;
+      fillWWLessonSelect('wwTestLesson', ww3000State.testBookId, ww3000State.testLessonId);
+      updateWWTestHint();
+      showScreen('screen-ww-test-home');
+    }
+
+    function updateWWTestHint() {
+      ww3000State.testBookId = document.getElementById('wwTestBook').value;
+      ww3000State.testLessonId = document.getElementById('wwTestLesson').value || 'all';
+      var includeSlashed = !document.getElementById('wwTestUnslashedOnly').checked;
+      var count = getWWPool(ww3000State.testBookId, ww3000State.testLessonId, includeSlashed).length;
+      document.getElementById('wwTestHint').textContent = getWWLabel(ww3000State.testBookId, ww3000State.testLessonId) + '：可测试 ' + count + ' 个词';
+      document.getElementById('btnStartWWTest').disabled = count === 0;
+    }
+
+    function startWWTest() {
+      var includeSlashed = !document.getElementById('wwTestUnslashedOnly').checked;
+      var pool = getWWPool(ww3000State.testBookId, ww3000State.testLessonId, includeSlashed);
+      if (!pool.length) { alert('该范围暂无可测试单词。'); return; }
+      var size = parseInt(document.getElementById('wwTestSize').value, 10) || 10;
+      size = Math.max(3, Math.min(size, pool.length));
+      ww3000State.questions = shuffleCopy(pool).slice(0, size);
+      ww3000State.answers = [];
+      ww3000State.currentIndex = 0;
+      ww3000State.lastCorrectIds = [];
+      ww3000State.testScopeLabel = getWWLabel(ww3000State.testBookId, ww3000State.testLessonId);
+      showScreen('screen-ww-quiz');
+      renderWWQuestion();
+    }
+
+    function renderWWQuestion() {
+      var q = ww3000State.questions[ww3000State.currentIndex];
+      if (!q) return;
+      var total = ww3000State.questions.length;
+      document.getElementById('wwQuizProgress').textContent = '第 ' + (ww3000State.currentIndex + 1) + ' / ' + total + ' 题';
+      document.getElementById('wwQuizScope').textContent = ww3000State.testScopeLabel;
+      document.getElementById('wwQuestionCn').textContent = q.definitionCn || '';
+      document.getElementById('wwQuestionEn').textContent = q.definitionEn || '';
+      var bar = '';
+      for (var i = 0; i < total; i++) {
+        var cls = i === ww3000State.currentIndex ? ' current' : '';
+        if (ww3000State.answers[i]) cls = ww3000State.answers[i].isCorrect ? ' correct' : ' wrong';
+        bar += '<span class="grammar-progress-dot' + cls + '"></span>';
+      }
+      document.getElementById('wwProgressBar').innerHTML = bar;
+      var ans = ww3000State.answers[ww3000State.currentIndex];
+      var input = document.getElementById('wwAnswerInput');
+      var feedback = document.getElementById('wwFeedback');
+      var exp = document.getElementById('wwExplanation');
+      input.value = ans ? ans.userAnswer : '';
+      input.disabled = !!ans;
+      input.classList.toggle('correct', !!ans && ans.isCorrect);
+      input.classList.toggle('wrong', !!ans && !ans.isCorrect);
+      feedback.style.display = ans ? 'inline-block' : 'none';
+      feedback.textContent = ans ? (ans.isCorrect ? '正确' : '错误') : '';
+      feedback.className = 'feedback ' + (ans && ans.isCorrect ? 'correct' : 'wrong');
+      exp.classList.toggle('show', !!ans);
+      var lessonName = (getWWLesson(q.lessonId) || {}).name || '';
+      exp.innerHTML = ans ? '正确答案：<strong>' + escapeHtml(q.word) + '</strong><br><span class="hint">' + escapeHtml(q.pos || '') + (q.phonetic ? ' · ' + escapeHtml(q.phonetic) : '') + ' · ' + escapeHtml((q.bookLabel || '') + (lessonName ? ' / ' + lessonName : '')) + '</span>' : '';
+      document.getElementById('btnWWQuizNext').textContent = ans ? (ww3000State.currentIndex === total - 1 ? '查看结果' : '下一题') : '提交';
+      if (!ans) setTimeout(function () { input.focus(); }, 0);
+    }
+
+    function submitWWAnswer() {
+      var q = ww3000State.questions[ww3000State.currentIndex];
+      if (!q || ww3000State.answers[ww3000State.currentIndex]) return;
+      var userAnswer = (document.getElementById('wwAnswerInput').value || '').trim();
+      if (!userAnswer) return;
+      var isCorrect = isWWAnswerCorrect(userAnswer, q.word);
+      ww3000State.answers[ww3000State.currentIndex] = {
+        userAnswer: userAnswer,
+        correctAnswer: q.word,
+        isCorrect: isCorrect
+      };
+      try {
+        var catId = 'ww:' + (q.lessonId || 'unknown');
+        var def = q.definitionCn || q.definitionEn || '';
+        recordWordResult(q.word, def, catId, isCorrect, isCorrect ? FSRS_GRADE.GOOD : FSRS_GRADE.AGAIN);
+      } catch (_) {}
+      renderWWQuestion();
+    }
+
+    function wwQuizNext() {
+      if (!ww3000State.answers[ww3000State.currentIndex]) {
+        submitWWAnswer();
+        return;
+      }
+      if (ww3000State.currentIndex < ww3000State.questions.length - 1) {
+        ww3000State.currentIndex++;
+        renderWWQuestion();
+      } else {
+        finishWWTest();
+      }
+    }
+
+    function finishWWTest() {
+      var total = ww3000State.questions.length;
+      var correct = ww3000State.answers.filter(function (a) { return a && a.isCorrect; }).length;
+      var score = Math.round(correct / Math.max(total, 1) * 100);
+      ww3000State.lastCorrectIds = ww3000State.questions.filter(function (_q, i) { return ww3000State.answers[i] && ww3000State.answers[i].isCorrect; }).map(function (q) { return q.id; });
+      document.getElementById('wwScoreNum').textContent = score + '%';
+      document.getElementById('wwCorrectCount').textContent = correct;
+      document.getElementById('wwWrongCount').textContent = total - correct;
+      document.getElementById('wwTotalCount').textContent = total;
+      var wrongHtml = ww3000State.questions.map(function (q, i) {
+        var a = ww3000State.answers[i] || {};
+        if (a.isCorrect) return '';
+        var lessonName = (getWWLesson(q.lessonId) || {}).name || '';
+        return '<div class="chem-term-card">' +
+          '<div class="chem-term-head"><div><div class="chem-term-title">' + escapeHtml(q.word) + '</div><div class="chem-phonetic">' + escapeHtml(q.pos || '') + (q.phonetic ? ' · ' + escapeHtml(q.phonetic) : '') + ' · ' + escapeHtml((q.bookLabel || '') + (lessonName ? ' / ' + lessonName : '')) + '</div></div><span class="chem-priority important">需复习</span></div>' +
+          '<div class="hint">你的答案：' + escapeHtml(a.userAnswer || '未作答') + '</div>' +
+          '<div class="chem-def-cn">' + escapeHtml(q.definitionCn || '') + '</div>' +
+          '<div class="chem-def-en">' + escapeHtml(q.definitionEn || '') + '</div>' +
+          '</div>';
+      }).join('');
+      document.getElementById('wwResultList').innerHTML = wrongHtml || '<div class="empty-state">全部正确，可以点击「斩掉本次答对词」。</div>';
+      saveWWTestResult(score, correct, total);
+      showScreen('screen-ww-result');
+    }
+
+    function saveWWTestResult(score, correct, total) {
+      var history = getWW3000HistoryFromStorage();
+      var item = {
+        id: 'ww_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        date: new Date().toISOString(),
+        user: _currentUser || '',
+        bookId: ww3000State.testBookId,
+        lessonId: ww3000State.testLessonId,
+        scopeLabel: ww3000State.testScopeLabel,
+        score: score,
+        totalCorrect: correct,
+        totalQuestions: total,
+        details: ww3000State.questions.map(function (q, i) {
+          var a = ww3000State.answers[i] || {};
+          return {
+            word: q.word,
+            userAnswer: a.userAnswer || '',
+            correctAnswer: q.word,
+            isCorrect: !!a.isCorrect,
+            definitionCn: q.definitionCn,
+            definitionEn: q.definitionEn,
+            bookLabel: q.bookLabel,
+            lessonId: q.lessonId
+          };
+        })
+      };
+      history.push(item);
+      saveWW3000HistoryToStorage(history);
+      renderWWOverview();
+    }
+
+    function slashWWCorrectWords() {
+      var byId = {};
+      getWWWords().forEach(function (w) { byId[w.id] = w; });
+      ww3000State.lastCorrectIds.forEach(function (id) {
+        if (byId[id]) slashWWWord(byId[id], 'test-correct');
+      });
+      renderWWOverview();
+      alert('已斩掉本次答对的 ' + ww3000State.lastCorrectIds.length + ' 个词。');
+    }
+
+    function openWWHistory() {
+      var history = getWW3000HistoryFromStorage().filter(function (h) { return h.user === (_currentUser || ''); });
+      var overview = document.getElementById('wwHistoryOverview');
+      var list = document.getElementById('wwHistoryList');
+      if (!history.length) {
+        overview.innerHTML = '<div class="empty-state">暂无 WW3000 测试记录</div>';
+        list.innerHTML = '';
+      } else {
+        var avg = Math.round(history.reduce(function (sum, h) { return sum + (h.score || 0); }, 0) / history.length);
+        overview.innerHTML = '<div class="chem-result-meta"><div class="chem-result-box"><div class="chem-result-value">' + history.length + '</div><div class="chem-result-label">次数</div></div><div class="chem-result-box"><div class="chem-result-value">' + avg + '%</div><div class="chem-result-label">平均</div></div><div class="chem-result-box"><div class="chem-result-value">' + Math.max.apply(null, history.map(function (h) { return h.score || 0; })) + '%</div><div class="chem-result-label">最高</div></div></div>';
+        list.innerHTML = history.slice().reverse().map(function (h) {
+          var date = new Date(h.date).toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+          var wrong = (h.details || []).filter(function (d) { return !d.isCorrect; }).map(function (d) { return d.word; }).slice(0, 6);
+          return '<div class="sentence-result-item"><span class="sri-num">' + (h.score || 0) + '%</span><span class="sri-word">' + escapeHtml(h.scopeLabel || 'WW3000') + '</span><span class="sri-score">' + (h.totalCorrect || 0) + '/' + (h.totalQuestions || 0) + '</span><div class="hint" style="flex-basis:100%;margin-left:2.4rem;">' + date + (wrong.length ? ' · 错词：' + escapeHtml(wrong.join(', ')) : ' · 全对') + '</div></div>';
+        }).join('');
+      }
+      showScreen('screen-ww-history');
+    }
+
+    function openWWSlashed() {
+      fillWWBookSelect('wwSlashedBook', ww3000State.slashedFilterBook, { allowAll: true });
+      renderWWSlashedList();
+      showScreen('screen-ww-slashed');
+    }
+
+    function renderWWSlashedList() {
+      ww3000State.slashedFilterBook = document.getElementById('wwSlashedBook').value || 'all';
+      var slashed = getWW3000SlashedFromStorage();
+      var items = Object.keys(slashed).map(function (id) { return slashed[id]; }).filter(function (item) {
+        return ww3000State.slashedFilterBook === 'all' || item.bookId === ww3000State.slashedFilterBook;
+      }).sort(function (a, b) { return String(b.slashedAt || '').localeCompare(String(a.slashedAt || '')); });
+      var list = document.getElementById('wwSlashedList');
+      if (!items.length) {
+        list.innerHTML = '<div class="empty-state">暂无已斩单词</div>';
+        return;
+      }
+      list.innerHTML = items.map(function (item) {
+        var date = item.slashedAt ? new Date(item.slashedAt).toLocaleDateString('zh-CN') : '';
+        var lessonName = (getWWLesson(item.lessonId) || {}).name || '';
+        return '<div class="chem-term-card">' +
+          '<div class="chem-term-head"><div><div class="chem-term-title">' + escapeHtml(item.word || '') + '</div><div class="chem-phonetic">' + escapeHtml((item.bookLabel || '') + (lessonName ? ' / ' + lessonName : '')) + '</div></div><button type="button" class="btn btn-secondary" data-ww-restore="' + escapeHtml(item.id) + '" style="margin:0;padding:0.25rem 0.55rem;font-size:0.75rem;">恢复</button></div>' +
+          '<div class="chem-def-cn">' + escapeHtml(item.definitionCn || '') + '</div>' +
+          '<div class="chem-def-en">' + escapeHtml(item.definitionEn || '') + '</div>' +
+          '<div class="chem-source">斩词时间：' + escapeHtml(date) + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    document.getElementById('btnOpenWW3000').addEventListener('click', openWW3000Home);
+    document.getElementById('btnWWBackHome').addEventListener('click', function () { showScreen('screen-home'); });
+    document.getElementById('wwOpenCards').addEventListener('click', openWWCards);
+    document.getElementById('wwOpenTest').addEventListener('click', openWWTestHome);
+    document.getElementById('wwOpenHistory').addEventListener('click', openWWHistory);
+    document.getElementById('wwOpenSlashed').addEventListener('click', openWWSlashed);
+    document.getElementById('btnWWCardsBack').addEventListener('click', openWW3000Home);
+    document.getElementById('btnWWTestBack').addEventListener('click', openWW3000Home);
+    document.getElementById('btnWWQuizBack').addEventListener('click', openWWTestHome);
+    document.getElementById('btnWWResultHome').addEventListener('click', openWW3000Home);
+    document.getElementById('btnWWResultBack').addEventListener('click', openWW3000Home);
+    document.getElementById('btnWWHistoryBack').addEventListener('click', openWW3000Home);
+    document.getElementById('btnWWSlashedBack').addEventListener('click', openWW3000Home);
+    document.getElementById('wwCardBook').addEventListener('change', function () {
+      ww3000State.cardBookId = this.value;
+      ww3000State.cardLessonId = 'all';
+      fillWWLessonSelect('wwCardLesson', ww3000State.cardBookId, ww3000State.cardLessonId);
+      renderWWCardDeck(true);
+    });
+    document.getElementById('wwCardLesson').addEventListener('change', function () { renderWWCardDeck(true); });
+    document.getElementById('wwHideSlashed').addEventListener('change', function () { renderWWCardDeck(true); });
+    document.getElementById('btnWWPrev').addEventListener('click', function () { moveWWCard(-1); });
+    document.getElementById('btnWWNext').addEventListener('click', function () { moveWWCard(1); });
+    document.getElementById('btnWWSpeak').addEventListener('click', function () {
+      var word = ww3000State.cardWords[ww3000State.cardIndex];
+      if (word) speakWord(word.word);
+    });
+    document.getElementById('btnWWSlash').addEventListener('click', slashCurrentWWCard);
+    document.getElementById('wwTestBook').addEventListener('change', function () {
+      ww3000State.testBookId = this.value;
+      ww3000State.testLessonId = 'all';
+      fillWWLessonSelect('wwTestLesson', ww3000State.testBookId, ww3000State.testLessonId);
+      updateWWTestHint();
+    });
+    document.getElementById('wwTestLesson').addEventListener('change', updateWWTestHint);
+    document.getElementById('wwTestUnslashedOnly').addEventListener('change', updateWWTestHint);
+    document.getElementById('wwTestSize').addEventListener('input', updateWWTestHint);
+    document.getElementById('btnStartWWTest').addEventListener('click', startWWTest);
+    document.getElementById('btnWWQuizNext').addEventListener('click', wwQuizNext);
+    document.getElementById('wwAnswerInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') wwQuizNext();
+    });
+    document.getElementById('btnWWSlashCorrect').addEventListener('click', slashWWCorrectWords);
+    document.getElementById('wwSlashedBook').addEventListener('change', renderWWSlashedList);
+    document.getElementById('wwSlashedList').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-ww-restore]');
+      if (!btn) return;
+      var slashed = getWW3000SlashedFromStorage();
+      delete slashed[btn.dataset.wwRestore];
+      saveWW3000SlashedToStorage(slashed);
+      renderWWSlashedList();
+      renderWWOverview();
     });
 
     // ═══════════════════════════════════════════════
